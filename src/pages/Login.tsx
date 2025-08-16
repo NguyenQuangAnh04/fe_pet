@@ -1,36 +1,45 @@
-import * as React from 'react';
+import * as React from "react";
 
 export default function Login() {
-    return (
-        <div className='bg-white px-10 py-20 rounded-3xl border-2 border-gray-200'>
-           <h1 className='text-4xl font-semibold'>Welcome to PetCare</h1>
-           <p className='font-medium text-lg text-center text-gray-500 mt-4'>Đăng nhập để tiếp tục!</p>
-           <div className='mt-8'>
-                <div>
-                    <label className='text-lg font-medium'>Tài khoản:</label>
-                    <input
-                        className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
-                        placeholder="Nhập tài khoản"
-                        title="Tài khoản"
-                    />
-                </div>
-                <div>
-                    <label className='text-lg font-medium'>Mật khẩu:</label>
-                    <input
-                        className='w-full border-2 border-gray-100 rounded-xl p-4 mt-1 bg-transparent'
-                        placeholder="Nhập mật khẩu"
-                        title="Mật khẩu"
-                    />
-                </div>
-                <div className='mt-8 flex justify-between items-center'>
-                        <div>
-                           <input type="checkbox" id="rememberpass" name="rememberpass" />
-                           <label className='ml-2 font-medium text-base' htmlFor="rememberpass">Nhớ mật khẩu</label>
-                        </div>
-                        <button className='font-medium text-base text-blue-600'>Quên mật khẩu?</button>
-                </div>
-                <button className='mt-6 w-full py-4 bg-blue-500 text-white rounded-xl font-semibold'>Đăng nhập</button>
-           </div>
+  return (
+    <div className="w-full">
+      <h2 className="text-xl font-bold text-amber-800">Đăng nhập để tiếp tục!</h2>
+      <h1 className="text-3xl font-extrabold mb-6">Welcome to PetCare</h1>
+
+      <form className="flex flex-col space-y-5">
+        <div>
+          <label className="block mb-2 text-gray-600">Tài khoản:</label>
+          <input
+            type="text"
+            placeholder="Nhập tài khoản"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200"
+          />
         </div>
-    );
+
+        <div>
+          <label className="block mb-2 text-gray-600">Mật khẩu:</label>
+          <input
+            type="password"
+            placeholder="Nhập mật khẩu"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200"
+          />
+        </div>
+
+        <a href="#" className="text-amber-950 text-sm text-right">
+          Quên mật khẩu?
+        </a>
+
+        <button
+          type="submit"
+          className="w-full bg-[#F4A259] text-white font-semibold py-2 rounded-lg hover:bg-[#DFAF4A] transition"
+        >
+          Đăng nhập
+        </button>
+
+        <p className="mt-6 text-center text-amber-950 text-sm text-gray-500">
+          <a href="#">Tạo tài khoản</a>
+        </p>
+      </form>
+    </div>
+  );
 }
