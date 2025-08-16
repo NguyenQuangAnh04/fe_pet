@@ -1,7 +1,19 @@
+import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import "./App.css";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
 
 function App() {
-  return <></>;
+  return (
+    <div>
+      <Routes>
+        <Route path="/register" element={<Register />}></Route>
+        <Route path="" element={<Home />}></Route>
+      </Routes>
+      <ToastContainer />
+    </div>
+  );
 }
 
 export default App;
