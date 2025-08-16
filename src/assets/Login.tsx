@@ -34,6 +34,7 @@ export default function Login() {
             placeholder="Nhập mật khẩu"
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200"
           />
+
         </div>
 
         <a href="#" className="text-amber-950 text-sm text-right">
