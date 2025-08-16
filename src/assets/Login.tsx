@@ -1,7 +1,19 @@
+import illustration from "/src/assets/ngunhubo.png";
 
 export default function Login() {
   return (
-    <div className="w-full">
+    <div className="flex w-full h-screen bg-[#f7c883] items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-lg flex w-[900px] max-w-5xl overflow-hidden">
+        <div className="w-1/2 bg-[#FDE3B7] flex items-center justify-center p-8">
+          <img
+            src={illustration}
+            alt="Login illustration"
+            className="w-72 h-72 object-contain"
+          />
+        </div>
+
+        <div className="w-1/2 flex items-center justify-center p-10">
+          <div className="w-full">
       <h2 className="text-xl font-bold text-amber-800">Đăng nhập để tiếp tục!</h2>
       <h1 className="text-3xl font-extrabold mb-6">Welcome to PetCare</h1>
 
@@ -39,6 +51,9 @@ export default function Login() {
           <a href="#">Tạo tài khoản</a>
         </p>
       </form>
+    </div>
+        </div>
+      </div>
     </div>
   );
 }
