@@ -59,10 +59,8 @@ const Register = () => {
     } else if (formData.password.length < 6) {
       newError.password = "Mật khẩu phải có ít nhất 6 ký tự";
     }
-
     setError(newError);
 
-    // Nếu có lỗi thì không submit
     if (Object.keys(newError).length > 0) return;
 
     mutation.mutate(formData);
@@ -70,18 +68,16 @@ const Register = () => {
 
   return (
     <div
-      className="flex items-center justify-center fixed inset-0 bg-black/30 px-4"
-      style={{
-        backgroundImage: `url("https://thuvienmeme.com/wp-content/uploads/2024/06/meme-meo-gio-ngon-tay-thoi-gao-thet.jpg")`,
-      }}
+      className="flex items-center justify-center fixed inset-0 bg-[#eed1a6] px-4"
+    
     >
       <div className="bg-white shadow-lg max-w-5xl w-full rounded overflow-hidden">
         <div className="flex flex-col md:flex-row w-full">
           <div className="w-3/5">
             <img
-              src="https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2F0JTIwYW5kJTIwZG9nfGVufDB8fDB8fHww&ixlib=rb-4.1.0&q=60&w=3000"
+              src="https://sdmntprwestus2.oaiusercontent.com/files/00000000-c938-61f8-884c-57229ec4f3d5/raw?se=2025-08-17T15%3A23%3A17Z&sp=r&sv=2024-08-04&sr=b&scid=ea5f1215-c3ba-5b8c-b436-299442cc00b8&skoid=0da8417a-a4c3-4a19-9b05-b82cee9d8868&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-08-17T12%3A03%3A38Z&ske=2025-08-18T12%3A03%3A38Z&sks=b&skv=2024-08-04&sig=A1qxq49WE5g1aVEtmnH%2BiXht6wlHhU%2BDtT4s1EOijQg%3D"
               alt=""
-              className="h-full w-full object-cover rounded-l"
+              className="h-full w-full object-center rounded-l"
             />
           </div>
           <form
@@ -224,7 +220,7 @@ const Register = () => {
             </div>
             <button
               type="submit"
-              className="px-4 py-2 bg-fuchsia-950 text-white  w-full  rounded cursor-pointer"
+              className="px-4 py-2 bg-[#f3ba64] text-white  w-full  rounded cursor-pointer"
             >
               Đăng ký tài khoản
             </button>
