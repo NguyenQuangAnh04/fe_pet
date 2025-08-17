@@ -69,12 +69,7 @@ const Register = () => {
   };
 
   return (
-    <div
-      className="flex items-center justify-center fixed inset-0 bg-black/30 px-4"
-      style={{
-        backgroundImage: `url("https://thuvienmeme.com/wp-content/uploads/2024/06/meme-meo-gio-ngon-tay-thoi-gao-thet.jpg")`,
-      }}
-    >
+    <div className="bg-[#f7c884] flex items-center justify-center fixed inset-0 px-4">
       <div className="bg-white shadow-lg max-w-5xl w-full rounded overflow-hidden">
         <div className="flex flex-col md:flex-row w-full">
           <div className="w-3/5">
