@@ -6,7 +6,7 @@ import logo from "../assets/logo.png";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
-
+  const [menuHeader, setMenuHeader] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -21,13 +21,13 @@ const Header = () => {
   return (
     <div
       className={`shadow-lg sticky top-0 left-0 z-50 transition duration-300 ${
-        scrolled ? "bg-white" : "bg-[#f7c883]"
+        scrolled ? "bg-white" : "bg-[#f5cb8d]"
       }`}
     >
       <div className="container mx-auto max-w-[1300px] w-full flex items-center justify-between">
         <div className="flex gap-7  items-center">
           <a href="">
-            <img src={logo} alt="" className="w-[100px]" />
+            <img src={logo} alt="" className="w-[70px]" />
           </a>
           <div className="relative">
             <input
@@ -43,7 +43,7 @@ const Header = () => {
           </div>
         </div>
         <div
-          className={`flex gap-4 text-sm sm:text-xl transition-colors duration-300 ${
+          className={`hidden sm:flex gap-4 text-sm sm:text-xl transition-colors duration-300 ${
             scrolled ? "text-black" : "text-white"
           }`}
         >
@@ -62,9 +62,27 @@ const Header = () => {
           <button>
             <FiShoppingCart size={25} />
           </button>
-          <button>
-            <FaUser size={25} />
-          </button>
+
+          <div className="relative mt-2">
+            <button onClick={() => setMenuHeader(!menuHeader)}>
+              <FaUser size={25} />
+            </button>
+            {/* {menuHeader && (
+              <div className="absolute bg-white px-2 py-1 top-8 -right-3 w-[100px] rounded shadow-lg">
+                <div className="flex justify-end pr-2 -mt-4">
+                  <FaCaretUp className="text-white" />
+                </div>
+                <ul>
+                  <li className="text-sm">
+                    <a href="">Profile</a>
+                  </li>
+                  <li className="text-sm">
+                    <a href="">Đăng xuất</a>
+                  </li>
+                </ul>
+              </div>
+            )} */}
+          </div>
         </div>
       </div>
     </div>

@@ -69,7 +69,9 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-[#f7c884] flex items-center justify-center fixed inset-0 px-4">
+    <div
+      className="bg-[#f7c884] flex items-center justify-center fixed inset-0 px-4"
+    >
       <div className="bg-white shadow-lg max-w-5xl w-full rounded overflow-hidden">
         <div className="flex flex-col md:flex-row w-full">
           <div className="w-3/5">
