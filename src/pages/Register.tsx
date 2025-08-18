@@ -86,7 +86,7 @@ const Register = () => {
           <img
             src={hiddenAnimal2}
             alt="Hidden animal"
-            className={`absolute bottom-[-15px] left-[-125px] w-[300px] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
+            className={`absolute bottom-[-15px] left-[-160px] w-[400px] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
               showPassword || showComfirmPassword ? "translate-x-0" : "translate-x-[110px]"
             }`}
           />

@@ -19,7 +19,7 @@ export default function Login() {
           <img
             src={hiddenAnimal2}
             alt="Hidden animal"
-            className={`absolute bottom-[-15px] left-[-90px] w-[300%] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
+            className={`absolute bottom-[-15px] left-[-90px] w-[360px] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
               showPassword ? "translate-x-0" : "translate-x-[110px]"
             }`}
           />
