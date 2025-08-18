@@ -5,3 +5,7 @@ export interface userRegister {
   password: string;
   confirmPassword: string;
 }
+export interface userLogin{
+  userName: string;
+  password: string;
+}

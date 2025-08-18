@@ -20,10 +20,10 @@ const ProductCard: React.FC<ProductCard> = ({
     }
     return () => document.body.classList.remove("overflow-hidden");
   }, [isOpen]);
-  if (!isOpen) return null;
   const sizes = ["400g", "1kg", "2kg", "3kg"];
   const [selectSize, setSelectSize] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 mt-16 shadow">

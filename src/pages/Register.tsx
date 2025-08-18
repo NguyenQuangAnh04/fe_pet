@@ -32,6 +32,7 @@ const Register = () => {
     },
     onSuccess: () => {
       toast.success("Đăng ký thành công!");
+      window.localStorage.href = "/login"
     },
   });
   const handleSubmit = (e: React.FormEvent) => {

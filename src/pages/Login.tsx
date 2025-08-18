@@ -1,16 +1,38 @@
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import illustration from "/src/assets/cho1.png";
+import { toast } from "react-toastify";
+import { login } from "../api/authService";
+import type { userLogin } from "../types/user";
 import hiddenAnimal from "/src/assets/cat2.png";
+import illustration from "/src/assets/cho1.png";
 import hiddenAnimal2 from "/src/assets/ngunhubo.png";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-
   const togglePassword = () => {
     setShowPassword((prev) => !prev);
   };
-
+  const [formData, setFormData] = useState<userLogin>({
+    userName: "",
+    password: "",
+  });
+  const handleChangeInput = (field: keyof userLogin, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+  const mutation = useMutation({
+    mutationFn: async (formData: userLogin) => {
+      const res = await login(formData);
+      localStorage.setItem("accessToken", res.data.data.accessToken);
+    },
+    onSuccess: () => {
+      toast.success("Đăng nhập thành công");
+    },
+  });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutation.mutate(formData);
+  };
   return (
     <div className="flex w-full h-screen bg-[#f7c884] items-center justify-center relative">
       <div className="flex flex-row-reverse w-[2500px] max-w-5xl relative">
@@ -49,13 +71,20 @@ export default function Login() {
               <h2 className="text-xl font-bold text-amber-800">
                 Đăng nhập để tiếp tục!
               </h2>
-              <h1 className="text-3xl font-extrabold mb-6">Welcome to PetShop</h1>
+              <h1 className="text-3xl font-extrabold mb-6">
+                Welcome to PetShop
+              </h1>
 
-              <form className="flex flex-col space-y-5">
+              <form className="flex flex-col space-y-5" onSubmit={handleSubmit}>
                 <div>
                   <label className="block mb-2 text-gray-600">Tài khoản:</label>
                   <input
                     type="text"
+                    value={formData?.userName}
+                    name="userName"
+                    onChange={(e) =>
+                      handleChangeInput("userName", e.target.value)
+                    }
                     placeholder="Nhập tài khoản"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200"
                   />
@@ -67,6 +96,10 @@ export default function Login() {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="Nhập mật khẩu"
+                      value={formData?.password}
+                      onChange={(e) =>
+                        handleChangeInput("password", e.target.value)
+                      }
                       className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200"
                     />
                     <span
@@ -90,7 +123,7 @@ export default function Login() {
                 </button>
 
                 <p className="mt-6 text-center text-amber-950 text-sm">
-                  <a href="#">Tạo tài khoản</a>
+                  <a href="/register">Tạo tài khoản</a>
                 </p>
               </form>
             </div>
