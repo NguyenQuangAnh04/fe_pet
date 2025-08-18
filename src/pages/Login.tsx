@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import illustration from "/src/assets/cho1.png";
+import illustration from "/src/assets/posterlogin.png";
 import hiddenAnimal from "/src/assets/cat2.png";
 import hiddenAnimal2 from "/src/assets/ngunhubo.png";
 
@@ -19,7 +19,7 @@ export default function Login() {
           <img
             src={hiddenAnimal2}
             alt="Hidden animal"
-            className={`absolute bottom-[-15px] left-[-90px] w-[360px] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
+            className={`absolute bottom-[-15px] left-[-90px] w-[300%] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
               showPassword ? "translate-x-0" : "translate-x-[110px]"
             }`}
           />
@@ -28,11 +28,11 @@ export default function Login() {
         {/* Khối form */}
         <div className="bg-white rounded-2xl shadow-lg flex flex-row-reverse w-[900px] max-w-5xl overflow-hidden relative z-10">
           {/* Ảnh chính bên phải */}
-          <div className="w-1/2 bg-[#FDE3B7] flex items-center justify-end p-0">
+          <div className="w-1/2 bg-[#FDE3B7] flex flex-row-reverse items-center justify-end p-0">
             <img
               src={illustration}
               alt="Login illustration"
-              className="w-[90%] h-auto object-contain"
+              className="w-[100%] h-auto object-contain"
             />
           </div>
 
