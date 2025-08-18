@@ -101,8 +101,7 @@ export default function ProductDetails() {
                   onClick={() => setQuantity((prev) => prev + 1)}
                   className="px-4 py-2 text-gray-600 hover:text-orange-600 transition-colors"
                 >
-                  +
-                </button>
+                  +</button>
               </div>
             </div>
           </div>
@@ -129,7 +128,7 @@ export default function ProductDetails() {
 
           {/* Thông tin bổ sung */}
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 space-y-2">
-            <h3 className="font-semibold text-blue-900">🎯 Đặc điểm nổi bật:</h3>
+            <h3 className="font-semibold text-blue-900">Đặc điểm nổi bật:</h3>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Dành riêng cho mèo trưởng thành nuôi trong nhà</li>
               <li>• Giảm mùi phân nhờ công thức đặc biệt</li>
