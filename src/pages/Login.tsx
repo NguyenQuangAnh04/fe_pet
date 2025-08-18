@@ -41,7 +41,7 @@ export default function Login() {
           <img
             src={hiddenAnimal2}
             alt="Hidden animal"
-            className={`absolute bottom-[-20px] left-[-50px] w-[360px] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
+            className={`absolute bottom-[-15px] left-[-90px] w-[360px] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
               showPassword ? "translate-x-0" : "translate-x-[110px]"
             }`}
           />
@@ -68,14 +68,19 @@ export default function Login() {
           {/* Form */}
           <div className="w-1/2 flex items-center justify-center p-10">
             <div className="w-full">
-              <h2 className="text-xl font-bold text-amber-800">
+              <h1 className="text-3xl text-center font-extrabold p-1">Welcome to PetShop</h1>
+              <h2 className="font-bold text-center text-amber-800 mb-6">
                 Đăng nhập để tiếp tục!
               </h2>
+<<<<<<< HEAD
               <h1 className="text-3xl font-extrabold mb-6">
                 Welcome to PetShop
               </h1>
 
               <form className="flex flex-col space-y-5" onSubmit={handleSubmit}>
+=======
+              <form className="flex flex-col space-y-5">
+>>>>>>> 0ff791097a8da9ea23f683552f42c897f64ca202
                 <div>
                   <label className="block mb-2 text-gray-600">Tài khoản:</label>
                   <input
