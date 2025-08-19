@@ -11,7 +11,15 @@ export interface ProductDTO2 {
   namePro: string;
   price: number;
   description: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string | Date ;
+  updatedAt?:  string | Date ;
   imageUrl: string;
+  imagesDTO: ImagesDTO[];
+}
+
+interface ImagesDTO {
+  id: number;
+  imageUrl: string;
+  publicId: string;
+  size: number;
 }

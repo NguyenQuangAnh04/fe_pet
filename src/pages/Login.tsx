@@ -7,6 +7,7 @@ import type { userLogin } from "../types/user";
 import hiddenAnimal from "/src/assets/cat2.png";
 import illustration from "/src/assets/cho1.png";
 import hiddenAnimal2 from "/src/assets/ngunhubo.png";
+import { Navigate } from "react-router-dom";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +24,8 @@ export default function Login() {
   const mutation = useMutation({
     mutationFn: async (formData: userLogin) => {
       const res = await login(formData);
-      localStorage.setItem("accessToken", res.data.data.accessToken);
+      localStorage.setItem("accessToken", res.data.data.token);
+      window.location.href = "/";
     },
     onSuccess: () => {
       toast.success("Đăng nhập thành công");
@@ -34,7 +36,7 @@ export default function Login() {
     mutation.mutate(formData);
   };
   return (
-    <div className="flex w-full h-screen bg-[#f7c884] items-center justify-center relative">
+    <div className="flex w-full h-screen bg-[#f7c884] items-center justify-center relative ">
       <div className="flex flex-row-reverse w-[2500px] max-w-5xl relative">
         {/* Ảnh núp ngoài form */}
         <div>
@@ -68,19 +70,17 @@ export default function Login() {
           {/* Form */}
           <div className="w-1/2 flex items-center justify-center p-10">
             <div className="w-full">
-              <h1 className="text-3xl text-center font-extrabold p-1">Welcome to PetShop</h1>
+              <h1 className="text-3xl text-center font-extrabold p-1">
+                Welcome to PetShop
+              </h1>
               <h2 className="font-bold text-center text-amber-800 mb-6">
                 Đăng nhập để tiếp tục!
               </h2>
-<<<<<<< HEAD
               <h1 className="text-3xl font-extrabold mb-6">
                 Welcome to PetShop
               </h1>
 
               <form className="flex flex-col space-y-5" onSubmit={handleSubmit}>
-=======
-              <form className="flex flex-col space-y-5">
->>>>>>> 0ff791097a8da9ea23f683552f42c897f64ca202
                 <div>
                   <label className="block mb-2 text-gray-600">Tài khoản:</label>
                   <input

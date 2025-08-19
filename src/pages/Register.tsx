@@ -71,7 +71,7 @@ const Register = () => {
 
   return (
     <div
-      className="bg-[#f7c884] flex items-center justify-center fixed inset-0 px-4"
+      className="bg-[#f7c884] flex items-center justify-center fixed inset-0 px-4 overflow-hidden"
     >
       <div className="bg-white shadow-lg max-w-5xl w-full rounded overflow-hidden">
         <div className="flex flex-col md:flex-row w-full">
@@ -85,7 +85,7 @@ const Register = () => {
           <form
             action=""
             onSubmit={handleSubmit}
-            className="md:w-2/5 p-3 space-y-5"
+            className="md:w-2/5 p-3 space-y-7"
           >
             <h2 className="text-center font-semibold text-xl">
               Đăng ký tài khoản
