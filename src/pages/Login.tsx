@@ -37,8 +37,6 @@ export default function Login() {
     onSuccess: () => {
       toast.success("Đăng nhập thành công!");
       window.location.href = "/";
-
-      // Redirect to dashboard or home page
     },
   });
 
