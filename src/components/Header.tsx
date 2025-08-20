@@ -26,7 +26,7 @@ const Header = () => {
     >
       <div className="container mx-auto max-w-[1300px] w-full flex items-center justify-between">
         <div className="flex gap-7  items-center">
-          <a href="">
+          <a href="/home">
             <img src={logo} alt="" className="w-[70px]" />
           </a>
           <div className="relative">
