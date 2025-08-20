@@ -7,6 +7,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetails from "./pages/ProductDetails";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import PrivateRoute from "./routes/PrivateRoute";
 import Category from "./components/dashboard/Category";
 
@@ -17,7 +19,9 @@ function App() {
         {/* Routes public */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/product-details/:id" element={<ProductDetails />} />
 
         <Route element={<PrivateRoute />}>
