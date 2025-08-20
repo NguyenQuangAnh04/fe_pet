@@ -60,12 +60,12 @@ const Header = () => {
 
         <div className="flex gap-4 text-xl">
           <button>
-            <FiShoppingCart size={25} />
+            <a href="/cart"><FiShoppingCart size={25} /></a>
           </button>
 
           <div className="relative mt-2">
             <button onClick={() => setMenuHeader(!menuHeader)}>
-              <FaUser size={25} />
+              <a href="/account"><FaUser size={25} /></a>
             </button>
             {/* {menuHeader && (
               <div className="absolute bg-white px-2 py-1 top-8 -right-3 w-[100px] rounded shadow-lg">

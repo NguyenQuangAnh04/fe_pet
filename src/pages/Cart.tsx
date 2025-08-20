@@ -187,10 +187,10 @@ export default function Cart() {
 
                 <div className="space-y-3">
                   <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg">
-                    Tiến hành thanh toán
+                    <a href="/checkout">Tiến hành thanh toán</a>
                   </button>
                   <button className="w-full bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg border border-gray-300 transition-colors duration-200">
-                    Tiếp tục mua sắm
+                    <a href="/home">Tiếp tục mua sắm</a>
                   </button>
                 </div>
               </div>

@@ -294,7 +294,7 @@ export default function Checkout() {
                                   <div>🏦 <strong>Ngân hàng:</strong> MBBank</div>
                                   <div>📋 <strong>Số tài khoản:</strong> 032759761</div>
                                   <div>👤 <strong>Chủ tài khoản:</strong> Nguyen Duc Dung</div>
-                                  <div>💬 <strong>Nội dung:</strong> Mã đơn hàng + [Số điện thoại]</div>
+                                  <div>💬 <strong>Nội dung:</strong> Mã đơn h + [Số điện thoại]</div>
                                 </div>
                               )}
                               
