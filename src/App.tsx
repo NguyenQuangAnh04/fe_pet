@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProductDetails from "./pages/ProductDetails";
 import PrivateRoute from "./routes/PrivateRoute";
+import Category from "./components/dashboard/Category";
 
 function App() {
   return (
@@ -16,12 +17,13 @@ function App() {
         {/* Routes public */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/product-details/:id" element={<ProductDetails />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/product-details/:id" element={<ProductDetails />} />
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="products" element={<Product />} />
+            <Route path="categories" element={<Category />} />
           </Route>
         </Route>
       </Routes>
