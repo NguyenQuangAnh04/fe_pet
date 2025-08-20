@@ -160,7 +160,7 @@ const ProductSuggestions: React.FC<ProductSuggestionsProps> = ({
       {/* View All Button */}
       <div className="text-center mt-8">
         <button className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
-          Xem thêm sản phẩm
+          <a href="/home">Xem thêm sản phẩm</a>
         </button>
       </div>
     </div>

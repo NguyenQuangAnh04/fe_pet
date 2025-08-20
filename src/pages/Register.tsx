@@ -234,7 +234,7 @@ const Register = () => {
                 </button>
 
                 <p className="mt-3 text-center text-amber-950 text-xs">
-                  Đã có tài khoản? <a href="#" className="underline hover:text-amber-700 transition-colors">Đăng nhập</a>
+                  Đã có tài khoản? <a href="./Login" className="underline hover:text-amber-700 transition-colors">Đăng nhập</a>
                 </p>
               </form>
             </div>

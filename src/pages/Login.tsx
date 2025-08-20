@@ -179,7 +179,7 @@ export default function Login() {
                 <p className="mt-3 text-center text-amber-950 text-xs">
                   Chưa có tài khoản?{" "}
                   <a
-                    href="#"
+                    href="./Register"
                     className="underline hover:text-amber-700 transition-colors"
                   >
                     Đăng ký

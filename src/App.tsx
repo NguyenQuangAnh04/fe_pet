@@ -17,7 +17,7 @@ function App() {
         {/* Routes public */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/product-details/:id" element={<ProductDetails />} />
 
         <Route element={<PrivateRoute />}>
