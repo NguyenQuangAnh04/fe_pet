@@ -22,19 +22,22 @@ export default function Login() {
   const [error, setError] = useState<FormErrors>({});
 
   const handleChangeInput = (field: keyof userLogin, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const mutation = useMutation({
     mutationFn: async (formData: userLogin) => {
       const response = await login(formData);
-      return response.data;
+      console.log(response.data);
+      localStorage.setItem("accessToken", response.data.data.token);
     },
     onSuccess: () => {
       toast.success("Đăng nhập thành công!");
+      window.location.href = "/";
+
       // Redirect to dashboard or home page
     },
   });
@@ -106,28 +109,38 @@ export default function Login() {
               </div>
               <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
                 <div>
-                  <label className="block mb-1 text-sm text-gray-600">Tài khoản:</label>
+                  <label className="block mb-1 text-sm text-gray-600">
+                    Tài khoản:
+                  </label>
                   <input
                     type="text"
                     name="userName"
                     value={formData.userName}
-                    onChange={(e) => handleChangeInput("userName", e.target.value)}
+                    onChange={(e) =>
+                      handleChangeInput("userName", e.target.value)
+                    }
                     placeholder="Nhập tài khoản"
                     className="w-full px-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all"
                   />
                   {error.userNameOrEmail && (
-                    <p className="text-red-500 text-xs mt-1">{error.userNameOrEmail}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {error.userNameOrEmail}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm text-gray-600">Mật khẩu:</label>
+                  <label className="block mb-1 text-sm text-gray-600">
+                    Mật khẩu:
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
-                      onChange={(e) => handleChangeInput("password", e.target.value)}
+                      onChange={(e) =>
+                        handleChangeInput("password", e.target.value)
+                      }
                       placeholder="Nhập mật khẩu"
                       className="w-full px-3 py-2.5 pr-10 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all"
                     />
@@ -136,15 +149,24 @@ export default function Login() {
                       className="absolute top-3 right-3 text-gray-500 cursor-pointer hover:text-gray-700 transition-colors"
                       title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                     >
-                      {showPassword ? <AiFillEyeInvisible size={18} /> : <AiFillEye size={18} />}
+                      {showPassword ? (
+                        <AiFillEyeInvisible size={18} />
+                      ) : (
+                        <AiFillEye size={18} />
+                      )}
                     </span>
                   </div>
                   {error.password && (
-                    <p className="text-red-500 text-xs mt-1">{error.password}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {error.password}
+                    </p>
                   )}
                 </div>
 
-                <a href="#" className="text-amber-950 text-xs text-right hover:underline pt-2">
+                <a
+                  href="#"
+                  className="text-amber-950 text-xs text-right hover:underline pt-2"
+                >
                   Quên mật khẩu?
                 </a>
 
@@ -157,7 +179,13 @@ export default function Login() {
                 </button>
 
                 <p className="mt-3 text-center text-amber-950 text-xs">
-                  Chưa có tài khoản? <a href="#" className="underline hover:text-amber-700 transition-colors">Đăng ký</a>
+                  Chưa có tài khoản?{" "}
+                  <a
+                    href="#"
+                    className="underline hover:text-amber-700 transition-colors"
+                  >
+                    Đăng ký
+                  </a>
                 </p>
               </form>
             </div>
