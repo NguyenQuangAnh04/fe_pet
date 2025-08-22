@@ -26,7 +26,7 @@ const Header = () => {
     >
       <div className="container mx-auto max-w-[1300px] w-full flex items-center justify-between">
         <div className="flex gap-7  items-center">
-          <a href="">
+          <a href="/home">
             <img src={logo} alt="" className="w-[70px]" />
           </a>
           <div className="relative">
@@ -50,7 +50,7 @@ const Header = () => {
           <a className="link" href="">
             SẢN PHẨM
           </a>
-          <a href="" className="link">
+          <a href="/services" className="link">
             DỊCH VỤ
           </a>
           <a href="" className="link">
@@ -60,12 +60,12 @@ const Header = () => {
 
         <div className="flex gap-4 text-xl">
           <button>
-            <FiShoppingCart size={25} />
+            <a href="/cart"><FiShoppingCart size={25} /></a>
           </button>
 
           <div className="relative mt-2">
             <button onClick={() => setMenuHeader(!menuHeader)}>
-              <FaUser size={25} />
+              <a href="/account"><FaUser size={25} /></a>
             </button>
             {/* {menuHeader && (
               <div className="absolute bg-white px-2 py-1 top-8 -right-3 w-[100px] rounded shadow-lg">
