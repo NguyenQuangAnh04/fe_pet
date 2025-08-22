@@ -7,15 +7,23 @@ import {
 } from "../../api/productService";
 import type { ProductDTO2 } from "./../../types/product.d";
 import { toast } from "react-toastify";
-export function useQueryProduct() {
-  const { data } = useQuery<ProductDTO2[]>({
-    queryKey: ["product"],
+type ProductResponse = {
+  totalPages: number;
+  content: ProductDTO2[];
+};
+type UseQueryProductProps = {
+  name?: string;
+  page?: number;
+};
+export function useQueryProduct({ page = 0, name = "" }: UseQueryProductProps) {
+  return useQuery<ProductResponse>({
+    queryKey: ["product", page, name],
     queryFn: async () => {
-      const res = await findAllProduct();
-      return res.data.data.content ?? [];
+      const res = await findAllProduct(page, name);
+      const data = res.data.data;
+      return { content: data.content, totalPages: data.totalPages };
     },
   });
-  return { data };
 }
 type AddProductParams = {
   cateId: number;

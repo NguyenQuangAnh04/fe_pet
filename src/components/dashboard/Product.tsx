@@ -7,13 +7,16 @@ import {
 } from "../../hook/product/useProduct";
 import ModalProduct from "./ModalProduct";
 import type { ProductDTO2 } from "../../types/product";
-export type ProductResponse = {
-  
-}
+import { formatPrice } from "../../utils/format";
+import ModalViewProduct from "./ModalViewProduct";
+export type ProductResponse = {};
 const Product = () => {
-  const { data } = useQueryProduct();
+  const [page, setPage] = useState(0);
+  const [name, setName] = useState<string>("");
+  const { data } = useQueryProduct({ page, name });
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setEditShowModal] = useState(false);
+  const [showModalViewProduct, setModalShowProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO2>();
   const { mutateAsync: mutateDeleteProduct } = useDeleteProduct();
   const handleDelete = (id: number) => {
@@ -32,17 +35,19 @@ const Product = () => {
         </button>
       </div>
       <div className="mt-5">
-        <p>Nhập từ khóa tìm kiếm</p>
+        <p>Tìm kiếm</p>
         <input
           type="text"
           name=""
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           id=""
-          className="border border-gray-400 rounded  px-3 py-1 "
+          className="border border-gray-300 rounded  px-3 py-1 "
           placeholder="Nhập từ khóa tìm kiếm"
         />
       </div>
       <table className="w-full mt-5 shadow rounded">
-        <thead className=" border-b">
+        <thead className="bg-gray-5  border-b border-gray-200">
           <tr>
             <th className="px-4 py-2 text-left">ID</th>
             <th className="px-4 py-2 text-left">Tên sản phẩm</th>
@@ -54,14 +59,14 @@ const Product = () => {
           </tr>
         </thead>
         <tbody>
-          {data?.map((item) => (
+          {data?.content.map((item) => (
             <tr>
               <td className="px-4 py-2">{item.id}</td>
               <td className="px-4 py-2">{item.namePro}</td>
               <td className="px-4 py-2">
                 <img src={item.imageUrl} alt="" className="w-10 h-10" />
               </td>
-              <td className="px-4 py-2">{item.price}</td>
+              <td className="px-4 py-2">{formatPrice(item.price)}</td>
 
               <td className="px-4 py-2">
                 {item.createdAt
@@ -76,7 +81,10 @@ const Product = () => {
 
               <td className="px-4 py-2">
                 <div className="flex gap-2">
-                  <button className="text-yellow-500">
+                  <button
+                    className="text-yellow-500"
+                    onClick={() => {setModalShowProduct(true); setSelectedProduct(item)}}
+                  >
                     <BsEye size={18} />
                   </button>
                   <button
@@ -88,7 +96,10 @@ const Product = () => {
                   >
                     <BiEdit size={18} />
                   </button>
-                  <button className="text-red-500" onClick={() => handleDelete(item.id)}>
+                  <button
+                    className="text-red-500"
+                    onClick={() => handleDelete(item.id)}
+                  >
                     <BiTrash size={18} />
                   </button>
                 </div>
@@ -113,6 +124,53 @@ const Product = () => {
           onClose={() => setEditShowModal(false)}
         />
       )}
+      {showModalViewProduct && selectedProduct && (
+        <ModalViewProduct
+          onClose={() => setModalShowProduct(false)}
+          initialData={selectedProduct}
+        />
+      )}
+      <div className="flex justify-end mt-4">
+        {data && data.content.length > 0 && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+              disabled={page === 0}
+              className={`w-[30px] h-[30px] rounded border ${
+                page === 0
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-400 text-white"
+              }`}
+            >
+              &lt;
+            </button>
+            {Array.from({ length: data?.totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`shadow w-[30px] h-[30px] text-black rounded ${
+                  page === i ? "bg-blue-400 text-white" : ""
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() =>
+                setPage((prev) => Math.min(prev + 1, data.totalPages - 1))
+              }
+              disabled={page === data.totalPages - 1}
+              className={` rounded border w-[30px] h-[30px] ${
+                page === data.totalPages - 1
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-400 text-white"
+              }`}
+            >
+              &gt;
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

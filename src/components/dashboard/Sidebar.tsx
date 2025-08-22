@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <div className="min-h-screen bg-blue-950 w-[250px]">
+    <div className=" min-h-screen h-full bg-blue-950 w-[250px]">
       <div className="mt-10">
         <a
           href="/"
@@ -22,7 +22,8 @@ const Sidebar = () => {
           ADMIN
         </a>
       </div>
-      <nav className="flex flex-col mt-10 text-white">
+     <div className="flex justify-between flex-col gap-5">
+       <nav className="flex flex-col mt-10 text-white">
         <Link
           to="/dashboard"
           className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
@@ -41,12 +42,7 @@ const Sidebar = () => {
         >
           <FaListAlt /> Danh mục
         </Link>
-        <Link
-          to="/dashboard/brands"
-          className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
-        >
-          <FaTags /> Thương hiệu
-        </Link>
+        
         <Link
           to="/dashboard/customers"
           className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
@@ -72,7 +68,7 @@ const Sidebar = () => {
           <FaCalendarCheck /> Quản lý lịch khám
         </Link>
       </nav>
-      <div className="fixed bottom-4 left-0 right-0 px-6 text-white mb-2">
+      <div className=" px-6 text-white mb-2">
         <Link
           to="/logout"
           className="text-white text-sm flex items-center gap-2"
@@ -80,6 +76,7 @@ const Sidebar = () => {
           <FaSignOutAlt /> Đăng xuất
         </Link>
       </div>
+     </div>
     </div>
   );
 };

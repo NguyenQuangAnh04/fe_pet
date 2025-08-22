@@ -7,7 +7,7 @@ const Dashboard = () => {
     <div className="flex ">
       <Sidebar />
       <div className="flex-1 h-screen flex flex-col">
-        <TopBar/>
+        {/* <TopBar/> */}
         <Outlet />
       </div>
     </div>
