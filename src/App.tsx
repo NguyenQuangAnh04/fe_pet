@@ -13,6 +13,7 @@ import Checkout from "./pages/Checkout";
 import PrivateRoute from "./routes/PrivateRoute";
 import Category from "./components/dashboard/Category";
 import Services from "./pages/Services";
+import User from "./components/dashboard/User";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/services" element={<Services />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/account" element={<Account />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/product-details/:id" element={<ProductDetails />} />
@@ -32,6 +33,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="products" element={<Product />} />
             <Route path="categories" element={<Category />} />
+            <Route path="account" element={<User />} />
           </Route>
         </Route>
       </Routes>
