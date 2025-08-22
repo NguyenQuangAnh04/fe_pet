@@ -26,7 +26,7 @@ const Header = () => {
     >
       <div className="container mx-auto max-w-[1300px] w-full flex items-center justify-between">
         <div className="flex gap-7  items-center">
-          <a href="/home">
+          <a href="/">
             <img src={logo} alt="" className="w-[70px]" />
           </a>
           <div className="relative">
@@ -60,12 +60,16 @@ const Header = () => {
 
         <div className="flex gap-4 text-xl">
           <button>
-            <a href="/cart"><FiShoppingCart size={25} /></a>
+            <a href="/cart">
+              <FiShoppingCart size={25} />
+            </a>
           </button>
 
           <div className="relative mt-2">
             <button onClick={() => setMenuHeader(!menuHeader)}>
-              <a href="/account"><FaUser size={25} /></a>
+              <a href="/account">
+                <FaUser size={25} />
+              </a>
             </button>
             {/* {menuHeader && (
               <div className="absolute bg-white px-2 py-1 top-8 -right-3 w-[100px] rounded shadow-lg">
