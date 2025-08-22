@@ -1,8 +1,8 @@
 import type { ProductDTO2 } from "../types/product";
 import api from "./axiosClient";
 
-const findAllProduct = () => {
-  return api.get("/product");
+const findAllProduct = (page: number, name?: string) => {
+  return api.get("/product", {params: {page, name}});
 };
 const addProduct = async (
   cateId: number,

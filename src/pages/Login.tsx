@@ -7,6 +7,7 @@ import type { userLogin } from "../types/user";
 import illustration from "/src/assets/posterlogin.png";
 import hiddenAnimal from "/src/assets/cat2.png";
 import hiddenAnimal2 from "/src/assets/ngunhubo.png";
+import { useAuth } from "../context/AuthContext";
 
 type FormErrors = {
   userNameOrEmail?: string;
@@ -20,7 +21,7 @@ export default function Login() {
     password: "",
   });
   const [error, setError] = useState<FormErrors>({});
-
+  const { setAccessToken, setRole } = useAuth();
   const handleChangeInput = (field: keyof userLogin, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -31,8 +32,9 @@ export default function Login() {
   const mutation = useMutation({
     mutationFn: async (formData: userLogin) => {
       const response = await login(formData);
-      console.log(response.data);
-      localStorage.setItem("accessToken", response.data.data.token);
+      setAccessToken(response.data.data.token);
+      setRole(response.data.data.nameRole);
+      console.log(response.data.data.nameRole);
     },
     onSuccess: () => {
       toast.success("Đăng nhập thành công!");
