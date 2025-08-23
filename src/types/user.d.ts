@@ -23,8 +23,8 @@ export interface userDTO {
 }
 
 export interface UpdateUserParams {
-  id: number;               
-  userUpdateRole: userUpdateRole; 
+  id: number;
+  userUpdateRole: userUpdateRole;
 }
 
 export interface userUpdateRole {
@@ -34,7 +34,7 @@ export interface userUpdateRole {
 }
 
 
-export interface Role{
+export interface Role {
   id: number;
   name: string;
 }
