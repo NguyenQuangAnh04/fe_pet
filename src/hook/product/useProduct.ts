@@ -5,11 +5,11 @@ import {
   findAllProduct,
   updateProduct,
 } from "../../api/productService";
-import type { ProductDTO2 } from "./../../types/product.d";
+import type { ProductDTO } from "./../../types/product.d";
 import { toast } from "react-toastify";
 type ProductResponse = {
   totalPages: number;
-  content: ProductDTO2[];
+  content: ProductDTO[];
 };
 type UseQueryProductProps = {
   name?: string;
@@ -27,7 +27,7 @@ export function useQueryProduct({ page = 0, name = "" }: UseQueryProductProps) {
 }
 type AddProductParams = {
   cateId: number;
-  productDTO: ProductDTO2;
+  productDTO: ProductDTO;
   images: File[];
 };
 export function useAddProduct() {
@@ -74,6 +74,16 @@ export function useDeleteProduct() {
     onError: (err) => {
       toast.error(err.message);
       console.error(err.message);
+    },
+  });
+}
+
+export function useQueryAllProducts() {
+  return useQuery<ProductDTO[]>({
+    queryKey: ["product"],
+    queryFn: async () => {
+      const res = await findAllProduct();
+      return res.data.data.content;
     },
   });
 }

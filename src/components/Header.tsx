@@ -3,10 +3,12 @@ import { BiSearch } from "react-icons/bi";
 import { FaUser } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
 import logo from "../assets/logo.png";
+import { useQueryCartByUser } from "../hook/carts/useCart";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuHeader, setMenuHeader] = useState(false);
+  const { data } = useQueryCartByUser();
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -60,8 +62,17 @@ const Header = () => {
 
         <div className="flex gap-4 text-xl">
           <button>
-            <a href="/cart">
+            <a href="/cart" className="relative">
               <FiShoppingCart size={25} />
+              {data && data.cartItems.length > 0 && (
+                <p
+                  className={`w-[12px] h-[12px] rounded-full text-[10px] bg-white   absolute top-0 right-0 flex items-center justify-center text-black ${
+                    scrolled ? "border border-gray-400" : ""
+                  }`}
+                >
+                  {data.cartItems.length}
+                </p>
+              )}
             </a>
           </button>
 
