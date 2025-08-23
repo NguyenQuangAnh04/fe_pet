@@ -10,7 +10,6 @@ export default function ProductDetails() {
   const [size, setSize] = useState("400g");
   const [quantity, setQuantity] = useState(1);
   
-  // Giá theo size
   const priceBySize = {
     "400g": 120000,
     "1kg": 280000,

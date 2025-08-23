@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { BiUpload, BiX, BiTrash } from "react-icons/bi";
-import type { ProductDTO2 } from "../../types/product";
+import { BiUpload, BiX } from "react-icons/bi";
+import type { ProductDTO } from "../../types/product";
 import { useAddProduct, useUpdateProduct } from "../../hook/product/useProduct";
 import { toast } from "react-toastify";
-import {
-  useQueryAllCategory,
-  useQueryCategory,
-} from "../../hook/category/useCategoty";
+import { useQueryAllCategory } from "../../hook/category/useCategoty";
 
 type ModalProduct = {
   isOpen: boolean;
   onClose: () => void;
   mode: "create" | "update";
-  initialData?: ProductDTO2;
+  initialData?: ProductDTO;
 };
 
 const ModalProduct: React.FC<ModalProduct> = ({
@@ -24,7 +21,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
   const [images, setImages] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<ProductDTO2>({
+  const [formData, setFormData] = useState<ProductDTO>({
     id: 0,
     namePro: "",
     imageUrl: "",
@@ -86,7 +83,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
   };
 
   const handleChangeInput = (
-    field: keyof ProductDTO2,
+    field: keyof ProductDTO,
     value: string | number
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

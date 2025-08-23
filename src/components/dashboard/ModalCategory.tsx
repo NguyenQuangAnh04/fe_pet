@@ -180,7 +180,7 @@ const CategoryModal: React.FC<CategoryProps> = ({
                   <img
                     src={previewImage}
                     alt="Preview"
-                    className="w-full h-80 object-cover"
+                    className="w-full h-80 object-contain"
                   />
                 </div>
                 <div className="absolute top-4 right-4 flex gap-2">

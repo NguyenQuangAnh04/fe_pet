@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { BiMinus, BiPlus, BiX } from "react-icons/bi";
 import type { ProductDTO } from "../types/product";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAddCart } from "../hook/carts/useCart";
+import type { CartDTOItem } from "../types/cart";
+import { formatPrice } from "../utils/format";
 
 type ProductCard = {
   isOpen: boolean;
@@ -22,7 +26,24 @@ const ProductCard: React.FC<ProductCard> = ({
   }, [isOpen]);
   const sizes = ["400g", "1kg", "2kg", "3kg"];
   const [selectSize, setSelectSize] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const { mutateAsync: useMutationAddCart } = useAddCart();
+  const [formData, setFormData] = useState<CartDTOItem>({
+    productId: initalData.id,
+    quantity: 1,
+  });
+  const addToCart = async () => {
+    const cartItem: CartDTOItem = {
+      productId: initalData?.id,
+      quantity: formData?.quantity,
+    };
+    return await useMutationAddCart(cartItem);
+  };
+
+  const handleChangeQuantity = (newQuantity: number) => {
+    if (newQuantity < 1) return;
+    setFormData((prev) => ({ ...prev, quantity: newQuantity }));
+  };
   if (!isOpen) return null;
 
   return (
@@ -36,37 +57,35 @@ const ProductCard: React.FC<ProductCard> = ({
         </div>
         <div className="flex justify-between p-6 gap-4">
           <div className="flex flex-col items-center w-3/5">
-            <img src={initalData.img} alt="" className="w-[400px] h-[400px]" />
+            <div className="w-[400px] h-[400px] overflow-hidden relative">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={selectedImage} // phải có key để trigger animation khi đổi ảnh
+                  src={initalData.imagesDTO[selectedImage].imageUrl}
+                  alt=""
+                  className="absolute w-full h-full object-cover rounded-xl shadow"
+                  initial={{ x: 300, opacity: 0 }} // ảnh mới xuất hiện từ bên phải
+                  animate={{ x: 0, opacity: 1 }} // trượt vào giữa
+                  exit={{ x: -300, opacity: 0 }} // ảnh cũ trượt sang trái
+                  transition={{ duration: 0.1 }}
+                />
+              </AnimatePresence>
+            </div>
             <div className="flex gap-2 mt-2">
-              <img
-                src="https://paddy.vn/cdn/shop/products/thuc-an-hat-meo-con-royal-canin-kitten-36-paddy-1.jpg?v=1737351672"
-                alt=""
-                className="w-[70px] h-[70px]"
-              />
-              <img
-                src="https://paddy.vn/cdn/shop/products/thuc-an-hat-meo-con-royal-canin-kitten-36-paddy-1.jpg?v=1737351672"
-                alt=""
-                className="w-[70px] h-[70px]"
-              />
-              <img
-                src="https://paddy.vn/cdn/shop/products/thuc-an-hat-meo-con-royal-canin-kitten-36-paddy-1.jpg?v=1737351672"
-                alt=""
-                className="w-[70px] h-[70px]"
-              />
-              <img
-                src="https://paddy.vn/cdn/shop/products/thuc-an-hat-meo-con-royal-canin-kitten-36-paddy-1.jpg?v=1737351672"
-                alt=""
-                className="w-[70px] h-[70px]"
-              />
-              <img
-                src="https://paddy.vn/cdn/shop/products/thuc-an-hat-meo-con-royal-canin-kitten-36-paddy-1.jpg?v=1737351672"
-                alt=""
-                className="w-[70px] h-[70px]"
-              />
+              {initalData.imagesDTO.map((item, i) => (
+                <img
+                  src={item.imageUrl}
+                  alt=""
+                  onClick={() => setSelectedImage(i)}
+                  className={`w-[70px] h-[70px] cursor-pointer ${
+                    selectedImage === i ? "border" : ""
+                  }`}
+                />
+              ))}
             </div>
           </div>
           <div className="flex flex-col w-2/5">
-            <h3 className="font-semibold text-xl">{initalData.name}</h3>
+            <h3 className="font-semibold text-xl">{initalData.namePro}</h3>
             <div className="mt-10">
               <p>Thương hiệu: Royal Canin</p>
               <p>Kho hàng: Còn hàng</p>
@@ -94,22 +113,27 @@ const ProductCard: React.FC<ProductCard> = ({
             <p className="mt-5">Số lượng:</p>
             <div className="relative w-[100px] rounded mt-1">
               <button className="absolute top-2 left-2">
-                <BiPlus onClick={() => setQuantity(quantity + 1)} />
+                <BiPlus
+                  onClick={() => handleChangeQuantity(formData.quantity! + 1)}
+                />
               </button>
               <input
                 type="number"
                 name=""
                 id=""
-                value={quantity}
+                value={formData?.quantity}
                 readOnly
-                defaultValue={1}
                 className="w-[100px] border border-gray-400 px-2 py-1 text-center"
               />
               <button className="absolute top-2 right-2">
-                <button disabled={quantity === 1}>
+                <button disabled={formData.quantity === 1}>
                   {" "}
                   <BiMinus
-                    onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
+                    onClick={() =>
+                      handleChangeQuantity(
+                        formData?.quantity! > 1 ? formData?.quantity! - 1 : 1
+                      )
+                    }
                   />
                 </button>
               </button>
@@ -117,10 +141,14 @@ const ProductCard: React.FC<ProductCard> = ({
             <p className="mt-2">
               Tổng tiền :{" "}
               <span>
-                {(initalData.price * quantity).toLocaleString("vi-VN")}₫
+                {initalData.price * formData?.quantity! &&
+                  formatPrice(initalData.price * formData?.quantity!)}
               </span>
             </p>
-            <button className="bg-[#f5cb8d] px-2 py-2 text-center text-white rounded hover:bg-[#f3d8b0] transform duration-300  overflow-hidden mt-3">
+            <button
+              onClick={() => addToCart()}
+              className="bg-[#f5cb8d] px-2 py-2 text-center text-white rounded hover:bg-[#f3d8b0] transform duration-300  overflow-hidden mt-3"
+            >
               Thêm vào giỏ hàng
             </button>
             <button className="bg-[#f5cb8d] px-2 py-2 text-center text-white rounded hover:bg-[#f3d8b0] transform duration-300  overflow-hidden mt-3">

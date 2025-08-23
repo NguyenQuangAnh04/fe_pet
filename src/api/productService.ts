@@ -1,12 +1,12 @@
-import type { ProductDTO2 } from "../types/product";
+import type { ProductDTO } from "../types/product";
 import api from "./axiosClient";
 
-const findAllProduct = (page: number, name?: string) => {
+const findAllProduct = (page?: number, name?: string) => {
   return api.get("/product", {params: {page, name}});
 };
 const addProduct = async (
   cateId: number,
-  productDTO: ProductDTO2,
+  productDTO: ProductDTO,
   images: File[]
 ) => {
   const formData = new FormData();
@@ -21,7 +21,7 @@ const addProduct = async (
 
 const updateProduct = async (
   id: number,
-  productDTO: ProductDTO2,
+  productDTO: ProductDTO,
   images: File[]
 ) => {
   const formData = new FormData();

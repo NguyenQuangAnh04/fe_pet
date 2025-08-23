@@ -102,7 +102,7 @@ export default function Category() {
                       <img
                         src={item.imageUrl}
                         alt=""
-                        className="w-[20px] h-[20px]"
+                        className="w-[70px] h-[70px]"
                       />
                     </td>
                     <td className="px-6 py-4 max-w-xs">

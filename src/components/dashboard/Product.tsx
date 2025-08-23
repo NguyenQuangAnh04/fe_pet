@@ -6,7 +6,7 @@ import {
   useQueryProduct,
 } from "../../hook/product/useProduct";
 import ModalProduct from "./ModalProduct";
-import type { ProductDTO2 } from "../../types/product";
+import type { ProductDTO } from "../../types/product";
 import { formatPrice } from "../../utils/format";
 import ModalViewProduct from "./ModalViewProduct";
 export type ProductResponse = {};
@@ -17,7 +17,7 @@ const Product = () => {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setEditShowModal] = useState(false);
   const [showModalViewProduct, setModalShowProduct] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductDTO2>();
+  const [selectedProduct, setSelectedProduct] = useState<ProductDTO>();
   const { mutateAsync: mutateDeleteProduct } = useDeleteProduct();
   const handleDelete = (id: number) => {
     mutateDeleteProduct(id);
