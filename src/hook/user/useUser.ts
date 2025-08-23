@@ -9,12 +9,22 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { userDTO, userUpdateRole } from "../../types/user";
 import { toast } from "react-toastify";
 
-export function useQueryUser(searchParams: { name?: string; email?: string; phoneNumber?: string } = {}) {
-    const { data, isLoading, error } = useQuery<userDTO[]>({
+
+type UserPageRes = {
+    content: userDTO[];
+    totalPages: number;
+    totalElements: number;
+    size: number;
+    number: number;
+}
+
+
+export function useQueryUser(searchParams = {}) {
+    const { data, isLoading, error } = useQuery<UserPageRes>({
         queryKey: ["user", searchParams],
         queryFn: async () => {
             const res = await findAllUser(searchParams);
-            return res.data.data.content ?? [];
+            return res.data.data ?? [];
         },
     });
     return { data, isLoading, error };

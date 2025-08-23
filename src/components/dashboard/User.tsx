@@ -1,23 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryUser, roleQuery, userUpdateRoleUser, useDeleteUser } from "../../hook/user/useUser";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
 import type { Role } from "../../types/user";
 
 export default function User() {
+    const [page, setPage] = useState(0);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [searchParams, setSearchParams] = useState({
-        name: undefined,
-        email: undefined,
-        phoneNumber: undefined,
+        name: "",
+        email: "",
+        phoneNumber: "",
+        page
     });
 
     const { data, isLoading, error } = useQueryUser(searchParams);
     const { data: roleData } = roleQuery();
     const { mutate: mutateUpdateRoleUser } = userUpdateRoleUser();
     const { mutateAsync: mutateDeleteUser } = useDeleteUser();
+
+    useEffect(() => {
+        setSearchParams((prev) => ({ ...prev, page }));
+    }, [page]);
 
     const handleDelete = async (id: number) => {
         await mutateDeleteUser(id);
@@ -28,6 +34,7 @@ export default function User() {
             name: name.trim(),
             email: email.trim(),
             phoneNumber: phoneNumber.trim(),
+            page: 0,
         });
     };
 
@@ -35,18 +42,16 @@ export default function User() {
         setName("");
         setEmail("");
         setPhoneNumber("");
-        setSearchParams({});
+        setSearchParams({
+            name: "",
+            email: "",
+            phoneNumber: "",
+            page: 0,
+        });
     };
 
     return (
         <div className="p-6">
-            {/* Header Section */}
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Quản lý User</h1>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center gap-2">
-                    <span>+</span> Thêm User
-                </button>
-            </div>
 
             {/* Search Section */}
             <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
@@ -108,61 +113,104 @@ export default function User() {
                         </tr>
                     </thead>
                     <tbody className="text-gray-700">
-                        {data?.map((item) => (
-                            <tr key={item.id} className="border-b hover:bg-gray-50 transition duration-150">
-                                <td className="px-6 py-4">{item.id}</td>
-                                <td className="px-6 py-4">{item.userName}</td>
-                                <td className="px-6 py-4">{item.email}</td>
-                                <td className="px-6 py-4">{item.phoneNumber}</td>
-                                <td className="px-6 py-4">
-                                    <select
-                                        value={item.role?.id}
-                                        className="border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        onChange={(e) =>
-                                            mutateUpdateRoleUser({
-                                                id: item.id,
-                                                userUpdateRole: { role: { id: Number(e.target.value) } },
-                                            })
-                                        }
-                                    >
-                                        {roleData?.map((role: Role) => (
-                                            <option key={role.id} value={role.id}>
-                                                {role.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </td>
-                                <td className="px-6 py-4">
-                                    {item.createdAt
-                                        ? new Date(item.createdAt).toLocaleDateString()
-                                        : "-"}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {item.updatedAt
-                                        ? new Date(item.updatedAt).toLocaleDateString()
-                                        : "-"}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex gap-3">
-                                        <button className="text-blue-600 hover:text-blue-800 transition duration-150">
-                                            <BsEye size={20} />
-                                        </button>
-                                        <button className="text-green-600 hover:text-green-800 transition duration-150">
-                                            <BiEdit size={20} />
-                                        </button>
-                                        <button
-                                            className="text-red-600 hover:text-red-800 transition duration-150"
-                                            onClick={() => handleDelete(item.id)}
+                        {data?.content && data.content.length > 0 ? (
+                            data.content.map((item) => (
+                                <tr key={item.id} className="border-b hover:bg-gray-50 transition duration-150">
+                                    <td className="px-6 py-4">{item.id}</td>
+                                    <td className="px-6 py-4">{item.userName}</td>
+                                    <td className="px-6 py-4">{item.email}</td>
+                                    <td className="px-6 py-4">{item.phoneNumber}</td>
+                                    <td className="px-6 py-4">
+                                        <select
+                                            value={item.role?.id}
+                                            className="border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            onChange={(e) =>
+                                                mutateUpdateRoleUser({
+                                                    id: item.id,
+                                                    userUpdateRole: { role: { id: Number(e.target.value) } },
+                                                })
+                                            }
                                         >
-                                            <BiTrash size={20} />
-                                        </button>
-                                    </div>
+                                            {roleData?.map((role: Role) => (
+                                                <option key={role.id} value={role.id}>
+                                                    {role.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-"}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : "-"}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex gap-3">
+                                            <button className="text-blue-600 hover:text-blue-800 transition duration-150">
+                                                <BsEye size={20} />
+                                            </button>
+                                            <button className="text-green-600 hover:text-green-800 transition duration-150">
+                                                <BiEdit size={20} />
+                                            </button>
+                                            <button
+                                                className="text-red-600 hover:text-red-800 transition duration-150"
+                                                onClick={() => handleDelete(item.id)}
+                                            >
+                                                <BiTrash size={20} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={8} className="text-center py-4">
+                                    Không có dữ liệu
                                 </td>
                             </tr>
-                        ))}
+                        )}
+
                     </tbody>
                 </table>
             </div>
+
+            {data && data.totalPages > 0 && (
+                <div className="flex justify-end mt-4 gap-2">
+                    <button
+                        onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+                        disabled={page === 0}
+                        className={`w-[30px] h-[30px] rounded border ${page === 0
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-blue-400 text-white"
+                            }`}
+                    >
+                        &lt;
+                    </button>
+
+                    {Array.from({ length: data.totalPages }, (_, i) => (
+                        <button
+                            onClick={() => setPage(i)}
+                            className={`rounded w-[30px] h-[30px] flex items-center justify-center
+              ${page === i ? "bg-blue-600 text-white" : " text-black shadow border border-gray-300 "}
+            `}
+                            key={i}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+
+                    <button
+                        onClick={() => setPage((prev) => Math.min(prev + 1, data.totalPages - 1))}
+                        disabled={page === data.totalPages - 1}
+                        className={`rounded border w-[30px] h-[30px] ${page === data.totalPages - 1
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-blue-400 text-white"
+                            }`}
+                    >
+                        &gt;
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
