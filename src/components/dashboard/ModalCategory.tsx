@@ -9,7 +9,7 @@ import {
 import { toast } from "react-toastify";
 
 type CategoryProps = {
-  onClose: () => void;
+  onClose: () => void
   initialData?: CategoriesDTO;
   mode: "create" | "update";
 };

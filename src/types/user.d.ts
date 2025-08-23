@@ -21,10 +21,18 @@ export interface userDTO {
   roleName: string;
   role: Role;
 }
-export interface userUpdateRole {
-  id: number;
-  roleId: number;
+
+export interface UpdateUserParams {
+  id: number;               
+  userUpdateRole: userUpdateRole; 
 }
+
+export interface userUpdateRole {
+  role: {
+    id: number;
+  };
+}
+
 
 export interface Role{
   id: number;
