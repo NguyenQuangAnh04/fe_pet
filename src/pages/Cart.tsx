@@ -7,13 +7,11 @@ import {
 } from "../hook/carts/useCart";
 import { formatPrice } from "../utils/format";
 import type { CartDTOItem } from "../types/cart";
-import type { deleteCartUser } from "../api/cartService";
 
 export default function Cart() {
   const { data } = useQueryCartByUser();
   const { mutateAsync: updateCart } = useUpdateCart();
   const { mutateAsync: deleteCartUser } = useDeleteCart();
-
   const handleUpdateQuantity = (item: CartDTOItem, newQuantity: number) => {
     if (newQuantity < 1) return;
     updateCart({ ...item, quantity: newQuantity });
@@ -24,7 +22,7 @@ export default function Cart() {
   return (
     <>
       <Header />
-      <div className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen">
+      <div className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen ">
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Giỏ hàng của bạn

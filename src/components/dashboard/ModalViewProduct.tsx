@@ -1,11 +1,11 @@
 import type React from "react";
 import { BiX } from "react-icons/bi";
-import type { ProductDTO2 } from "../../types/product";
 import { formatPrice } from "../../utils/format";
+import type { ProductDTO } from "../../types/product";
 
 type ModalViewProductProps = {
   onClose: () => void;
-  initialData: ProductDTO2;
+  initialData: ProductDTO;
 };
 
 const ModalViewProduct: React.FC<ModalViewProductProps> = ({
