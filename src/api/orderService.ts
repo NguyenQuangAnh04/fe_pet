@@ -1,12 +1,33 @@
-import type { OrderDTO } from "../types/order";
+import type { OrderDTO, OrderStatus } from "../types/order";
 import api from "./axiosClient";
-const findAllOrderUser = () => {
-  return api.get("/order");
+const findAllOrderUser = (status: string) => {
+  return api.get("/order/history", { params: { status } });
+};
+const findAllOrder = (
+  name: string,
+  phoneNumber: string,
+  status: string,
+  page: number
+) => {
+  return api.get("/order", { params: { name, phoneNumber, status, page } });
 };
 const addOrder = (orderDTO: OrderDTO) => {
   return api.post("/order/add", orderDTO);
 };
-const editOrder = (orderId: number) => {
-  return api.put(`/order/update/${orderId}`);
+export interface OrderUpdateDTO {
+  status: OrderStatus;
+}
+const editOrderAdmin = (orderId: number, orderDTO: OrderUpdateDTO) => {
+  return api.put(`/order/update/${orderId}`, orderDTO);
 };
-export { addOrder, editOrder, findAllOrderUser };
+
+const deleteOrder = (orderId: number) => {
+  return api.delete(`/order/delete/${orderId}`);
+};
+export {
+  addOrder,
+  editOrderAdmin,
+  findAllOrderUser,
+  findAllOrder,
+  deleteOrder,
+};

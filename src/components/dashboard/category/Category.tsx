@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import {
   useDeleteCategory,
   useQueryCategory,
-} from "../../hook/category/useCategoty";
+} from "../../../hook/category/useCategoty";
 import { BiEdit, BiTrash, BiPlus, BiSearch } from "react-icons/bi";
-import type { CategoriesDTO } from "../../types/category";
+import type { CategoriesDTO } from "../../../types/category";
 import CategoryModal from "./ModalCategory";
 
 export default function Category() {

@@ -7,7 +7,7 @@ import {
   FaPhone,
   FaTwitter,
 } from "react-icons/fa";
-import logo from "../assets/logo.png";
+import logo from "../../assets/logo.png";
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 text-gray-800 relative overflow-hidden">

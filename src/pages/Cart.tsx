@@ -1,5 +1,4 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Footer from "../components/common/Footer";
 import {
   useDeleteCart,
   useQueryCartByUser,
@@ -7,11 +6,22 @@ import {
 } from "../hook/carts/useCart";
 import { formatPrice } from "../utils/format";
 import type { CartDTOItem } from "../types/cart";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/common/Header";
 
 export default function Cart() {
+  const navigate = useNavigate();
   const { data } = useQueryCartByUser();
   const { mutateAsync: updateCart } = useUpdateCart();
   const { mutateAsync: deleteCartUser } = useDeleteCart();
+  // const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      navigate("/login");
+    }
+  }, [navigate]);
   const handleUpdateQuantity = (item: CartDTOItem, newQuantity: number) => {
     if (newQuantity < 1) return;
     updateCart({ ...item, quantity: newQuantity });
@@ -19,6 +29,7 @@ export default function Cart() {
   const handleDeleteCart = async (id: number) => {
     return await deleteCartUser(id);
   };
+
   return (
     <>
       <Header />
@@ -88,10 +99,10 @@ export default function Cart() {
                           {item.product?.namePro}
                         </h3>
 
-                        {/* <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600">
                           <span className="font-medium">Kích thước:</span>
                           <span className="ml-1">{item.size}</span>
-                        </p> */}
+                        </p>
                       </div>
 
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

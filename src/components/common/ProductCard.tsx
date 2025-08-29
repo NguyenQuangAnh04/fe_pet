@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { BiMinus, BiPlus, BiX } from "react-icons/bi";
-import type { ProductDTO } from "../types/product";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAddCart } from "../hook/carts/useCart";
-import type { CartDTOItem } from "../types/cart";
-import { formatPrice } from "../utils/format";
+import { useAddCart } from "../../hook/carts/useCart";
+import type { CartDTOItem } from "../../types/cart";
+import type { ProductDTO } from "../../types/product";
+import { formatPrice } from "../../utils/format";
+import type { VariantDTO } from "../../types/variant";
 
 type ProductCard = {
   isOpen: boolean;
@@ -24,8 +25,9 @@ const ProductCard: React.FC<ProductCard> = ({
     }
     return () => document.body.classList.remove("overflow-hidden");
   }, [isOpen]);
-  const sizes = ["400g", "1kg", "2kg", "3kg"];
-  const [selectSize, setSelectSize] = useState(0);
+  const [sizes, setSizes] = useState(0);
+  const [selectSize, setSelectSize] = useState<VariantDTO>();
+
   const [selectedImage, setSelectedImage] = useState(0);
   const { mutateAsync: useMutationAddCart } = useAddCart();
   const [formData, setFormData] = useState<CartDTOItem>({
@@ -36,6 +38,7 @@ const ProductCard: React.FC<ProductCard> = ({
     const cartItem: CartDTOItem = {
       productId: initalData?.id,
       quantity: formData?.quantity,
+      size: selectSize?.size,
     };
     return await useMutationAddCart(cartItem);
   };
@@ -47,8 +50,8 @@ const ProductCard: React.FC<ProductCard> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center z-50 mt-16 shadow">
-      <div className="max-w-4xl w-full bg-white relative shadow rounded ">
+    <div className="fixed inset-0 flex justify-center items-center z-50 mt-16 ">
+      <div className="max-w-4xl w-full bg-white relative shadow-lg border border-gray-300 rounded ">
         <div
           className=" absolute top-0 right-0 cursor-pointer"
           onClick={onClose}
@@ -92,22 +95,29 @@ const ProductCard: React.FC<ProductCard> = ({
               <p>Loại sản phầm: Thức ăn khô</p>
             </div>
             <p className="text-red-600 font-semibold mt-5">
-              {initalData.price.toLocaleString("vi-VN")}₫
+              {initalData.variants &&
+                formatPrice(initalData.variants[sizes].price)}
             </p>
 
             <div className="mt-5">
-              <p>Size: {sizes[selectSize]}</p>
+              <p>
+                Size: {initalData.variants && initalData.variants[sizes].size}
+              </p>
               <div className="flex gap-2 mt-2">
-                {sizes.map((size, i) => (
-                  <span
-                    onClick={() => setSelectSize(i)}
-                    className={` px-2 py-2 cursor-pointer ${
-                      selectSize === i ? "border border-amber-600" : "border"
-                    }`}
-                  >
-                    {size}
-                  </span>
-                ))}
+                {initalData.variants &&
+                  initalData.variants.map((size, i) => (
+                    <span
+                      onClick={() => {
+                        setSizes(i);
+                        setSelectSize(size);
+                      }}
+                      className={` px-2 py-2 cursor-pointer ${
+                        sizes === i ? "border border-amber-600" : "border"
+                      }`}
+                    >
+                      {size.size}
+                    </span>
+                  ))}
               </div>
             </div>
             <p className="mt-5">Số lượng:</p>
@@ -142,7 +152,10 @@ const ProductCard: React.FC<ProductCard> = ({
               Tổng tiền :{" "}
               <span>
                 {initalData.price * formData?.quantity! &&
-                  formatPrice(initalData.price * formData?.quantity!)}
+                  initalData.variants &&
+                  formatPrice(
+                    initalData.variants[sizes].price * formData?.quantity!
+                  )}
               </span>
             </p>
             <button

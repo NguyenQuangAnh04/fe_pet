@@ -1,26 +1,37 @@
-import { useState } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import { useEffect, useState } from "react";
+import Footer from "../components/common/Footer";
 import { useQueryCartByUser } from "../hook/carts/useCart";
-import type { AddressDTO, OrderDTO } from "../types/order";
+import type { AddressDTO, ItemDTO, OrderDTO } from "../types/order";
 
 import { formatPrice } from "../utils/format";
 import { useAddOrder } from "../hook/order/useOrder";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
+import type { CartDTOItem } from "../types/cart";
+import Header from "../components/common/Header";
 
 export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const location = useLocation();
+  const buyNowItems =
+    location.state?.mode === "buyNow" ? location.state.items : null;
   const { data } = useQueryCartByUser();
-  const [formData, setFormData] = useState<OrderDTO>();
-
+  const [formData, setFormData] = useState<OrderDTO>({ id: 0 });
+  const [cart, setCart] = useState<CartDTOItem[]>();
+  useEffect(() => {
+    if (buyNowItems) {
+      setCart(buyNowItems);
+    } else if (data?.cartItems) {
+      setCart(data.cartItems);
+    }
+  }, [buyNowItems, data]);
   const handleInputChange = (field: keyof OrderDTO, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-
+  console.log(cart);
   const handleInputChangeAddress = (field: keyof AddressDTO, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -37,8 +48,17 @@ export default function Checkout() {
       toast.error("Vui lòng điền đủ các trường thông tin!");
       return;
     }
-    return await mutateAddOrder(formData);
+    const itemToSend: ItemDTO[] = (cart ?? []).map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
+    }));
+    await mutateAddOrder({ ...formData, items: itemToSend });
+    window.location.href = "/orders";
   };
+  const totalMoney = (cart ?? []).reduce(
+    (sum, item) => sum + (item.product?.price || 0) * (item.quantity ?? 1),
+    0
+  );
   return (
     <>
       <Header />
@@ -86,9 +106,9 @@ export default function Checkout() {
                     <input
                       type="text"
                       name="fullName"
-                      value={formData?.name}
+                      value={formData?.fullName}
                       onChange={(e) =>
-                        handleInputChange("name", e.target.value)
+                        handleInputChange("fullName", e.target.value)
                       }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                       placeholder="Nhập họ và tên"
@@ -306,31 +326,35 @@ export default function Checkout() {
 
                 {/* Danh sách sản phẩm */}
                 <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
-                  {data?.cartItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-3 pb-3 border-b border-gray-100 last:border-b-0"
-                    >
-                      <img
-                        src={item.product?.imageUrl}
-                        alt={item.product?.namePro}
-                        className="w-12 h-12 object-cover rounded-lg"
-                        onError={(e) => {
-                          e.currentTarget.src = "/src/assets/product_01.jpg";
-                        }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 truncate">
-                          {item.product?.namePro}
-                        </h4>
-                        <p className="text-xs text-gray-500">{item.quantity}</p>
+                  {cart &&
+                    cart.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 pb-3 border-b border-gray-100 last:border-b-0"
+                      >
+                        <img
+                          src={item.product?.imageUrl}
+                          alt={item.product?.namePro}
+                          className="w-12 h-12 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.currentTarget.src = "/src/assets/product_01.jpg";
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-gray-900 truncate">
+                            {item.product?.namePro}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            x{item.quantity}
+                          </p>
+                          <p className="text-xs text-gray-500">{item.size}</p>
+                        </div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {item.product?.price &&
+                            formatPrice(item.product?.price)}
+                        </div>
                       </div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {item.product?.price &&
-                          formatPrice(item.product?.price)}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
 
                 {/* Tính toán */}
@@ -338,7 +362,7 @@ export default function Checkout() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tạm tính:</span>
                     <span className="font-medium">
-                      {data?.totalMoney && formatPrice(data.totalMoney)}
+                      {formatPrice(totalMoney)}
                     </span>
                   </div>
                   {/* <div className="flex justify-between">
@@ -355,7 +379,7 @@ export default function Checkout() {
                     <div className="flex justify-between text-lg font-bold">
                       <span>Tổng cộng:</span>
                       <span className="text-orange-600">
-                        {data?.totalMoney && formatPrice(data.totalMoney)}
+                        {formatPrice(totalMoney)}
                       </span>
                     </div>
                   </div>

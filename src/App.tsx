@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "./App.css";
-import Product from "./components/dashboard/Product";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -11,9 +10,14 @@ import Cart from "./pages/Cart";
 import Account from "./pages/Account";
 import Checkout from "./pages/Checkout";
 import PrivateRoute from "./routes/PrivateRoute";
-import Category from "./components/dashboard/Category";
+import Category from "./components/dashboard/category/Category";
 import Services from "./pages/Services";
-import User from "./components/dashboard/User";
+
+import SearchPage from "./pages/SearchPage";
+import OrdersPage from "./pages/OrdersPage";
+import Order from "./components/dashboard/order/Order";
+import User from "./components/dashboard/user/User";
+import Product from "./components/dashboard/product/Product";
 
 function App() {
   return (
@@ -27,12 +31,17 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/account" element={<Account />} />
         <Route path="/checkout" element={<Checkout />} />
-        <Route path="/product-details/:id" element={<ProductDetails />} />
-
+        <Route path="/product-details/:slug" element={<ProductDetails />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="orders" element={<OrdersPage />} />
+        </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="products" element={<Product />} />
             <Route path="categories" element={<Category />} />
+            <Route path="orders" element={<Order />} />
+
             <Route path="account" element={<User />} />
           </Route>
         </Route>

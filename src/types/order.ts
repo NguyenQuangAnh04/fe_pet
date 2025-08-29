@@ -1,13 +1,32 @@
+export enum OrderStatus {
+  ALL= "",
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  SHIPPING = "SHIPPING",
+  COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED",
+}
+
+export enum PaymentMethod {
+  COD,
+  MOMO,
+  ZALOPAY,
+  VNPAY,
+  CREDIT_CARD,
+}
+
 export interface OrderDTO {
-  id?: number;
+  id: number;
   userId?: number;
-  name?: string;
+  fullName?: string;
   phoneNumber?: string;
   totalAmount?: number;
   status?: OrderStatus;
+  createdAt?: string;
   note?: string;
+  items?: ItemDTO[];
   paymentMethod?: PaymentMethod;
-  orderDetailDTO?: OrderDetailDTO;
+  orderDetailDTO?: OrderDetailDTO[];
   addressDTO?: AddressDTO;
 }
 
@@ -19,23 +38,10 @@ export interface OrderDetailDTO {
   totalPrice?: number;
   urlProductImage?: string;
 }
-export enum OrderStatus {
-  PENDING = "Chờ xác nhận",
-  CONFIRMED = "Đã xác nhận",
-  IN_PREPARATION = "Đang pha chế",
-  SERVED = "Đã phục vụ",
-  COMPLETED = "Hoàn tất",
-  CANCELED = "Đã hủy",
+export interface ItemDTO {
+  productId?: number;
+  quantity?: number;
 }
-
-export enum PaymentMethod {
-  COD,
-  MOMO,
-  ZALOPAY,
-  VNPAY,
-  CREDIT_CARD,
-}
-
 export interface AddressDTO {
   homeAddress?: string;
   city?: string;

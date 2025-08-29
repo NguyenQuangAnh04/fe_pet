@@ -5,9 +5,7 @@ import {
   FaClipboardList,
   FaListAlt,
   FaSignOutAlt,
-  FaTags,
   FaUser,
-  FaUserFriends,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -43,12 +41,7 @@ const Sidebar = () => {
           <FaListAlt /> Danh mục
         </Link>
         
-        <Link
-          to="/dashboard/customers"
-          className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
-        >
-          <FaUserFriends /> Khách hàng
-        </Link>
+        
         <Link
           to="/dashboard/orders"
           className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"

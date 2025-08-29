@@ -1,22 +1,7 @@
 // file này import list ảnh sản phẩm qua trang chi tiết
-import React, { useState } from "react";
-import product02 from "../assets/product_02.jpg";
-import product01 from "../assets/product_01.jpg";
-import product03 from "../assets/product_05.jpg";
-import product04 from "../assets/product_07.jpg";
-import product05 from "../assets/product_12.jpg";
-import product06 from "../assets/product_15.jpg";
+import  { useState } from "react";
 
-const images = [
-  product01,
-  product02,
-  product03,
-  product04,
-  product05,
-  product06,
-];
-
-export default function ProductImages() {
+export default function ProductImages({images}: {images: string[]}) {
   const [selectedImage, setSelectedImage] = useState(images[0]);
 
   return (

@@ -1,7 +1,8 @@
 import type React from "react";
 import { BiX } from "react-icons/bi";
-import { formatPrice } from "../../utils/format";
-import type { ProductDTO } from "../../types/product";
+import type { ProductDTO } from "../../../types/product";
+import { formatPrice } from "../../../utils/format";
+
 
 type ModalViewProductProps = {
   onClose: () => void;
@@ -26,7 +27,7 @@ const ModalViewProduct: React.FC<ModalViewProductProps> = ({
             <BiX size={28} className="text-gray-600 hover:text-gray-800" />
           </button>
         </div>
-
+    
         <div className="p-6">
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="space-y-6">

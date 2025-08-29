@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import type { CategoriesDTO } from "../../types/category";
-import { BiX, BiTrash } from "react-icons/bi";
+import type { CategoriesDTO } from "../../../types/category";
+import { BiX } from "react-icons/bi";
 import { BsUpload, BsImage } from "react-icons/bs";
 import {
   useAddCategory,
   useUpdateCategory,
-} from "../../hook/category/useCategoty";
+} from "../../../hook/category/useCategoty";
 import { toast } from "react-toastify";
 
 type CategoryProps = {
-  onClose: () => void
+  onClose: () => void;
   initialData?: CategoriesDTO;
   mode: "create" | "update";
 };

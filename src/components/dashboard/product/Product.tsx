@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
+
+import ModalViewProduct from "./ModalViewProduct";
 import {
   useDeleteProduct,
   useQueryProduct,
-} from "../../hook/product/useProduct";
+} from "../../../hook/product/useProduct";
+import type { ProductDTO } from "../../../types/product";
+import { formatPrice } from "../../../utils/format";
 import ModalProduct from "./ModalProduct";
-import type { ProductDTO } from "../../types/product";
-import { formatPrice } from "../../utils/format";
-import ModalViewProduct from "./ModalViewProduct";
 export type ProductResponse = {};
 const Product = () => {
   const [page, setPage] = useState(0);
@@ -46,13 +47,14 @@ const Product = () => {
           placeholder="Nhập từ khóa tìm kiếm"
         />
       </div>
-      <table className="w-full mt-5 shadow rounded">
-        <thead className="bg-gray-5  border-b border-gray-200">
+      <table className="w-full mt-5 shadow-lg rounded-xl overflow-hidden">
+        <thead className="bg-gray-5  border-b border-gray-200 bg-gray-50">
           <tr>
-            <th className="px-4 py-2 text-left">ID</th>
+            <th className="px-4 py-4 text-left">ID</th>
             <th className="px-4 py-2 text-left">Tên sản phẩm</th>
             <th className="px-4 py-2 text-left">Ảnh</th>
             <th className="px-4 py-2 text-left">Giá</th>
+            <th className="px-4 py-2 text-left">Số lượng</th>
             <th className="px-4 py-2 text-left">Ngày thêm</th>
             <th className="px-4 py-2 text-left">Ngày sửa</th>
             <th className="px-4 py-2 text-left">Thao tác</th>
@@ -60,20 +62,23 @@ const Product = () => {
         </thead>
         <tbody>
           {data?.content.map((item) => (
-            <tr>
+            <tr className="border-b border-gray-200 hover:bg-gray-50">
               <td className="px-4 py-2">{item.id}</td>
-              <td className="px-4 py-2">{item.namePro}</td>
+              <td className="px-4 py-2 text-sm">{item.namePro}</td>
               <td className="px-4 py-2">
-                <img src={item.imageUrl} alt="" className="w-10 h-10" />
+                <img src={item.imageUrl} alt="" className="w-12 h-12" />
               </td>
-              <td className="px-4 py-2">{formatPrice(item.price)}</td>
+              <td className="px-4 py-2 font-medium text-sm">
+                {formatPrice(item.price)}
+              </td>
+              <td className="px-4 py-2 font-medium text-sm">{item.sl}</td>
 
-              <td className="px-4 py-2">
+              <td className="px-4 py-2 text-sm">
                 {item.createdAt
                   ? new Date(item.createdAt).toLocaleDateString()
                   : "-"}
               </td>
-              <td className="px-4 py-2">
+              <td className="px-4 py-2 text-sm">
                 {item.updatedAt
                   ? new Date(item.updatedAt).toLocaleDateString()
                   : "-"}
@@ -83,7 +88,10 @@ const Product = () => {
                 <div className="flex gap-2">
                   <button
                     className="text-yellow-500"
-                    onClick={() => {setModalShowProduct(true); setSelectedProduct(item)}}
+                    onClick={() => {
+                      setModalShowProduct(true);
+                      setSelectedProduct(item);
+                    }}
                   >
                     <BsEye size={18} />
                   </button>
@@ -108,15 +116,16 @@ const Product = () => {
           ))}
         </tbody>
       </table>
-      {showModal && (
+      {showModal && selectedProduct && (
         <ModalProduct
           mode="create"
+          initialData={selectedProduct}
           isOpen={showModal}
           onClose={() => setShowModal(false)}
         />
       )}
 
-      {showEditModal && (
+      {showEditModal && selectedProduct && (
         <ModalProduct
           mode="update"
           initialData={selectedProduct}

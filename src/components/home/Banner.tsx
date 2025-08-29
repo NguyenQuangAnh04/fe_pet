@@ -1,4 +1,4 @@
-import banner from "../assets/banner.png";
+import banner from "../../assets/banner.png";
 const Banner = () => {
   return (
     <div className="mt-5 overflow-hidden rounded-lg">

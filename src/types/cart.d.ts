@@ -13,4 +13,5 @@ export interface CartDTOItem {
   totalPrice?: number;
   productId?: number;
   product?: ProductDTO;
+  size?: string
 }
