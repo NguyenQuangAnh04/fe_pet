@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { OrderDTO, OrderStatus } from "../../types/order";
 import {
   addOrder,
+  cancelOrder,
   deleteOrder,
   editOrderAdmin,
   findAllOrder,
@@ -41,7 +42,6 @@ export function useQueryOrder({
     },
   });
 }
-
 
 export function useAddOrder() {
   const queryClient = useQueryClient();
@@ -94,6 +94,24 @@ export function useUpdateOrderAdmin() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["order"] });
       toast.success("Cập nhật trạng thái đơn hàng");
+    },
+
+    onError: (err) => {
+      console.error(err.message);
+    },
+  });
+}
+
+export function useCancelOrderUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (orderId: number) => {
+      return await cancelOrder(orderId);
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["order"] });
+      toast.success("Huỷ đơn hàng thành công");
     },
 
     onError: (err) => {

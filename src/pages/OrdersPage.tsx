@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { OrderStatus, type OrderDTO } from "../types/order";
 import { formatPrice } from "../utils/format";
-import { useQueryOrderByUser } from "../hook/order/useOrder";
+import {
+  useCancelOrderUser,
+  useQueryOrderByUser,
+} from "../hook/order/useOrder";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
@@ -19,8 +22,7 @@ export default function OrdersPage() {
     return label[status];
   };
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<OrderDTO>();
+  const { mutateAsync: mutateCancelOrder } = useCancelOrderUser();
   const getStatusColor = (status: OrderStatus) => {
     const colors: Record<OrderStatus, string> = {
       [OrderStatus.ALL]: "bg-gray-100 text-gray-700",
@@ -32,7 +34,9 @@ export default function OrdersPage() {
     };
     return colors[status];
   };
-
+  const handleCancelOrder = async (orderId: number) => {
+    await mutateCancelOrder(orderId);
+  };
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { data } = useQueryOrderByUser(selectedStatus);
@@ -195,6 +199,9 @@ export default function OrdersPage() {
                                     </span>
                                   </span>
                                 </div>
+                                <p className="text-sm text-gray-600">
+                                  {orderItem.size}
+                                </p>
                               </div>
 
                               <div className="text-right">
@@ -224,17 +231,8 @@ export default function OrdersPage() {
                         </span>
                       </div>
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedOrder(order);
-                            setShowModal(true);
-                          }}
-                          className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md transition-colors"
-                        >
-                          Xem chi tiết
-                        </button>
                         {order.status === OrderStatus.PENDING && (
-                          <button className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md transition-colors">
+                          <button onClick={() => handleCancelOrder(order.id)} className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md transition-colors">
                             Hủy đơn
                           </button>
                         )}

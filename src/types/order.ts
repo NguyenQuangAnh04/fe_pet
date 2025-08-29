@@ -34,6 +34,7 @@ export interface OrderDetailDTO {
   id?: number;
   quantity?: number;
   price?: number;
+  size?: string;
   productName?: string;
   totalPrice?: number;
   urlProductImage?: string;

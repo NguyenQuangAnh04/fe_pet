@@ -24,10 +24,14 @@ const editOrderAdmin = (orderId: number, orderDTO: OrderUpdateDTO) => {
 const deleteOrder = (orderId: number) => {
   return api.delete(`/order/delete/${orderId}`);
 };
+const cancelOrder = (orderId: number) => {
+  return api.put(`/order/cancel/${orderId}`);
+};
 export {
   addOrder,
   editOrderAdmin,
   findAllOrderUser,
   findAllOrder,
   deleteOrder,
+  cancelOrder,
 };
