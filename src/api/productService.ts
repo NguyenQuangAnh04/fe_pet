@@ -2,8 +2,17 @@ import axios from "axios";
 import type { ProductDTO } from "../types/product";
 import api from "./axiosClient";
 
-const findAllProduct = (page?: number, name?: string) => {
-  return api.get("/product", { params: { page, name } });
+const findAllProduct = (
+  page?: number,
+  name?: string,
+  categoryId?: number,
+  size?: string,
+  minPrice?: number,
+  maxPrice?: number
+) => {
+  return api.get("/product", {
+    params: { page, name, categoryId, minPrice, maxPrice, size },
+  });
 };
 const addProduct = async (
   cateId: number,

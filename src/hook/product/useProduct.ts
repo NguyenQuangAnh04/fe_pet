@@ -14,12 +14,30 @@ type ProductResponse = {
 type UseQueryProductProps = {
   name?: string;
   page?: number;
+  categoryId?: number;
+  size?: string;
+  minPrice?: number;
+  maxPrice?: number;
 };
-export function useQueryProduct({ page = 0, name = "" }: UseQueryProductProps) {
+export function useQueryProduct({
+  page = 0,
+  name = "",
+  categoryId,
+  size,
+  minPrice,
+  maxPrice,
+}: UseQueryProductProps) {
   return useQuery<ProductResponse>({
-    queryKey: ["product", page, name],
+    queryKey: ["product", page, name, categoryId, size, minPrice, maxPrice],
     queryFn: async () => {
-      const res = await findAllProduct(page, name);
+      const res = await findAllProduct(
+        page,
+        name,
+        categoryId,
+        size,
+        minPrice,
+        maxPrice
+      );
       const data = res.data.data;
       return { content: data.content, totalPages: data.totalPages };
     },
