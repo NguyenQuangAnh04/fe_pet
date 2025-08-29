@@ -249,11 +249,10 @@ export default function Services() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${
-                  selectedCategory === category.id
-                    ? "bg-orange-500 text-white"
-                    : "bg-white text-gray-700 border border-gray-300 hover:border-orange-300"
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${selectedCategory === category.id
+                  ? "bg-orange-500 text-white"
+                  : "bg-white text-gray-700 border border-gray-300 hover:border-orange-300"
+                  }`}
               >
                 <span>{category.icon}</span>
                 <span className="font-medium">{category.label}</span>
@@ -352,7 +351,7 @@ export default function Services() {
                   </h2>
                   <button
                     onClick={() => setShowBookingModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    classNamve="text-gray-400 hover:text-gray-600"
                     title="Đóng modal"
                     aria-label="Đóng modal đặt lịch"
                   >
@@ -415,20 +414,43 @@ export default function Services() {
                         </select>
                       </div>
 
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Tuổi thú cưng
-                        </label>
-                        <input
-                          type="text"
-                          value={bookingForm.petAge}
-                          onChange={(e) =>
-                            handleBookingFormChange("petAge", e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          placeholder="Ví dụ: 2 tuổi, 6 tháng"
-                        />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Tuổi thú cưng
+                          </label>
+                          <input
+                            type="text"
+                            value={bookingForm.petAge}
+                            onChange={(e) =>
+                              handleBookingFormChange("petAge", e.target.value)
+                            }
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="Ví dụ: 2 tuổi, 6 tháng"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Giới tính
+                          </label>
+                          <select
+                            value={bookingForm.petGender}
+                            onChange={(e) =>
+                              handleBookingFormChange("petGender", e.target.value)
+                            }
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            title="Chọn giới tính thú cưng"
+                            aria-label="Giới tính thú cưng"
+                            required
+                          >
+                            <option value="male">Đực</option>
+                            <option value="female">Cái</option>
+                            <option value="unknown">Không rõ</option>
+                          </select>
+                        </div>
                       </div>
+
                     </div>
                   </div>
 

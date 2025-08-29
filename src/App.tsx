@@ -18,6 +18,7 @@ import OrdersPage from "./pages/OrdersPage";
 import Order from "./components/dashboard/order/Order";
 import User from "./components/dashboard/user/User";
 import Product from "./components/dashboard/product/Product";
+import Vet from "./components/dashboard/veterinarian/Veterinarian"
 
 function App() {
   return (
@@ -41,8 +42,8 @@ function App() {
             <Route path="products" element={<Product />} />
             <Route path="categories" element={<Category />} />
             <Route path="orders" element={<Order />} />
-
             <Route path="account" element={<User />} />
+            <Route path="vet" element={<Vet />} />
           </Route>
         </Route>
       </Routes>

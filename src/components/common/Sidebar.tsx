@@ -55,6 +55,12 @@ const Sidebar = () => {
           <FaUser /> Tài khoản
         </Link>
         <Link
+          to="/dashboard/vet"
+          className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+        >
+          <FaUser /> Bác sĩ
+        </Link>
+        <Link
           to="/dashboard/schedules"
           className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
         >
