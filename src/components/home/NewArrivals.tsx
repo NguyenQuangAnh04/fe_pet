@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const NewArrivals = () => {
   const { data } = useQueryAllProducts();
   const navigate = useNavigate();
-  const [selectProduct] = useState<ProductDTO>();
+  const [selectProduct, setSelectedProduct] = useState<ProductDTO>();
   const [showModalProductCart, setShowModalProductCart] = useState(false);
   return (
     <div className=" py-12 space-y-16">
@@ -36,7 +36,7 @@ const NewArrivals = () => {
                 </button> */}
                 <button
                   onClick={() => {
-                    // setSelectedProduct(p);
+                    setSelectedProduct(p);
                     setShowModalProductCart(true);
                   }}
                   className="absolute w-8 h-8 rounded-full bg-white text-black shadow flex items-center justify-center right-0 top-2 opacity-0 translate-x-full group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
