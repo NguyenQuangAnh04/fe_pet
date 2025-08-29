@@ -7,11 +7,11 @@ export interface CartDTO {
   userId: number;
 }
 export interface CartDTOItem {
-  id?: number;
+  id?: number | null;
   quantity?: number;
   price?: number;
   totalPrice?: number;
   productId?: number;
   product?: ProductDTO;
-  size?: string
+  size?: string;
 }

@@ -26,9 +26,14 @@ export default function ProductDetails() {
     const getData = async () => {
       const res = await findProductBySlug(slug);
       setProduct(res.data);
+      if (res.data?.variants && res.data.variants.length > 0) {
+        setSelectedSize(res.data.variants[0]);
+        setSize(0);
+      }
     };
     getData();
   }, [slug]);
+  console.log(selectedSize);
   const handleAddToCart = (id: number) => {
     const cartItem: CartDTOItem = {
       productId: id,
@@ -43,13 +48,17 @@ export default function ProductDetails() {
       state: {
         items: [
           {
-            id: product.id,
+            id: null,
+            productId: product.id,
+            price: selectedSize?.price && selectedSize?.price * quantity,
+
+            size: selectedSize?.size,
             quantity: quantity,
             product: {
               id: product.id,
               namePro: product.namePro,
               imageUrl: product.imageUrl,
-              price: product.price,
+              price: selectedSize?.price,
             },
           },
         ],
@@ -132,7 +141,9 @@ export default function ProductDetails() {
             {/* Giá */}
             <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
               <p className="text-3xl md:text-4xl font-bold text-orange-600">
-                {product?.variants && formatPrice(product.variants[size].price)}
+                {product?.variants &&
+                  product.variants[size].price &&
+                  formatPrice(product.variants[size].price)}
               </p>
               <p className="text-sm text-gray-600 mt-1">Giá đã bao gồm VAT</p>
             </div>
@@ -147,6 +158,7 @@ export default function ProductDetails() {
                       key={s.id}
                       onClick={() => {
                         setSize(index);
+                        setQuantity(1);
                         setSelectedSize(s);
                       }}
                       className={`border-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
@@ -167,6 +179,7 @@ export default function ProductDetails() {
               <div className="flex items-center space-x-4">
                 <div className="flex items-center border border-gray-300 rounded-lg">
                   <button
+                    disabled={quantity < 1}
                     onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
                     className="px-4 py-2 text-gray-600 hover:text-orange-600 transition-colors"
                   >
@@ -175,12 +188,15 @@ export default function ProductDetails() {
                   <span className="px-4 py-2 text-lg font-medium border-x border-gray-300 min-w-[60px] text-center">
                     {quantity}
                   </span>
-                  <button
-                    onClick={() => setQuantity((prev) => prev + 1)}
-                    className="px-4 py-2 text-gray-600 hover:text-orange-600 transition-colors"
-                  >
-                    +
-                  </button>
+                  {product?.variants && product?.variants[size].stock && (
+                    <button
+                      disabled={quantity > product?.variants[size].stock}
+                      onClick={() => setQuantity((prev) => prev + 1)}
+                      className="px-4 py-2 text-gray-600 hover:text-orange-600 transition-colors"
+                    >
+                      +
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -191,7 +207,7 @@ export default function ProductDetails() {
                 <span className="text-lg font-medium text-gray-700">
                   Tổng tiền:
                 </span>
-                {product?.variants && (
+                {product?.variants && product?.variants[size].price && (
                   <span className="text-2xl font-bold text-orange-600">
                     {formatPrice(product.variants[size].price * quantity)}
                   </span>

@@ -31,7 +31,6 @@ export default function Checkout() {
       [field]: value,
     }));
   };
-  console.log(cart);
   const handleInputChangeAddress = (field: keyof AddressDTO, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -51,6 +50,8 @@ export default function Checkout() {
     const itemToSend: ItemDTO[] = (cart ?? []).map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
+      size: item.size,
+      price: item.price
     }));
     await mutateAddOrder({ ...formData, items: itemToSend });
     window.location.href = "/orders";
