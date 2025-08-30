@@ -19,6 +19,7 @@ import Order from "./components/dashboard/order/Order";
 import User from "./components/dashboard/user/User";
 import Product from "./components/dashboard/product/Product";
 import Vet from "./components/dashboard/veterinarian/Veterinarian"
+import Exam from "./components/dashboard/examination/Examination"
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
             <Route path="orders" element={<Order />} />
             <Route path="account" element={<User />} />
             <Route path="vet" element={<Vet />} />
+            <Route path="exam" element={<Exam />} />
           </Route>
         </Route>
       </Routes>

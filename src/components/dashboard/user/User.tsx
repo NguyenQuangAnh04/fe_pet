@@ -160,9 +160,6 @@ export default function User() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-3">
-                      <button className="text-blue-600 hover:text-blue-800 transition duration-150">
-                        <BsEye size={20} />
-                      </button>
                       <button className="text-green-600 hover:text-green-800 transition duration-150">
                         <BiEdit size={20} />
                       </button>

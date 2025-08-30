@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
-import { BsEye } from "react-icons/bs";
 import {
     useQueryVeterinarian,
     deleteVeterinarian,
-    updateVeterinarian,
-    addVeterinarian
+    useAddVeterinarian,
+    useUpdateVeterinarian
 } from "../../../hook/veterinarian/useVeterinarian"
+import VetModal from "./ModalVet";
+import type { VeterinarianDTO } from "../../../types/veterinarian";
 
 export default function Veterinarian() {
     const [page, setPage] = useState(0);
@@ -19,12 +20,11 @@ export default function Veterinarian() {
         phoneNumber: "",
         page,
     });
-    const [showModal, setShowModal] = useState(false);
+    const [showModalCreate, setShowModalCreate] = useState(false);
     const [showEditModal, setEditShowModal] = useState(false);
     const { data, isLoading, error } = useQueryVeterinarian(searchParams);
-    const { mutateUpdate: mutateUpdateVet } = updateVeterinarian();
     const { mutateAsync: mutateDeleteVet } = deleteVeterinarian();
-    const { mutateAdd: mutateAddVet } = addVeterinarian();
+    const [selectedVet, setSelectedVet] = useState<VeterinarianDTO>();
 
     useEffect(() => {
         setSearchParams((prev) => ({ ...prev, page }));
@@ -62,7 +62,7 @@ export default function Veterinarian() {
 
                 <button
                     className="bg-blue-500 text-white px-2 py-2 rounded"
-                    onClick={() => setShowModal(true)}
+                    onClick={() => setShowModalCreate(true)}
                 >
                     + Thêm bác sĩ
                 </button>
@@ -78,7 +78,7 @@ export default function Veterinarian() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         className="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Tên người bác sĩ"
+                        placeholder="Tên bác sĩ"
                     />
                     <input
                         type="text"
@@ -153,12 +153,16 @@ export default function Veterinarian() {
                                     <td className="px-6 py-4">
                                         <div className="flex gap-3">
 
-                                            <button className="text-green-600 hover:text-green-800 transition duration-150">
+                                            <button className="text-green-600 hover:text-green-800 transition duration-150"
+                                                onClick={() => {
+                                                    setEditShowModal(true);
+                                                    setSelectedVet(item);
+                                                }}>
                                                 <BiEdit size={20} />
                                             </button>
                                             <button
                                                 className="text-red-600 hover:text-red-800 transition duration-150"
-                                                onClick={() => handleDelete(item.id)}
+                                                onClick={() => handleDelete(item.id as number)}
                                             >
                                                 <BiTrash size={20} />
                                             </button>
@@ -176,6 +180,20 @@ export default function Veterinarian() {
                     </tbody>
                 </table>
             </div>
+            {showModalCreate && (
+                <VetModal
+                    mode="create"
+                    onClose={() => setShowModalCreate(false)}
+                />
+            )}
+
+            {showEditModal && (
+                <VetModal
+                    mode="update"
+                    onClose={() => setEditShowModal(false)}
+                    initialData={selectedVet}>
+                </VetModal>
+            )}
 
             {data && data.totalPages > 0 && (
                 <div className="flex justify-end mt-4 gap-2">
