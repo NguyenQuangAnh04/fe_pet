@@ -69,7 +69,7 @@ const Sidebar = () => {
             <FaStethoscope /> Dịch vụ khám
           </Link>
           <Link
-            to="/dashboard/schedules"
+            to="/dashboard/appoint"
             className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
           >
             <FaCalendarCheck /> Quản lý lịch khám

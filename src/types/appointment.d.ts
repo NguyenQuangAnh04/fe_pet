@@ -30,3 +30,11 @@ export enum PetType {
   DOG,
   OTHER
 }
+
+export enum AppointStatus {
+  ALL= "",
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED",
+}

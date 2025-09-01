@@ -1,21 +1,20 @@
-import { OrderStatus, type OrderDTO } from "../../../types/order";
+import { AppointStatus, type AppointmentDTO } from "../../../types/appointment";
 import { formatPrice } from "../../../utils/format";
 
-type ModalOrderProps = {
+type ModalAppointProps = {
   onClose: () => void;
-  initialData?: OrderDTO;
+  initialData?: AppointmentDTO;
 };
 
-export default function ModalOrder({ onClose, initialData }: ModalOrderProps) {
+export default function ModalOrder({ onClose, initialData }: ModalAppointProps) {
   if (!initialData) return null;
-  const getStatusLabel = (status: OrderStatus) => {
-    const label: Record<OrderStatus, string> = {
-      [OrderStatus.ALL]: "",
-      [OrderStatus.PENDING]: "Đang xử lý",
-      [OrderStatus.CONFIRMED]: "Đã xác nhận",
-      [OrderStatus.SHIPPING]: "Đang giao hàng",
-      [OrderStatus.COMPLETED]: "Hoàn thành",
-      [OrderStatus.CANCELED]: "Đã hủy",
+  const getStatusLabel = (status: AppointStatus) => {
+    const label: Record<AppointStatus, string> = {
+      [AppointStatus.ALL]: "",
+      [AppointStatus.PENDING]: "Đang xử lý",
+      [AppointStatus.CONFIRMED]: "Đã xác nhận",
+      [AppointStatus.COMPLETED]: "Hoàn thành",
+      [AppointStatus.CANCELED]: "Đã hủy",
     };
     return label[status];
   };
@@ -24,7 +23,7 @@ export default function ModalOrder({ onClose, initialData }: ModalOrderProps) {
       <div className="bg-white rounded-2xl shadow-lg max-w-2xl w-full p-6 overflow-hidden">
         <div className="flex justify-between items-center border-b pb-3 mb-4">
           <h2 className="text-lg font-semibold">
-            Chi tiết đơn hàng #{initialData.id}
+            Chi tiết lịch khám #{initialData.id}
           </h2>
           <button
             onClick={onClose}
@@ -39,32 +38,38 @@ export default function ModalOrder({ onClose, initialData }: ModalOrderProps) {
             Thông tin khách hàng
           </h3>
           <p>
-            <span className="font-medium">Họ tên:</span> {initialData.fullName}
+            <span className="font-medium">Họ tên:</span> {initialData.ownerName}
           </p>
           <p>
             <span className="font-medium">Số điện thoại:</span>{" "}
             {initialData.phoneNumber}
           </p>
           <p>
-            <span className="font-medium">Địa chỉ:</span>{" "}
-            {initialData.addressDTO?.homeAddress},{" "}
-            {initialData.addressDTO?.commune},{" "}
-            {initialData.addressDTO?.district}, {initialData.addressDTO?.city}
+            <span className="font-medium">Email:</span>{" "}
+            {initialData.email}
           </p>
         </div>
 
         <div className="mb-4">
           <h3 className="font-semibold text-gray-700 mb-2">
-            Thông tin đơn hàng
+            Thông tin thú cưng
           </h3>
           <p>
-            <span className="font-medium">Ngày tạo:</span>{" "}
-            {initialData.createdAt}
+            <span className="font-medium">Tên Pet:</span>{" "}
+            {initialData.petName}
           </p>
-          <p>
+            <p>
+            <span className="font-medium">Giới tính:</span>{" "}
+            {initialData.petGender}
+          </p>
+            <p>
+            <span className="font-medium">Tuổi:</span>{" "}
+            {initialData.age}
+          </p>
+          {/* <p>
             <span className="font-medium">Trạng thái:</span>{" "}
-            {initialData.status && getStatusLabel(initialData.status)}
-          </p>
+            {initialData.appointStatus && getStatusLabel(initialData.appointStatus)}
+          </p> */}
           <p>
             <span className="font-medium">Thanh toán:</span>{" "}
             {initialData.paymentMethod}
