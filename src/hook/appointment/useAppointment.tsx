@@ -1,11 +1,11 @@
 import {
-   findAllAppointment,
-   updateAppointment,
-   deleteAppointment
+    findAllAppointment,
+    updateAppointment,
+    deleteAppointment
 } from "../../api/appointmentService";
 import { toast } from "react-toastify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { AppointmentDTO } from "../../types/appointment";
+import type { AppointmentDTO, AppointStatus } from "../../types/appointment";
 
 
 type AppointPageRes = {
@@ -16,7 +16,7 @@ type AppointPageRes = {
     number: number;
 }
 
-export function useQueryVeterinarian(searchParams = {}) {
+export function useQueryAppoint(searchParams = {}) {
     const { data, isLoading, error } = useQuery<AppointPageRes>({
         queryKey: ["appointment", searchParams],
         queryFn: async () => {
@@ -29,13 +29,15 @@ export function useQueryVeterinarian(searchParams = {}) {
 
 type UpdateAppointment = {
     id: number;
-    updateAppoint: AppointmentDTO;
+    appointment: {
+        appointStatus: AppointStatus;
+    };
 };
 export function useUpdateAppointment() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, updateAppoint }: UpdateAppointment) => {
-            return await updateAppointment(id, updateAppoint);
+        mutationFn: async ({ id, appointment }: UpdateAppointment) => {
+            return await updateAppointment(id, appointment);
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["appointment"] });

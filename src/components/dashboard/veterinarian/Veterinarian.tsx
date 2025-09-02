@@ -3,8 +3,6 @@ import { BiEdit, BiTrash } from "react-icons/bi";
 import {
     useQueryVeterinarian,
     deleteVeterinarian,
-    useAddVeterinarian,
-    useUpdateVeterinarian
 } from "../../../hook/veterinarian/useVeterinarian"
 import VetModal from "./ModalVet";
 import type { VeterinarianDTO } from "../../../types/veterinarian";
@@ -67,7 +65,6 @@ export default function Veterinarian() {
                     + Thêm bác sĩ
                 </button>
             </div>
-            {/* Search Section */}
             <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-lg font-semibold text-gray-700 mb-4">
                     Tìm kiếm Bác sĩ
