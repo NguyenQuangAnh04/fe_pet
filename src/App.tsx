@@ -1,26 +1,25 @@
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "./App.css";
+import Category from "./components/dashboard/category/Category";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import ProductDetails from "./pages/ProductDetails";
-import Cart from "./pages/Cart";
-import Account from "./pages/Account";
-import Checkout from "./pages/Checkout";
-import PrivateRoute from "./routes/PrivateRoute";
-import Category from "./components/dashboard/category/Category";
+import Register from "./pages/Register";
 import Services from "./pages/Services";
+import PrivateRoute from "./routes/PrivateRoute";
 
-import SearchPage from "./pages/SearchPage";
-import OrdersPage from "./pages/OrdersPage";
+import Appointment from "./components/dashboard/appointment/Appointment";
+import Examination from "./components/dashboard/examination/Examination";
 import Order from "./components/dashboard/order/Order";
-import User from "./components/dashboard/user/User";
 import Product from "./components/dashboard/product/Product";
+import User from "./components/dashboard/user/User";
 import Vet from "./components/dashboard/veterinarian/Veterinarian";
-import Exam from "./components/dashboard/examination/Examination";
-import Appoint from "./components/dashboard/appointment/Appointment";
+import ProductFilter from "./components/product/ProductFilter";
+import OrdersPage from "./pages/OrdersPage";
 
 function App() {
   return (
@@ -32,10 +31,10 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/services" element={<Services />} />
         <Route path="/" element={<Home />} />
-        <Route path="/account" element={<Account />} />
+        {/* <Route path="/account" element={<Account />} /> */}
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
-        <Route path="/search" element={<SearchPage />} />
+        <Route path="/search" element={<ProductFilter />} />
         <Route element={<PrivateRoute />}>
           <Route path="orders" element={<OrdersPage />} />
         </Route>
@@ -46,8 +45,8 @@ function App() {
             <Route path="orders" element={<Order />} />
             <Route path="account" element={<User />} />
             <Route path="vet" element={<Vet />} />
-            <Route path="exam" element={<Exam />} />
-            <Route path="appoint" element={<Appoint />} />
+            <Route path="exam" element={<Examination />} />
+            <Route path="appoint" element={<Appointment />} />
           </Route>
         </Route>
       </Routes>

@@ -7,32 +7,32 @@ import {
 } from "../../api/productService";
 import type { ProductDTO } from "./../../types/product.d";
 import { toast } from "react-toastify";
-type ProductResponse = {
+export type ProductResponse = {
   totalPages: number;
   content: ProductDTO[];
 };
 type UseQueryProductProps = {
-  name?: string;
+  keyword?: string;
   page?: number;
   categoryId?: number;
   size?: string;
-  minPrice?: number;
-  maxPrice?: number;
+  minPrice?: number | null;
+  maxPrice?: number | null;
 };
 export function useQueryProduct({
   page = 0,
-  name = "",
+  keyword = "",
   categoryId,
   size,
   minPrice,
   maxPrice,
 }: UseQueryProductProps) {
   return useQuery<ProductResponse>({
-    queryKey: ["product", page, name, categoryId, size, minPrice, maxPrice],
+    queryKey: ["product", page, keyword, categoryId, size, minPrice, maxPrice],
     queryFn: async () => {
       const res = await findAllProduct(
         page,
-        name,
+        keyword,
         categoryId,
         size,
         minPrice,

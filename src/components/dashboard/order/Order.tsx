@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BiPackage, BiPhone, BiUser } from "react-icons/bi";
-import { BsClock, BsCheckCircle, BsEye, BsTrash } from "react-icons/bs";
+import { BsCheckCircle, BsClock, BsEye, BsTrash } from "react-icons/bs";
 import { FaMoneyBillWave, FaTruck } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
 import { MdCancel } from "react-icons/md";
@@ -64,6 +64,25 @@ export default function Order() {
     setStatus(statusInput);
     setPage(pageInput);
   };
+  const pendingOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.PENDING
+  ).length;
+
+  const confirmedOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.CONFIRMED
+  ).length;
+
+  const shippingOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.SHIPPING
+  ).length;
+
+  const completedOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.COMPLETED
+  ).length;
+
+  const canceledOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.CANCELED
+  ).length;
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-semibold">Quản lý đơn hàng</h1>
@@ -267,8 +286,8 @@ export default function Order() {
                 </td>
 
                 <td className="text-left px-6 py-3">
-                  {item.createdAt
-                    ? new Date(item.createdAt).toLocaleDateString("vi-VN")
+                  {item.orderDate
+                    ? new Date(item.orderDate).toLocaleDateString("vi-VN")
                     : "-"}
                 </td>
                 <td className="text-left px-6 py-3">{item.paymentMethod}</td>
@@ -309,6 +328,7 @@ export default function Order() {
           </button>
           {Array.from({ length: data?.totalPages }, (_, index) => (
             <button
+              onClick={() => setPage(index)}
               className={`w-7 h-7 rounded shadow ${page === index
                 ? "text-white bg-blue-500 flex items-center justify-center"
                 : ""

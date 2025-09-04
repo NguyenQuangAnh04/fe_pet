@@ -22,7 +22,7 @@ export interface OrderDTO {
   phoneNumber?: string;
   totalAmount?: number;
   status?: OrderStatus;
-  createdAt?: string;
+  orderDate?: string;
   note?: string;
   items?: ItemDTO[];
   paymentMethod?: PaymentMethod;

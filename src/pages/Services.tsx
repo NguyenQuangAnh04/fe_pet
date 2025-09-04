@@ -351,7 +351,7 @@ export default function Services() {
                   </h2>
                   <button
                     onClick={() => setShowBookingModal(false)}
-                    classNamve="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600"
                     title="Đóng modal"
                     aria-label="Đóng modal đặt lịch"
                   >
