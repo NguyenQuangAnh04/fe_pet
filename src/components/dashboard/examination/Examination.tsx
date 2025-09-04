@@ -1,54 +1,57 @@
 import { useState, useEffect } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import {
-    useQueryVeterinarian,
-    deleteVeterinarian,
-} from "../../../hook/veterinarian/useVeterinarian"
-import VetModal from "./ModalVet";
-import type { VeterinarianDTO } from "../../../types/veterinarian";
+    useQueryExamination,
+    userAddExamination,
+    userUpdateExamination,
+    useDeleteExamination
+} from "../../../hook/examination/useExamination"
+import ExamModal from "./ModalExamination";
+import type { ExaminationDTO } from "../../../types/examination";
 
-export default function Veterinarian() {
+export default function Examination() {
     const [page, setPage] = useState(0);
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [min, setMin] = useState<number | null>(null);
+    const [max, setMax] = useState<number | null>(null);
     const [searchParams, setSearchParams] = useState({
         name: "",
-        email: "",
-        phoneNumber: "",
-        page,
+        min: 0 as number | null,
+        max: 0 as number | null,
+        page: 0,
     });
+
     const [showModalCreate, setShowModalCreate] = useState(false);
     const [showEditModal, setEditShowModal] = useState(false);
-    const { data, isLoading, error } = useQueryVeterinarian(searchParams);
-    const { mutateAsync: mutateDeleteVet } = deleteVeterinarian();
-    const [selectedVet, setSelectedVet] = useState<VeterinarianDTO>();
+    const { data, isLoading, error } = useQueryExamination(searchParams);
+    const { mutateAsync: mutateDeleteExam } = useDeleteExamination();
+    const [selectedExam, setSelectedExam] = useState<ExaminationDTO>();
 
     useEffect(() => {
         setSearchParams((prev) => ({ ...prev, page }));
     }, [page]);
 
     const handleDelete = async (id: number) => {
-        await mutateDeleteVet(id);
+        await mutateDeleteExam(id);
     };
 
     const handleSearch = () => {
         setSearchParams({
             name: name.trim(),
-            email: email.trim(),
-            phoneNumber: phoneNumber.trim(),
+            min: min,
+            max: max,
             page: 0,
         });
     };
 
     const handleClearSearch = () => {
         setName("");
-        setEmail("");
-        setPhoneNumber("");
+        setMin(null);
+        setMax(null);
         setSearchParams({
             name: "",
-            email: "",
-            phoneNumber: "",
+            min: null,
+            max: null,
             page: 0,
         });
     };
@@ -56,40 +59,42 @@ export default function Veterinarian() {
     return (
         <div className="p-4">
             <div className="flex justify-between ">
-                <h1 className="text-2xl font-semibold">Quản lý bác sĩ</h1>
+                <h1 className="text-2xl font-semibold">Quản lý dịch vụ khám</h1>
 
                 <button
                     className="bg-blue-500 text-white px-2 py-2 rounded"
                     onClick={() => setShowModalCreate(true)}
                 >
-                    + Thêm bác sĩ
+                    + Thêm dịch vụ khám
                 </button>
             </div>
-            <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
+            {/* Search Section */}
+            <div className="mb-6 bg-white p-8 rounded-lg shadow-md">
                 <h2 className="text-lg font-semibold text-gray-700 mb-4">
-                    Tìm kiếm Bác sĩ
+                    Tìm kiếm dịch vụ khám
                 </h2>
                 <div className="flex flex-wrap gap-4 items-center">
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Tên bác sĩ"
+                        className="flex-5 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Tên dịch vụ khám"
                     />
                     <input
-                        type="text"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Email"
+                        type="number"
+                        value={min ?? ""}
+                        onChange={(e) => setMin(e.target.value ? Number(e.target.value) : null)}
+                        className="flex-1 w-[20px] border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="min"
                     />
+                    -
                     <input
-                        type="text"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        className="flex-1 min-w-[200px] border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Số điện thoại"
+                        type="number"
+                        value={max ?? ""}
+                        onChange={(e) => setMax(e.target.value ? Number(e.target.value) : null)}
+                        className="flex-1 min-w-[20px] border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="max"
                     />
                     <button
                         onClick={handleSearch}
@@ -119,8 +124,8 @@ export default function Veterinarian() {
                         <tr>
                             <th className="px-4 py-5 text-left">ID</th>
                             <th className="px-4 py-5 text-left">Tên</th>
-                            <th className="px-4 py-5 text-left">Email</th>
-                            <th className="px-4 py-5 text-left">Sdt</th>
+                            <th className="px-4 py-5 text-left">Giá</th>
+                            <th className="px-4 py-5 text-left">Mô tả</th>
                             <th className="px-4 py-5 text-left">Ngày thêm</th>
                             <th className="px-4 py-5 text-left">Ngày sửa</th>
                             <th className="px-4 py-5 text-left">Thao tác</th>
@@ -135,8 +140,8 @@ export default function Veterinarian() {
                                 >
                                     <td className="px-4 py-2 text-sm">{item.id}</td>
                                     <td className="px-4 py-2 text-sm">{item.name}</td>
-                                    <td className="px-4 py-2 text-sm">{item.email}</td>
-                                    <td className="px-4 py-2 text-sm">{item.phoneNumber}</td>
+                                    <td className="px-4 py-2 text-sm">{item.price}</td>
+                                    <td className="px-4 py-2 text-sm">{item.description}</td>
                                     <td className="px-6 py-4">
                                         {item.createdAt
                                             ? new Date(item.createdAt).toLocaleDateString()
@@ -153,7 +158,7 @@ export default function Veterinarian() {
                                             <button className="text-green-600 hover:text-green-800 transition duration-150"
                                                 onClick={() => {
                                                     setEditShowModal(true);
-                                                    setSelectedVet(item);
+                                                    setSelectedExam(item);
                                                 }}>
                                                 <BiEdit size={20} />
                                             </button>
@@ -178,18 +183,18 @@ export default function Veterinarian() {
                 </table>
             </div>
             {showModalCreate && (
-                <VetModal
+                <ExamModal
                     mode="create"
                     onClose={() => setShowModalCreate(false)}
                 />
             )}
 
             {showEditModal && (
-                <VetModal
+                <ExamModal
                     mode="update"
                     onClose={() => setEditShowModal(false)}
-                    initialData={selectedVet}>
-                </VetModal>
+                    initialData={selectedExam}>
+                </ExamModal>
             )}
 
             {data && data.totalPages > 0 && (

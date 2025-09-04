@@ -28,14 +28,14 @@ export function useQueryVeterinarian(searchParams = {}) {
     return { data, isLoading, error };
 }
 
-export function addVeterinarian() {
+export function useAddVeterinarian() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (newVet: VeterinarianDTO) => {
             return await addVeterinarians(newVet);
         },
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ["vet"] });
+            queryClient.invalidateQueries({ queryKey: ["veterinarian"] });
             toast.success("Them vet thanh cong");
         },
         onError: (err) => {
@@ -48,15 +48,15 @@ export function addVeterinarian() {
 type UpdateVeterinarians = {
     id: number;
     updateVet: VeterinarianDTO;
-}
-export function updateVeterinarian() {
+};
+export function useUpdateVeterinarian() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ id, updateVet }: UpdateVeterinarians) => {
             return await updateVeterinarians(id, updateVet);
         },
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ["user"] });
+            queryClient.invalidateQueries({ queryKey: ["veterinarian"] });
             toast.success("Cập nhật vet thành công!");
         },
         onError: (err) => {
@@ -73,7 +73,7 @@ export function deleteVeterinarian() {
             return await deleteVeterinarians(id);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["user"] });
+            queryClient.invalidateQueries({ queryKey: ["veterinarian"] });
             toast.success("Xóa vet thành công!");
         },
         onError: (err) => {

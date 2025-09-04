@@ -18,8 +18,14 @@ import OrdersPage from "./pages/OrdersPage";
 import Order from "./components/dashboard/order/Order";
 import User from "./components/dashboard/user/User";
 import Product from "./components/dashboard/product/Product";
+<<<<<<< HEAD
 import Vet from "./components/dashboard/veterinarian/Veterinarian"
 import ProductFilter from "./components/product/ProductFilter";
+=======
+import Vet from "./components/dashboard/veterinarian/Veterinarian";
+import Exam from "./components/dashboard/examination/Examination";
+import Appoint from "./components/dashboard/appointment/Appointment";
+>>>>>>> 0eeee39161fa3c818dcafb18bc49b519e81ec698
 
 function App() {
   return (
@@ -45,6 +51,8 @@ function App() {
             <Route path="orders" element={<Order />} />
             <Route path="account" element={<User />} />
             <Route path="vet" element={<Vet />} />
+            <Route path="exam" element={<Exam />} />
+            <Route path="appoint" element={<Appoint />} />
           </Route>
         </Route>
       </Routes>
