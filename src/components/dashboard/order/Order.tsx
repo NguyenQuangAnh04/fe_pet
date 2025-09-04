@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BiPackage, BiPhone, BiUser } from "react-icons/bi";
-import { BsClock, BsCheckCircle, BsEye, BsTrash } from "react-icons/bs";
+import { BsCheckCircle, BsClock, BsEye, BsTrash } from "react-icons/bs";
 import { FaMoneyBillWave, FaTruck } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
 import { MdCancel } from "react-icons/md";
@@ -60,6 +60,25 @@ export default function Order() {
     setStatus(statusInput);
     setPage(pageInput);
   };
+  const pendingOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.PENDING
+  ).length;
+
+  const confirmedOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.CONFIRMED
+  ).length;
+
+  const shippingOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.SHIPPING
+  ).length;
+
+  const completedOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.COMPLETED
+  ).length;
+
+  const canceledOrders = data?.content.filter(
+    (order) => order.status === OrderStatus.CANCELED
+  ).length;
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-semibold">Quản lý đơn hàng</h1>
@@ -78,7 +97,7 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đang xử lý</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{pendingOrders}</p>
           </div>
           <BsClock size={30} className="text-yellow-500" />
         </div>
@@ -86,7 +105,7 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đang giao</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{shippingOrders}</p>
           </div>
           <FaTruck size={30} className="text-purple-500" />
         </div>
@@ -94,7 +113,7 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã giao</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{completedOrders}</p>
           </div>
           <BsCheckCircle size={30} className="text-green-500" />
         </div>
@@ -102,7 +121,7 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã hủy</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{canceledOrders && canceledOrders > 0 ? canceledOrders : ""}</p>
           </div>
           <MdCancel size={30} className="text-red-500" />
         </div>
@@ -111,7 +130,12 @@ export default function Order() {
           <div>
             <h1 className="font-medium">Doanh thu</h1>
             <p className=" text-sm text-green-400 font-semibold">
-              200.000.000 VNĐ
+              {data && data.content
+                .reduce((total, order) => total + (order.totalAmount || 0), 0)
+                .toLocaleString("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                })}
             </p>
           </div>
           <FaMoneyBillWave size={30} className="text-green-500" />
@@ -253,8 +277,8 @@ export default function Order() {
                 </td>
 
                 <td className="text-left px-6 py-3">
-                  {item.createdAt
-                    ? new Date(item.createdAt).toLocaleDateString("vi-VN")
+                  {item.orderDate
+                    ? new Date(item.orderDate).toLocaleDateString("vi-VN")
                     : "-"}
                 </td>
                 <td className="text-left px-6 py-3">{item.paymentMethod}</td>
@@ -295,11 +319,11 @@ export default function Order() {
           </button>
           {Array.from({ length: data?.totalPages }, (_, index) => (
             <button
-              className={`w-7 h-7 rounded shadow ${
-                page === index
-                  ? "text-white bg-blue-500 flex items-center justify-center"
-                  : ""
-              }`}
+              onClick={() => setPage(index)}
+              className={`w-7 h-7 rounded shadow ${page === index
+                ? "text-white bg-blue-500 flex items-center justify-center"
+                : ""
+                }`}
             >
               {index + 1}
             </button>

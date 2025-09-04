@@ -1,8 +1,8 @@
-import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { BsEye } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 import type { ProductDTO } from "../types/product";
 import { formatPrice } from "../utils/format";
-import { BsEye } from "react-icons/bs";
 
 import ProductCard from "../components/common/ProductCard";
 import type { ProductResponse } from "../hook/product/useProduct";

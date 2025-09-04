@@ -1,11 +1,11 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { BiMinus, BiPlus, BiX } from "react-icons/bi";
-import { motion, AnimatePresence } from "framer-motion";
 import { useAddCart } from "../../hook/carts/useCart";
 import type { CartDTOItem } from "../../types/cart";
 import type { ProductDTO } from "../../types/product";
-import { formatPrice } from "../../utils/format";
 import type { VariantDTO } from "../../types/variant";
+import { formatPrice } from "../../utils/format";
 
 type ProductCard = {
   isOpen: boolean;
@@ -40,9 +40,17 @@ const ProductCard: React.FC<ProductCard> = ({
       quantity: formData?.quantity,
       size: selectSize?.size,
     };
+    console.log(cartItem);
     return await useMutationAddCart(cartItem);
   };
-
+  useEffect(() => {
+    if (initalData?.variants && initalData.variants.length > 0) {
+      setSizes(0);
+      setSelectSize(initalData.variants[0]);
+    } else {
+      setSelectSize(undefined);
+    }
+  }, [initalData]);
   const handleChangeQuantity = (newQuantity: number) => {
     if (newQuantity < 1) return;
     setFormData((prev) => ({ ...prev, quantity: newQuantity }));
@@ -80,9 +88,8 @@ const ProductCard: React.FC<ProductCard> = ({
                   src={item.imageUrl}
                   alt=""
                   onClick={() => setSelectedImage(i)}
-                  className={`w-[70px] h-[70px] cursor-pointer ${
-                    selectedImage === i ? "border" : ""
-                  }`}
+                  className={`w-[70px] h-[70px] cursor-pointer ${selectedImage === i ? "border" : ""
+                    }`}
                 />
               ))}
             </div>
@@ -96,6 +103,7 @@ const ProductCard: React.FC<ProductCard> = ({
             </div>
             <p className="text-red-600 font-semibold mt-5">
               {initalData.variants &&
+                initalData.variants[sizes].price !== undefined &&
                 formatPrice(initalData.variants[sizes].price)}
             </p>
 
@@ -111,9 +119,8 @@ const ProductCard: React.FC<ProductCard> = ({
                         setSizes(i);
                         setSelectSize(size);
                       }}
-                      className={` px-2 py-2 cursor-pointer ${
-                        sizes === i ? "border border-amber-600" : "border"
-                      }`}
+                      className={` px-2 py-2 cursor-pointer ${sizes === i ? "border border-amber-600" : "border"
+                        }`}
                     >
                       {size.size}
                     </span>
@@ -151,10 +158,11 @@ const ProductCard: React.FC<ProductCard> = ({
             <p className="mt-2">
               Tổng tiền :{" "}
               <span>
-                {initalData.price * formData?.quantity! &&
-                  initalData.variants &&
+                {initalData.variants &&
+                  initalData.variants[sizes] !== undefined &&
+                  initalData.variants[sizes].price !== undefined &&
                   formatPrice(
-                    initalData.variants[sizes].price * formData?.quantity!
+                    (initalData.variants[sizes]?.price ?? 0) * (formData?.quantity ?? 1)
                   )}
               </span>
             </p>

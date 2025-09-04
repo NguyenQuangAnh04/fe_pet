@@ -59,7 +59,9 @@ export default function ModalOrder({ onClose, initialData }: ModalOrderProps) {
           </h3>
           <p>
             <span className="font-medium">Ngày tạo:</span>{" "}
-            {initialData.createdAt}
+            {initialData.orderDate
+              ? new Date(initialData.orderDate).toLocaleDateString("vi-VN")
+              : "-"}
           </p>
           <p>
             <span className="font-medium">Trạng thái:</span>{" "}
@@ -92,6 +94,7 @@ export default function ModalOrder({ onClose, initialData }: ModalOrderProps) {
                     SL: {item.quantity} ×{" "}
                     {item.price && formatPrice(item.price)}
                   </p>
+                  <p className="text-sm text-gray-600">{item.size}</p>
                 </div>
                 <p className="font-semibold">
                   {item.price &&

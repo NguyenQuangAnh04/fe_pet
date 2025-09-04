@@ -1,11 +1,11 @@
-import { useState } from "react";
 import { Filter } from "lucide-react";
-import SearchPage from "../../pages/SearchPage";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
-import { useQueryProduct } from "../../hook/product/useProduct";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useQueryCategory } from "../../hook/category/useCategoty";
+import { useQueryProduct } from "../../hook/product/useProduct";
+import SearchPage from "../../pages/SearchPage";
+import Footer from "../common/Footer";
+import Header from "../common/Header";
 
 export default function PetProductFilter() {
   const [categoryIdInput, setCategoryIdInput] = useState<number | null>(null);
@@ -26,13 +26,12 @@ export default function PetProductFilter() {
     setAppliedCategory(categoryIdInput);
     setAppliedMinPrice(minPrice);
     setAppliedMaxPrice(maxPrice);
-    setAppliedSize(size);
+    setAppliedSize(size?.toLowerCase() ?? null);
     setPage(0);
   };
-  
+
   const [name, setName] = useState<string>("");
-  console.log(productData);
-  
+
   const { data: categoryData } = useQueryCategory({ page: 0, name });
   return (
     <div>
