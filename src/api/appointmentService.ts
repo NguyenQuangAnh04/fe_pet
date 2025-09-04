@@ -13,7 +13,7 @@ export const findAllAppointment = (params?: {
 }) => {
     return api.get("/appointment", { params });
 };
-export interface updateStatus{
+export interface updateStatus {
     appointStatus: AppointStatus;
 }
 export const updateAppointment = async (id: number, appointment: updateStatus) =>

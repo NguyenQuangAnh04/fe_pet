@@ -10,6 +10,7 @@ import {
   useQueryAppoint,
   useUpdateAppointment
 } from "../../../hook/appointment/useAppointment";
+import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useDashboard"
 import { formatPrice } from "../../../utils/format";
 import ModalAppoint from "./ModalAppointment";
 
@@ -17,23 +18,20 @@ export default function Appointment() {
   const [ownerName, setOwnerName] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [namePet, setNamePet] = useState<string>("");
-  const [nameVet, setNameVet] = useState<string>("");
+  const [petName, setPetName] = useState<string>("");
+  const [vetName, setVetName] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [page, setPage] = useState<number>(0);
+  const { data: countStatus } = useQueryAppointCountStatus();
+  const { data: totalRevenue } = useQueryAppointTotalRevenue();
   const [searchParams, setSearchParams] = useState({
     ownerName: "",
     phoneNumber: "",
     email: "",
-    namePet: "",
-    nameVet: "",
+    petName: "",
+    vetName: "",
     status: "",
     page
-  });
-  const [pageInput] = useState<number>(0);
-  const { data } = useQueryAppoint({
-    ownerName, phoneNumber, email,
-    namePet, nameVet, status, page
   });
   const { mutateAsync: mutateDeleteOrder } = useDeleteAppointment();
   const handleDelete = (id: number) => {
@@ -64,14 +62,15 @@ export default function Appointment() {
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDTO>();
   const [showModalAppointment, setShowModalAppointment] = useState(false);
   const { mutateAsync: mutateUpdateAppointment } = useUpdateAppointment();
+  const { data, isLoading, error } = useQueryAppoint(searchParams);
 
   const handleSearch = () => {
     setSearchParams({
       ownerName: ownerName.trim(),
       phoneNumber: phoneNumber.trim(),
       email: email.trim(),
-      namePet: namePet.trim(),
-      nameVet: nameVet.trim(),
+      petName: petName.trim(),
+      vetName: vetName.trim(),
       status: status.trim(),
       page: 0,
     });
@@ -81,15 +80,15 @@ export default function Appointment() {
     setOwnerName("");
     setPhoneNumber("");
     setEmail("");
-    setNamePet("");
-    setNameVet("");
+    setPetName("");
+    setVetName("");
     setStatus("");
     setSearchParams({
       ownerName: "",
       phoneNumber: "",
       email: "",
-      namePet: "",
-      nameVet: "",
+      petName: "",
+      vetName: "",
       status: "",
       page: 0,
     });
@@ -113,7 +112,7 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đang xử lý</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "PENDING")?.[1] ?? 0}</p>
           </div>
           <BsClock size={30} className="text-yellow-500" />
         </div>
@@ -121,7 +120,7 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã xác nhận</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "CONFIRMED")?.[1] ?? 0}</p>
           </div>
           <FaTruck size={30} className="text-purple-500" />
         </div>
@@ -129,7 +128,7 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã hoàn thành</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "COMPLETED")?.[1] ?? 0}</p>
           </div>
           <BsCheckCircle size={30} className="text-green-500" />
         </div>
@@ -137,7 +136,7 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã hủy</h1>
-            <p className="text-gray-400 text-sm">5</p>
+            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "CANCELED")?.[1] ?? 0}</p>
           </div>
           <MdCancel size={30} className="text-red-500" />
         </div>
@@ -145,8 +144,8 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Doanh thu</h1>
-            <p className=" text-sm text-green-400 font-semibold">
-              200.000.000 VNĐ
+            <p className="text-sm text-green-400 font-semibold">
+              {totalRevenue?.toLocaleString("vi-VN") ?? 0} VNĐ
             </p>
           </div>
           <FaMoneyBillWave size={30} className="text-green-500" />
@@ -160,12 +159,10 @@ export default function Appointment() {
           <div className="relative">
             <input
               type="text"
-              name=""
               value={ownerName}
               onChange={(e) => setOwnerName(e.target.value)}
-              id=""
               placeholder="Tên khách hàng"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm "
+              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
             />
             <BiUser
               size={25}
@@ -176,12 +173,10 @@ export default function Appointment() {
           <div className="relative ">
             <input
               type="tel"
-              name=""
-              id=""
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="Nhập số điện thoại"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm "
+              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
             />
             <BiPhone
               size={25}
@@ -197,7 +192,7 @@ export default function Appointment() {
               onChange={(e) => setEmail(e.target.value)}
               id=""
               placeholder="  Tìm kiếm theo email"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm "
+              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
             />
             <FaEnvelope
               size={25}
@@ -208,12 +203,10 @@ export default function Appointment() {
           <div className="relative">
             <input
               type="text"
-              name=""
-              value={namePet}
-              onChange={(e) => setNamePet(e.target.value)}
-              id=""
+              value={petName}
+              onChange={(e) => setPetName(e.target.value)}
               placeholder=" Tên thú cưng"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm "
+              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
             />
             <FaDog
               size={25}
@@ -224,12 +217,10 @@ export default function Appointment() {
           <div className="relative">
             <input
               type="text"
-              name=""
-              value={namePet}
-              onChange={(e) => setNameVet(e.target.value)}
-              id=""
+              value={vetName}
+              onChange={(e) => setVetName(e.target.value)}
               placeholder="Tên bác sĩ"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm "
+              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
             />
             <BiUser
               size={25}
@@ -241,27 +232,33 @@ export default function Appointment() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              name=""
-              id=""
-              className="focus:ring-0 focus:outline-none border border-gray-300 rounded-lg px-3 py-2"
+              className="focus:ring-0 focus:outline-none border border-gray-300 rounded-lg px-3 py-2 w-50"
             >
               <option value="">Tất cả trạng thái</option>
               {Object.values(AppointStatus)
-                .filter((iterm) => iterm !== "")
-                .map((status) => (
-                  <option key={status} value={status}>
-                    {getStatusLabel(status)}
+                .filter((i) => i !== "")
+                .map((it) => (
+                  <option key={it} className="bg-white text-black" value={it}>
+                    {getStatusLabel(it)}
                   </option>
                 ))}
+
             </select>
           </div>
           <button
             type="button"
-            // onClick={() => handleFilter()}
+            onClick={handleSearch}
             className="flex items-center justify-center border border-gray-300  rounded-lg px-3 py-2 bg-blue-500 text-white"
           >
             <FiFilter size={25} />
             Lọc
+          </button>
+          <button
+            type="button"
+            onClick={handleClearSearch}
+            className="flex items-center justify-center border border-gray-300  rounded-lg px-3 py-2 bg-blue-500 text-white"
+          >
+            Xoá lọc
           </button>
         </form>
       </div>
@@ -297,7 +294,7 @@ export default function Appointment() {
           </thead>
           <tbody>
             {data?.content.map((item) => (
-              <tr className="shadown  border-b border-b-gray-200 hover:bg-gray-50">
+              <tr key={item.id} className="shadown border-b border-b-gray-200 hover:bg-gray-50">
                 <td className="text-left px-6 py-3">#{item.id}</td>
                 <td className="text-left px-6 py-3 flex flex-col">
                   {item.ownerName}{" "}
