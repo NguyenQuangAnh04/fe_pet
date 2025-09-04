@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   FaBoxOpen,
   FaCalendarCheck,
@@ -5,13 +6,23 @@ import {
   FaClipboardList,
   FaListAlt,
   FaSignOutAlt,
+  FaStethoscope,
   FaUser,
   FaUserMd,
-  FaStethoscope,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:8080/api/auth/logout", {}, { withCredentials: true });
+      localStorage.removeItem("accessToken");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  }
   return (
     <div className=" min-h-screen h-full bg-blue-950 w-[250px]">
       <div className="mt-10">
@@ -76,12 +87,12 @@ const Sidebar = () => {
           </Link>
         </nav>
         <div className=" px-6 text-white mb-2">
-          <Link
-            to="/logout"
+          <button
+            onClick={handleLogout}
             className="text-white text-sm flex items-center gap-2"
           >
             <FaSignOutAlt /> Đăng xuất
-          </Link>
+          </button>
         </div>
       </div>
     </div>
