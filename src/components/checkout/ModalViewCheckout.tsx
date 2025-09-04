@@ -40,6 +40,7 @@ export default function ModalViewCheckOut({
                       className="w-16 h-16 object-cover rounded mr-4"
                     />
                   )}
+                  
                   <div className="flex-1">
                     <p className="font-medium">{item.productName}</p>
                     <p>Số lượng: {item.quantity}</p>

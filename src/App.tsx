@@ -19,6 +19,7 @@ import Order from "./components/dashboard/order/Order";
 import User from "./components/dashboard/user/User";
 import Product from "./components/dashboard/product/Product";
 import Vet from "./components/dashboard/veterinarian/Veterinarian"
+import ProductFilter from "./components/product/ProductFilter";
 
 function App() {
   return (
@@ -33,7 +34,7 @@ function App() {
         <Route path="/account" element={<Account />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
-        <Route path="/search" element={<SearchPage />} />
+        <Route path="/search" element={<ProductFilter />} />
         <Route element={<PrivateRoute />}>
           <Route path="orders" element={<OrdersPage />} />
         </Route>
