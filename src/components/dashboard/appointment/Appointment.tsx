@@ -10,7 +10,7 @@ import {
   useQueryAppoint,
   useUpdateAppointment
 } from "../../../hook/appointment/useAppointment";
-import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useDashboard"
+import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useStatistics"
 import { formatPrice } from "../../../utils/format";
 import ModalAppoint from "./ModalAppointment";
 
