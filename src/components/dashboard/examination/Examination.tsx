@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import {
-    useQueryExamination,
-    userAddExamination,
-    userUpdateExamination,
-    useDeleteExamination
-} from "../../../hook/examination/useExamination"
-import ExamModal from "./ModalExamination";
+    useDeleteExamination,
+    useQueryExamination
+} from "../../../hook/examination/useExamination";
 import type { ExaminationDTO } from "../../../types/examination";
+import ExamModal from "./ModalExamination";
 
 export default function Examination() {
     const [page, setPage] = useState(0);

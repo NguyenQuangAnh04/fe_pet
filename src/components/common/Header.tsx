@@ -10,6 +10,7 @@ import { useQueryCartByUser } from "../../hook/carts/useCart";
 import type { ProductDTO } from "../../types/product";
 import { formatPrice } from "../../utils/format";
 
+
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const { data } = useQueryCartByUser();
@@ -17,7 +18,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
+  
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
@@ -172,6 +173,27 @@ const Header = () => {
         </nav>
       </div>
     </div>
+    // <section className="flex items-center justify-between px-4 py-2 sticky top-0 left-0 z-50 transition-all duration-300 bg-white backdrop-blur-sm max-w-[1440px] mx-auto">
+    //   <div className="flex gap-3">
+    //     <a href="">Trang chủ</a>
+    //     <a href="">Dịch vụ</a>
+    //     <a href="">Shop</a>
+    //     <a href="">Giới thiệu</a>
+    //     <a href="">Liên hệ</a>
+    //   </div>
+    //   <div className="flex items-center gap-6 justify-center">
+    //     <p>+0965693740</p>
+    //     {
+    //       data && data.cartItems.length > 0 && (
+    //         <div className="relative">
+    //           <p className="w-10 h-10 "> <FiShoppingCart size={25} /></p>
+    //           <p className="absolute -top-2 right-1 ">{data.cartItems.length}</p>
+    //         </div>
+    //       )
+    //     }
+    //     <a className="bg-yellow-500 text-white px-4 py-2 rounded-2xl">Đặt lịch hẹn!</a>
+    //   </div>
+    // </section>
   );
 };
 
