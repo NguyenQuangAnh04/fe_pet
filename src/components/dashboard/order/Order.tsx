@@ -9,6 +9,7 @@ import {
   useQueryOrder,
   useUpdateOrderAdmin,
 } from "../../../hook/order/useOrder";
+import { useQueryCountStatus, useQueryTotalRevenue } from "../../../hook/dashboard/useDashboard";
 import { OrderStatus, type OrderDTO } from "../../../types/order";
 import { formatPrice } from "../../../utils/format";
 import ModalOrder from "./ModalOrder";
@@ -23,7 +24,10 @@ export default function Order() {
   const [statusInput, setStatusInput] = useState<string>("");
   const [pageInput] = useState<number>(0);
   const { data } = useQueryOrder({ name, phoneNumber, status, page });
+  const { data: countStatus } = useQueryCountStatus();
+  const { data: totalRevenue } = useQueryTotalRevenue();
   const { mutateAsync: mutateDeleteOrder } = useDeleteOrder();
+
   const handleDelete = (id: number) => {
     return mutateDeleteOrder(id);
   };
@@ -97,15 +101,25 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đang xử lý</h1>
-            <p className="text-gray-400 text-sm">{pendingOrders}</p>
+            <p className="text-gray-400 text-sm">
+              {countStatus?.find(([status]) => status === "PENDING")?.[1] ?? 0}
+            </p>
           </div>
           <BsClock size={30} className="text-yellow-500" />
         </div>
 
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
+            <h1 className="font-medium">Đã xác nhận</h1>
+            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "CONFIRMED")?.[1] ?? 0}</p>
+          </div>
+          <FaTruck size={30} className="text-purple-500" />
+        </div>
+
+        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
+          <div>
             <h1 className="font-medium">Đang giao</h1>
-            <p className="text-gray-400 text-sm">{shippingOrders}</p>
+            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "SHIPPING")?.[1] ?? 0}</p>
           </div>
           <FaTruck size={30} className="text-purple-500" />
         </div>
@@ -113,7 +127,7 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã giao</h1>
-            <p className="text-gray-400 text-sm">{completedOrders}</p>
+            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "COMPLETED")?.[1] ?? 0}</p>
           </div>
           <BsCheckCircle size={30} className="text-green-500" />
         </div>
@@ -121,7 +135,7 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã hủy</h1>
-            <p className="text-gray-400 text-sm">{canceledOrders && canceledOrders > 0 ? canceledOrders : ""}</p>
+            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "CANCELED")?.[1] ?? 0}</p>
           </div>
           <MdCancel size={30} className="text-red-500" />
         </div>
@@ -129,13 +143,8 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Doanh thu</h1>
-            <p className=" text-sm text-green-400 font-semibold">
-              {data && data.content
-                .reduce((total, order) => total + (order.totalAmount || 0), 0)
-                .toLocaleString("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                })}
+            <p className="text-sm text-green-400 font-semibold">
+              {totalRevenue?.toLocaleString("vi-VN") ?? 0} VNĐ
             </p>
           </div>
           <FaMoneyBillWave size={30} className="text-green-500" />

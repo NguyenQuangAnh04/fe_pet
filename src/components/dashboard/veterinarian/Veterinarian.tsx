@@ -126,7 +126,7 @@ export default function Veterinarian() {
                             <th className="px-4 py-5 text-left">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody className="text-gray-700">
+                    <tbody className="text-gray-700 font-semibold">
                         {data?.content && data.content.length > 0 ? (
                             data.content.map((item) => (
                                 <tr

@@ -54,6 +54,9 @@ export default function User() {
 
   return (
     <div className="p-4">
+      <div className="flex justify-between ">
+        <h1 className="text-2xl font-semibold">Quản lý người dùng</h1>
+      </div>
       {/* Search Section */}
       <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-lg font-semibold text-gray-700 mb-4">
@@ -117,7 +120,7 @@ export default function User() {
               <th className="px-4 py-5 text-left">Thao tác</th>
             </tr>
           </thead>
-          <tbody className="text-gray-700">
+          <tbody className="text-gray-700 font-semibold">
             {data?.content && data.content.length > 0 ? (
               data.content.map((item) => (
                 <tr
@@ -189,11 +192,10 @@ export default function User() {
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
             disabled={page === 0}
-            className={`w-[30px] h-[30px] rounded border ${
-              page === 0
+            className={`w-[30px] h-[30px] rounded border ${page === 0
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-blue-400 text-white"
-            }`}
+              }`}
           >
             &lt;
           </button>
@@ -202,11 +204,10 @@ export default function User() {
             <button
               onClick={() => setPage(i)}
               className={`rounded w-[30px] h-[30px] flex items-center justify-center
-              ${
-                page === i
+              ${page === i
                   ? "bg-blue-600 text-white"
                   : " text-black shadow border border-gray-300 "
-              }
+                }
             `}
               key={i}
             >
@@ -219,11 +220,10 @@ export default function User() {
               setPage((prev) => Math.min(prev + 1, data.totalPages - 1))
             }
             disabled={page === data.totalPages - 1}
-            className={`rounded border w-[30px] h-[30px] ${
-              page === data.totalPages - 1
+            className={`rounded border w-[30px] h-[30px] ${page === data.totalPages - 1
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-blue-400 text-white"
-            }`}
+              }`}
           >
             &gt;
           </button>
