@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { BiPlus, BiUpload, BiX } from "react-icons/bi";
-import type { ProductDTO } from "../../../types/product";
+import { BsX } from "react-icons/bs";
+import { toast } from "react-toastify";
+import { useQueryAllCategory } from "../../../hook/category/useCategoty";
 import {
   useAddProduct,
   useUpdateProduct,
 } from "../../../hook/product/useProduct";
-import { useQueryAllCategory } from "../../../hook/category/useCategoty";
-import { toast } from "react-toastify";
+import { useDeleteVariant } from "../../../hook/variant/useVariant";
+import type { ProductDTO } from "../../../types/product";
 import type { VariantDTO } from "../../../types/variant";
-import { BsX } from "react-icons/bs";
 
 type ModalProduct = {
   isOpen: boolean;
@@ -38,6 +39,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
 
   const { mutateAsync: mutateAddProduct } = useAddProduct();
   const { mutateAsync: mutateUpdateProduct } = useUpdateProduct();
+  const { mutateAsync: mutateDeleteVariant } = useDeleteVariant()
   const [categoryId, setCategoryId] = useState(1);
   const { data } = useQueryAllCategory();
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -349,13 +351,11 @@ const ModalProduct: React.FC<ModalProduct> = ({
                   </div>
                   <button
                     onClick={() => {
-                      setVariants((prev) =>
-                        prev.filter((_, idx) => idx !== index)
-                      );
+                      mutateDeleteVariant(item.id!);
                     }}
                     className="absolute right-0 top-0 bg-red-500 rounded-full text-white"
                   >
-                    <BsX />
+                    <BsX /> 
                   </button>
                 </div>
               ))}
@@ -372,11 +372,10 @@ const ModalProduct: React.FC<ModalProduct> = ({
           <button
             onClick={handleSubmit}
             disabled={loading || !validateForm()}
-            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-              loading || !validateForm()
+            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${loading || !validateForm()
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
-            }`}
+              }`}
           >
             {loading ? (
               <div className="flex items-center gap-2">
