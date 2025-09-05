@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import {
     useQueryExamination,

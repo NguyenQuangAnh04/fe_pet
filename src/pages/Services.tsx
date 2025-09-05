@@ -1,6 +1,6 @@
-import { useState } from "react";
-import Header from "../components/common/Header";
+import { useMemo, useState } from "react";
 import Footer from "../components/common/Footer";
+import Header from "../components/common/Header";
 
 interface Service {
   id: number;
@@ -12,38 +12,22 @@ interface Service {
   category: "medical" | "grooming" | "training" | "boarding";
 }
 
-interface BookingForm {
-  serviceId: number;
-  petName: string;
-  petType: "dog" | "cat" | "other";
-  petAge: string;
-  ownerName: string;
-  phone: string;
-  email: string;
-  date: string;
-  time: string;
-  notes: string;
-}
-
 type ServiceCategory = "all" | "medical" | "grooming" | "training" | "boarding";
 
+type ScheduledItem = {
+  serviceId: number;
+  date: string; // yyyy-mm-dd
+  time: string; // hh:mm
+};
+
 export default function Services() {
-  const [selectedCategory, setSelectedCategory] =
-    useState<ServiceCategory>("all");
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [bookingForm, setBookingForm] = useState<BookingForm>({
-    serviceId: 0,
-    petName: "",
-    petType: "dog",
-    petAge: "",
-    ownerName: "",
-    phone: "",
-    email: "",
-    date: "",
-    time: "",
-    notes: "",
-  });
+  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>("all");
+  // selected services with their chosen date/time
+  const [scheduled, setScheduled] = useState<ScheduledItem[]>([]);
+  const [petName, setPetName] = useState("");
+  const [ownerName, setOwnerName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
   const services: Service[] = [
     // Medical Services
@@ -177,54 +161,54 @@ export default function Services() {
       ? services
       : services.filter((service) => service.category === selectedCategory);
 
-  const handleBookService = (service: Service) => {
-    setSelectedService(service);
-    setBookingForm((prev) => ({ ...prev, serviceId: service.id }));
-    setShowBookingModal(true);
+  const today = new Date().toISOString().split("T")[0];
+
+  const selectedServicesIds = useMemo(() => scheduled.map((s) => s.serviceId), [scheduled]);
+
+  const toggleSelectService = (service: Service) => {
+    const exists = scheduled.find((s) => s.serviceId === service.id);
+    if (exists) {
+      setScheduled((prev) => prev.filter((p) => p.serviceId !== service.id));
+    } else {
+      // add with default date = today and first time slot
+      setScheduled((prev) => [
+        ...prev,
+        { serviceId: service.id, date: today, time: timeSlots[0] },
+      ]);
+    }
   };
 
-  const handleBookingFormChange = (field: keyof BookingForm, value: string) => {
-    setBookingForm((prev) => ({ ...prev, [field]: value }));
+  const updateScheduled = (serviceId: number, patch: Partial<ScheduledItem>) => {
+    setScheduled((prev) => prev.map((s) => (s.serviceId === serviceId ? { ...s, ...patch } : s)));
   };
 
-  const handleSubmitBooking = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Validation
-    const requiredFields: (keyof BookingForm)[] = [
-      "petName",
-      "ownerName",
-      "phone",
-      "email",
-      "date",
-      "time",
-    ];
-    const missingFields = requiredFields.filter((field) => !bookingForm[field]);
-
-    if (missingFields.length > 0) {
-      alert("Vui lòng điền đầy đủ thông tin bắt buộc");
+  const handleConfirmBooking = () => {
+    if (!petName || !ownerName || !phone || !email) {
+      alert("Vui lòng điền tên thú cưng và thông tin liên hệ (tên, điện thoại, email)");
       return;
     }
 
-    // Mock API call
-    alert(
-      `Đặt lịch thành công!\nDịch vụ: ${selectedService?.name}\nNgày: ${bookingForm.date}\nGiờ: ${bookingForm.time}\nChúng tôi sẽ liên hệ xác nhận trong thời gian sớm nhất.`
-    );
+    if (scheduled.length === 0) {
+      alert("Chưa chọn dịch vụ nào");
+      return;
+    }
 
-    // Reset form
-    setShowBookingModal(false);
-    setBookingForm({
-      serviceId: 0,
-      petName: "",
-      petType: "dog",
-      petAge: "",
-      ownerName: "",
-      phone: "",
-      email: "",
-      date: "",
-      time: "",
-      notes: "",
-    });
+    // Mock API call for multiple bookings
+    const summary = scheduled
+      .map((s) => {
+        const svc = services.find((x) => x.id === s.serviceId);
+        return `- ${svc?.name} — ${s.date} ${s.time}`;
+      })
+      .join("\n");
+
+    alert(`Đặt lịch thành công!\nTên thú cưng: ${petName}\nChủ: ${ownerName}\nSĐT: ${phone}\nEmail: ${email}\n\n${summary}`);
+
+    // reset
+    setScheduled([]);
+    setPetName("");
+    setOwnerName("");
+    setPhone("");
+    setEmail("");
   };
 
   return (
@@ -261,46 +245,101 @@ export default function Services() {
           </div>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {filteredServices.map((service) => (
-            <div
-              key={service.id}
-              className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="text-center mb-4">
-                <div className="text-4xl mb-2">{service.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {service.name}
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  {service.description}
-                </p>
-              </div>
-
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Giá dịch vụ:</span>
-                  <span className="font-bold text-orange-600">
-                    {service.price.toLocaleString()}đ
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">Thời gian:</span>
-                  <span className="text-sm text-gray-700">
-                    {service.duration}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => handleBookService(service)}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+        {/* Services Grid with multi-select */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {filteredServices.map((service) => {
+            const checked = selectedServicesIds.includes(service.id);
+            return (
+              <div
+                key={service.id}
+                className={`bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow ${checked ? "ring-2 ring-orange-200" : ""}`}
               >
-                Đặt lịch ngay
-              </button>
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <div className="text-4xl mb-2">{service.icon}</div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {service.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm">{service.description}</p>
+                  </div>
+                  <div className="ml-3">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleSelectService(service)}
+                        className="w-5 h-5"
+                        aria-label={`Chọn dịch vụ ${service.name}`}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="mt-2 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Giá:</p>
+                    <p className="font-bold text-orange-600">{service.price.toLocaleString()}đ</p>
+                  </div>
+                  <div className="text-sm text-gray-700">{service.duration}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Selected scheduling panel */}
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4">Lịch đã chọn ({scheduled.length})</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Tên thú cưng *</label>
+              <input value={petName} onChange={(e) => setPetName(e.target.value)} className="w-full px-4 py-2 border rounded" />
             </div>
-          ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Chủ (Họ tên) *</label>
+              <input value={ownerName} onChange={(e) => setOwnerName(e.target.value)} className="w-full px-4 py-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Số điện thoại *</label>
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-2 border rounded" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+              <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 border rounded" />
+            </div>
+          </div>
+
+          {scheduled.length === 0 ? (
+            <p className="text-sm text-gray-500 mt-4">Chưa chọn dịch vụ nào. Tích chọn hộp bên cạnh dịch vụ để thêm.</p>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {scheduled.map((s) => {
+                const svc = services.find((x) => x.id === s.serviceId)!;
+                return (
+                  <div key={s.serviceId} className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-3 border rounded">
+                    <div>
+                      <div className="font-medium">{svc.name}</div>
+                      <div className="text-sm text-gray-500">{svc.duration} • {svc.price.toLocaleString()}đ</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input type="date" value={s.date} min={today} onChange={(e) => updateScheduled(s.serviceId, { date: e.target.value })} className="px-3 py-2 border rounded" />
+                      <select value={s.time} onChange={(e) => updateScheduled(s.serviceId, { time: e.target.value })} className="px-3 py-2 border rounded">
+                        {timeSlots.map((t) => (
+                          <option key={t} value={t}>{t}</option>
+                        ))}
+                      </select>
+                      <button type="button" onClick={() => setScheduled((prev) => prev.filter(p => p.serviceId !== s.serviceId))} className="text-sm text-red-500">Bỏ</button>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="flex gap-3 mt-4">
+                <button onClick={handleConfirmBooking} className="bg-orange-500 text-white px-4 py-2 rounded">Xác nhận đặt lịch</button>
+                <button onClick={() => setScheduled([])} className="bg-gray-200 px-4 py-2 rounded">Bỏ chọn hết</button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Info Section */}
@@ -340,281 +379,7 @@ export default function Services() {
           </div>
         </div>
 
-        {/* Booking Modal */}
-        {showBookingModal && selectedService && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Đặt lịch: {selectedService.name}
-                  </h2>
-                  <button
-                    onClick={() => setShowBookingModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
-                    title="Đóng modal"
-                    aria-label="Đóng modal đặt lịch"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                <form onSubmit={handleSubmitBooking} className="space-y-6">
-                  {/* Pet Information */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-gray-900 mb-4">
-                      Thông tin thú cưng
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Tên thú cưng <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={bookingForm.petName}
-                          onChange={(e) =>
-                            handleBookingFormChange("petName", e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          placeholder="Tên thú cưng"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Loại thú cưng <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={bookingForm.petType}
-                          onChange={(e) =>
-                            handleBookingFormChange("petType", e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          title="Chọn loại thú cưng"
-                          aria-label="Loại thú cưng"
-                          required
-                        >
-                          <option value="dog">Chó</option>
-                          <option value="cat">Mèo</option>
-                          <option value="other">Khác</option>
-                        </select>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tuổi thú cưng
-                          </label>
-                          <input
-                            type="text"
-                            value={bookingForm.petAge}
-                            onChange={(e) =>
-                              handleBookingFormChange("petAge", e.target.value)
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            placeholder="Ví dụ: 2 tuổi, 6 tháng"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Giới tính
-                          </label>
-                          <select
-                            value={bookingForm.petGender}
-                            onChange={(e) =>
-                              handleBookingFormChange("petGender", e.target.value)
-                            }
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            title="Chọn giới tính thú cưng"
-                            aria-label="Giới tính thú cưng"
-                            required
-                          >
-                            <option value="male">Đực</option>
-                            <option value="female">Cái</option>
-                            <option value="unknown">Không rõ</option>
-                          </select>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* Owner Information */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-gray-900 mb-4">
-                      Thông tin chủ sở hữu
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Họ và tên <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={bookingForm.ownerName}
-                          onChange={(e) =>
-                            handleBookingFormChange("ownerName", e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          placeholder="Họ và tên"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Số điện thoại <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          value={bookingForm.phone}
-                          onChange={(e) =>
-                            handleBookingFormChange("phone", e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          placeholder="Số điện thoại"
-                          required
-                        />
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          value={bookingForm.email}
-                          onChange={(e) =>
-                            handleBookingFormChange("email", e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          placeholder="Email"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Appointment Time */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-gray-900 mb-4">
-                      Thời gian hẹn
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Ngày hẹn <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="date"
-                          value={bookingForm.date}
-                          onChange={(e) =>
-                            handleBookingFormChange("date", e.target.value)
-                          }
-                          min={new Date().toISOString().split("T")[0]}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          title="Chọn ngày hẹn"
-                          aria-label="Ngày hẹn"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Giờ hẹn <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={bookingForm.time}
-                          onChange={(e) =>
-                            handleBookingFormChange("time", e.target.value)
-                          }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                          title="Chọn giờ hẹn"
-                          aria-label="Giờ hẹn"
-                          required
-                        >
-                          <option value="">Chọn giờ</option>
-                          {timeSlots.map((time) => (
-                            <option key={time} value={time}>
-                              {time}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Notes */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ghi chú
-                    </label>
-                    <textarea
-                      value={bookingForm.notes}
-                      onChange={(e) =>
-                        handleBookingFormChange("notes", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                      rows={3}
-                      placeholder="Mô tả triệu chứng, yêu cầu đặc biệt..."
-                    />
-                  </div>
-
-                  {/* Service Summary */}
-                  <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                    <h4 className="font-medium text-orange-900 mb-2">
-                      Tóm tắt dịch vụ:
-                    </h4>
-                    <div className="space-y-1 text-sm text-orange-800">
-                      <p>
-                        <strong>Dịch vụ:</strong> {selectedService.name}
-                      </p>
-                      <p>
-                        <strong>Thời gian:</strong> {selectedService.duration}
-                      </p>
-                      <p>
-                        <strong>Giá:</strong>{" "}
-                        {selectedService.price.toLocaleString()}đ
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setShowBookingModal(false)}
-                      className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors"
-                    >
-                      Hủy
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-                    >
-                      Xác nhận đặt lịch
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* old single booking modal removed; multi-select UI handles booking */}
       </div>
       <Footer />
     </>

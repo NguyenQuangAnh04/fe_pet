@@ -21,6 +21,7 @@ import Vet from "./components/dashboard/veterinarian/Veterinarian";
 import ProductFilter from "./components/product/ProductFilter";
 import DashboardHome from "./components/dashboard/dashboardHome/Dashboard";
 import OrdersPage from "./pages/OrdersPage";
+import BookingForm from "./pages/BookingForm";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/booking" element={<BookingForm />} />
         <Route path="/" element={<Home />} />
         {/* <Route path="/account" element={<Account />} /> */}
         <Route path="/checkout" element={<Checkout />} />
