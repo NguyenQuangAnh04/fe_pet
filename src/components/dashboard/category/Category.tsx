@@ -19,7 +19,7 @@ export default function Category() {
     await mutateDeleteCategory(id);
   };
   return (
-    <div className="p-3 bg-gray-50 min-h-screen">
+    <div className="p-3 bg-gray-50 min-h-screen ml-[250px]">
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>

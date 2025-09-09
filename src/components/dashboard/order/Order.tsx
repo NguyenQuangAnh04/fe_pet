@@ -84,7 +84,7 @@ export default function Order() {
     (order) => order.status === OrderStatus.CANCELED
   ).length;
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
+    <div className="p-4 bg-gray-50 min-h-screen ml-[250px]">
       <h1 className="text-2xl font-semibold">Quản lý đơn hàng</h1>
       <p className="text-gray-600 text-[15px]">
         Theo dõi và quản lý tất cả đơn hàng của bạn

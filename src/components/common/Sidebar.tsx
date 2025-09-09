@@ -24,7 +24,7 @@ const Sidebar = () => {
     }
   }
   return (
-    <div className=" min-h-screen h-full bg-blue-950 w-[250px]">
+    <div className="fixed min-h-screen h-full bg-blue-950 w-[250px] overflow-y-auto">
       <div className="mt-10">
         <a
           href="/"

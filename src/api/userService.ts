@@ -2,7 +2,7 @@
 import type { userRegister, userUpdateRole } from "../types/user";
 import api from "./axiosClient";
 
-export const findAllUser = (params?: { name?: string; phoneNumber?: string; email?: string; page?: Number }) => {
+export const findAllUser = (params?: { name?: string; phoneNumber?: string; email?: string; page?: number }) => {
     return api.get("/user", { params });
 };
 export const addUser = async (userRegister: userRegister) => await api.post("/user/create", userRegister);
