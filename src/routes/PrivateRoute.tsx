@@ -8,7 +8,7 @@ const PrivateRoute: React.FC = () => {
   if (!accessToken) {
     return <Navigate to="/login" replace />;
   }
-  if (role !== "ADMIN") return <Navigate to="/login" replace />;
+  if (role !== "ROLE_ADMIN") return <Navigate to="/login" replace />;
   return <Outlet />;
 };
 

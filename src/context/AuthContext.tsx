@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import api from "../api/axiosClient";
 
 type AuthContextType = {
   accessToken: string | null;
@@ -18,7 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("accessToken")
   );
-  const [role, setRole] = useState<string | null>(localStorage.getItem("role"));
+  const [role, setRole] = useState<string | null>(null);
   useEffect(() => {
     if (accessToken) {
       localStorage.setItem("accessToken", accessToken);
@@ -28,12 +29,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [accessToken]);
 
   useEffect(() => {
-    if (role) {
-      localStorage.setItem("role", role);
-    } else {
-      localStorage.removeItem("role");
+    if (accessToken === null) {
+      setRole(null);
+      return;
     }
-  }, [role]);
+    const fetchRole = async () => {
+      try {
+        const res = await api.get("/auth/me");
+        setRole(res.data.role);
+      } catch (err) {
+        console.error("Lỗi khi gọi /auth/me:", err);
+        setAccessToken(null);
+        setRole(null);
+      }
+    };
+    fetchRole();
+  }, [accessToken]);
   return (
     <AuthContext.Provider
       value={{ accessToken, setAccessToken, role, setRole }}

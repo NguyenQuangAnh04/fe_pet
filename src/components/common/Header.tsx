@@ -4,11 +4,13 @@ import { BiSearch } from "react-icons/bi";
 import { FaUser } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../../api/axiosClient";
 import { findAllProduct } from "../../api/productService";
 import logo from "../../assets/logo.png";
 import { useQueryCartByUser } from "../../hook/carts/useCart";
 import type { ProductDTO } from "../../types/product";
 import { formatPrice } from "../../utils/format";
+import { useAuth } from "../../context/AuthContext";
 
 
 const Header = () => {
@@ -18,7 +20,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  
+
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
@@ -70,6 +72,20 @@ const Header = () => {
       console.error("Logout failed", error);
     }
   }
+  // const [role, setRole] = useState<string | null>(null);
+  // useEffect(() => {
+  //   const fetchRole = async () => {
+  //     try {
+  //       const res = await api.get("/auth/me");
+  //       setRole(res.data.role);
+  //     } catch {
+  //       setRole(null);
+  //     }
+  //   }
+  //   fetchRole();
+  // }, [])
+  // console.log("Vai trò người dùng:", role);
+  const {role} = useAuth();
   return (
     <div
       className={`shadow-lg sticky top-0 left-0 z-50 transition-all duration-300 ${scrolled ? "bg-white" : "bg-white/90"
@@ -161,7 +177,7 @@ const Header = () => {
                 <div className="absolute right-0 mt-2 w-40 bg-white shadow rounded py-2 text-sm space-y-1">
                   <Link to="/orders" className="block px-3 py-2 hover:bg-gray-50">Đơn hàng</Link>
                   {/* <Link to="/account" className="block px-3 py-2 hover:bg-gray-50">Tài khoản</Link> */}
-                  {localStorage.getItem('role') === 'ADMIN' && (
+                  {role === "ROLE_ADMIN" && (
                     <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-50">Quản trị</Link>
                   )}
                   <button onClick={() => { handleLogout() }} className="block px-3 py-2 hover:bg-gray-50">Đăng xuất</button>

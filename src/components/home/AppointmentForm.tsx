@@ -39,14 +39,14 @@ export default function AppointmentForm() {
 
     const toggleService = (serviceId: number) => {
         setFormData(prev => {
-            const exists = prev.examination?.includes(serviceId);
-            const newExams = exists
-                ? prev.examination?.filter(e => e.id !== serviceId)
-                : [...(prev.examination || []), serviceId];
-            setSelectedServices(newExams);
+            const currentExams = prev.examination || [];
+            const newExams = currentExams.includes(serviceId)
+                ? currentExams.filter(id => id !== serviceId)
+                : [...currentExams, serviceId];
+
             return {
                 ...prev,
-                examination: newExams || []
+                examination: newExams
             };
         });
     };
@@ -66,11 +66,12 @@ export default function AppointmentForm() {
         const appointmentTimeForBackend = formData.appointmentTime.length === 5
             ? formData.appointmentTime + ":00"
             : formData.appointmentTime;
-        const selectedExams = selectedServices.map(id => ({ id }));
+        const selectedExams = formData.examination?.map(id => ({ id })) || [];
         const newFormData = {
             ...formData,
             appointmentTime: appointmentTimeForBackend,
             examination: selectedExams
+
         };
         await mutateAddAppointment({ vetId: selectedVet || 0, newAppoint: newFormData });
         setIsBooked(false); // reset form nếu muốn
@@ -145,9 +146,17 @@ export default function AppointmentForm() {
                                             key={s.id}
                                             type="button"
                                             onClick={() => toggleService(s.id ?? 0)}
-                                            className={`flex items-center gap-3 p-3 rounded-lg border border-gray-400 transition ${selectedServices.includes(s.id ?? 0) ? "bg-yellow-50 border-yellow-300" : "bg-white border-gray-200"}`}
+                                            className={`flex items-center gap-3 p-3 rounded-lg border border-gray-400 transition ${formData.examination?.includes(s.id ?? 0)
+                                                ? "bg-yellow-50 border-yellow-300"
+                                                : "bg-white border-gray-200"
+                                                }`}
                                         >
-                                            <input readOnly type="checkbox" className="w-4 h-4" checked={selectedServices.includes(s.id ?? 0)} />
+                                            <input
+                                                readOnly
+                                                type="checkbox"
+                                                className="w-4 h-4"
+                                                checked={formData.examination?.includes(s.id ?? 0)}
+                                            />
                                             <div className="text-sm text-gray-800">{s.name} ({s.price}k)</div>
                                         </button>
                                     ))}
