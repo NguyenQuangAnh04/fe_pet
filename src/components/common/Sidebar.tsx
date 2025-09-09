@@ -36,7 +36,7 @@ const Sidebar = () => {
       <div className="flex justify-between flex-col gap-5">
         <nav className="flex flex-col mt-10 text-white">
           <Link
-            to="/dashboard"
+            to="/dashboard/dashboardHome"
             className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
           >
             <FaChartBar /> Thống kê

@@ -9,7 +9,7 @@ import {
   useQueryOrder,
   useUpdateOrderAdmin,
 } from "../../../hook/order/useOrder";
-import { useQueryCountStatus, useQueryTotalRevenue } from "../../../hook/dashboard/useDashboard";
+import { useQueryCountStatus, useQueryTotalRevenue } from "../../../hook/dashboard/useStatistics";
 import { OrderStatus, type OrderDTO } from "../../../types/order";
 import { formatPrice } from "../../../utils/format";
 import ModalOrder from "./ModalOrder";

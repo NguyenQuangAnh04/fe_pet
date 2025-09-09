@@ -16,11 +16,22 @@ type AppointPageRes = {
     number: number;
 }
 
-export function useQueryAppoint(searchParams = {}) {
+type useAppointmentProps = {
+    ownerName?: string,
+    email?: string,
+    phoneNumber?: string,
+    petName?: string,
+    vetName?: string,
+    status?: string,
+    page?: number
+}
+
+export function useQueryAppoint({ ownerName, email, phoneNumber, petName, vetName, status, page
+}: useAppointmentProps) {
     const { data, isLoading, error } = useQuery<AppointPageRes>({
-        queryKey: ["appointment", searchParams],
+        queryKey: ["appointment", ownerName, email, phoneNumber, petName, vetName, status, page],
         queryFn: async () => {
-            const res = await findAllAppointment(searchParams);
+            const res = await findAllAppointment(ownerName, email, phoneNumber, petName, vetName, status, page);
             return res.data.data ?? [];
         },
     });

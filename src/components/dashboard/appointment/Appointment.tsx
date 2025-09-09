@@ -10,7 +10,7 @@ import {
   useQueryAppoint,
   useUpdateAppointment
 } from "../../../hook/appointment/useAppointment";
-import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useDashboard"
+import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useStatistics"
 import { formatPrice } from "../../../utils/format";
 import ModalAppoint from "./ModalAppointment";
 
@@ -31,7 +31,6 @@ export default function Appointment() {
     petName: "",
     vetName: "",
     status: "",
-    page
   });
   const { mutateAsync: mutateDeleteOrder } = useDeleteAppointment();
   const handleDelete = (id: number) => {
@@ -62,7 +61,7 @@ export default function Appointment() {
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDTO>();
   const [showModalAppointment, setShowModalAppointment] = useState(false);
   const { mutateAsync: mutateUpdateAppointment } = useUpdateAppointment();
-  const { data, isLoading, error } = useQueryAppoint(searchParams);
+  const { data} = useQueryAppoint({page});
 
   const handleSearch = () => {
     setSearchParams({
@@ -72,7 +71,7 @@ export default function Appointment() {
       petName: petName.trim(),
       vetName: vetName.trim(),
       status: status.trim(),
-      page: 0,
+  
     });
   };
 
@@ -93,6 +92,7 @@ export default function Appointment() {
       page: 0,
     });
   };
+  console.log(data);
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">

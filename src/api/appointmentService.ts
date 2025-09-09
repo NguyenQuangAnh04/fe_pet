@@ -2,16 +2,18 @@
 import type { AppointmentDTO, AppointStatus } from "../types/appointment";
 import api from "./axiosClient";
 
-export const findAllAppointment = (params?: {
-    ownerName?: string;
-    email?: string;
-    phoneNumber?: string;
-    petName?: string;
-    vetName?: string;
-    status?: string;
-    page?: Number
-}) => {
-    return api.get("/appointment", { params });
+export const findAllAppointment = (
+    ownerName?: string,
+    email?: string,
+    phoneNumber?: string,
+    petName?: string,
+    vetName?: string,
+    status?: string,
+    page?: number
+) => {
+    return api.get(`/appointment`, {
+        params: { ownerName, email, phoneNumber, petName, vetName, status, page },
+    });
 };
 export interface updateStatus {
     appointStatus: AppointStatus;

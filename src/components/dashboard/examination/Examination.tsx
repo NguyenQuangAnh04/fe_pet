@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import {
-    useDeleteExamination,
-    useQueryExamination
-} from "../../../hook/examination/useExamination";
-import type { ExaminationDTO } from "../../../types/examination";
+    useQueryExamination,
+    useDeleteExamination
+} from "../../../hook/examination/useExamination"
 import ExamModal from "./ModalExamination";
+import { formatPrice } from "../../../utils/format";
+import type { ExaminationDTO } from "../../../types/examination";
 
 export default function Examination() {
     const [page, setPage] = useState(0);
@@ -109,13 +110,12 @@ export default function Examination() {
                 </div>
             </div>
 
-            {/* Loading and Error States */}
+        
             {isLoading && <p className="text-center text-gray-600">Đang tải...</p>}
             {error && (
                 <p className="text-center text-red-500">Lỗi: {error.message}</p>
             )}
 
-            {/* Table Section */}
             <div className="bg-white rounded-lg shadow-md overflow-x-auto overflow-hidden">
                 <table className="w-full">
                     <thead className="bg-gray-100 text-gray-600 uppercase text-sm">
@@ -138,7 +138,7 @@ export default function Examination() {
                                 >
                                     <td className="px-4 py-2 text-sm">{item.id}</td>
                                     <td className="px-4 py-2 text-sm">{item.name}</td>
-                                    <td className="px-4 py-2 text-sm">{item.price}</td>
+                                    <td className="px-4 py-2 text-sm">{item.price && formatPrice(item.price)}</td>
                                     <td className="px-4 py-2 text-sm">{item.description}</td>
                                     <td className="px-6 py-4">
                                         {item.createdAt

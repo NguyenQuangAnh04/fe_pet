@@ -19,6 +19,7 @@ import Product from "./components/dashboard/product/Product";
 import User from "./components/dashboard/user/User";
 import Vet from "./components/dashboard/veterinarian/Veterinarian";
 import ProductFilter from "./components/product/ProductFilter";
+import DashboardHome from "./components/dashboard/dashboardHome/Dashboard";
 import OrdersPage from "./pages/OrdersPage";
 import BookingForm from "./pages/BookingForm";
 
@@ -42,6 +43,7 @@ function App() {
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />}>
+            <Route path="dashboardHome" element={<DashboardHome />} />
             <Route path="products" element={<Product />} />
             <Route path="categories" element={<Category />} />
             <Route path="orders" element={<Order />} />
