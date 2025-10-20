@@ -53,7 +53,7 @@ export default function User() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 ml-[250px]">
       <div className="flex justify-between ">
         <h1 className="text-2xl font-semibold">Quản lý người dùng</h1>
       </div>

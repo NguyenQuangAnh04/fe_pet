@@ -12,6 +12,7 @@ export interface ProductDTO {
   sl?: number;
   categoryName?: number;
   imagesDTO: ImagesDTO[];
+  averageRating: number;
   variants?: VariantDTO[];
 }
 

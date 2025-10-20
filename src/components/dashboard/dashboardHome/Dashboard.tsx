@@ -42,15 +42,15 @@ export default function Dashboard() {
   const { data: orderTotalRevenue, isLoading: orderRevenueLoading, refetch: refetchOrderRevenue } = useQueryTotalRevenue();
 
   // Kiểm tra trạng thái loading tổng thể
-  const isLoading = useMemo(() => 
-    appointStatusLoading || appointRevenueLoading || appointDailyLoading || 
-    appointMonthlyLoading || topExamLoading || orderDailyLoading || 
+  const isLoading = useMemo(() =>
+    appointStatusLoading || appointRevenueLoading || appointDailyLoading ||
+    appointMonthlyLoading || topExamLoading || orderDailyLoading ||
     orderMonthlyLoading || topProductLoading || orderStatusLoading || orderRevenueLoading,
-  [
-    appointStatusLoading, appointRevenueLoading, appointDailyLoading,
-    appointMonthlyLoading, topExamLoading, orderDailyLoading,
-    orderMonthlyLoading, topProductLoading, orderStatusLoading, orderRevenueLoading
-  ]);
+    [
+      appointStatusLoading, appointRevenueLoading, appointDailyLoading,
+      appointMonthlyLoading, topExamLoading, orderDailyLoading,
+      orderMonthlyLoading, topProductLoading, orderStatusLoading, orderRevenueLoading
+    ]);
 
   // Hàm refresh tất cả data
   const refreshAllData = () => {
@@ -92,42 +92,42 @@ export default function Dashboard() {
     return merged;
   }, [appointMonthly, refreshKey]);
 
-  const dailyOrderData = useMemo(() => 
+  const dailyOrderData = useMemo(() =>
     (orderDaily ?? []).map((d) => ({
       date: d.date ? new Date(d.date).toLocaleDateString() : "",
       revenue: d.revenue ?? 0,
       count: d.orderCount ?? 0,
     })),
-  [orderDaily, refreshKey]);
+    [orderDaily, refreshKey]);
 
-  const dailyAppointData = useMemo(() => 
+  const dailyAppointData = useMemo(() =>
     (appointDaily ?? []).map((d) => ({
       date: d.date ? new Date(d.date).toLocaleDateString() : "",
       revenue: d.revenue ?? 0,
       count: d.appointCount ?? 0,
     })),
-  [appointDaily, refreshKey]);
+    [appointDaily, refreshKey]);
 
   const dailyData = dailyChartType === "order" ? dailyOrderData : dailyAppointData;
   const monthlyData = monthlyChartType === "order" ? monthlyOrderData : monthlyAppointData;
 
-  const statusData = useMemo(() => 
+  const statusData = useMemo(() =>
     statusChartType === "order"
       ? (orderStatusCounts ?? []).map(([status, count]) => ({ name: status, value: count }))
       : (appointStatusCounts ?? []).map(([status, count]) => ({ name: status, value: count })),
-  [orderStatusCounts, appointStatusCounts, statusChartType, refreshKey]);
+    [orderStatusCounts, appointStatusCounts, statusChartType, refreshKey]);
 
-  const COLORS = useMemo(() => 
+  const COLORS = useMemo(() =>
     statusChartType === "order"
       ? ["#2563eb", "#16a34a", "#60a5fa", "#f59e0b", "#ef4444"]
       : ["#7c3aed", "#dc2626", "#a78bfa", "#f97316", "#10b981"],
-  [statusChartType]);
+    [statusChartType]);
 
-  const topItemsData = useMemo(() => 
+  const topItemsData = useMemo(() =>
     chartType === "product"
       ? (topProduct ?? []).map((item) => ({ name: item.productName, total: item.totalPro, fullName: item.productName }))
       : (topExam ?? []).map((item) => ({ name: item.examinationName, total: item.totalExamination, fullName: item.examinationName })),
-  [topProduct, topExam, chartType, refreshKey]);
+    [topProduct, topExam, chartType, refreshKey]);
 
   const formatCurrency = (value: number) => value.toLocaleString("vi-VN");
 
@@ -136,15 +136,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen ml-[250px]">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-semibold">Thống kê</h2>
+        <h2 className="text-2xl font-semibold">Thống kê</h2>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Năm</span>
-            <select 
-              className="border rounded px-2 py-1" 
-              value={year} 
+            <select
+              className="border rounded px-2 py-1"
+              value={year}
               onChange={(e) => setYear(Number(e.target.value))}
               aria-label="Chọn năm"
             >
@@ -156,29 +156,30 @@ export default function Dashboard() {
           <RefreshButton onRefresh={refreshAllData} />
         </div>
       </div>
-      
+
       {/* Cards */}
-      <RevenueCards
-        orderTotalRevenue={orderTotalRevenue || 0}
-        appointTotalRevenue={appointTotalRevenue || 0}
-        formatCurrency={formatCurrency}
-      />
+      <div className="gap-5">
+        <RevenueCards
+          orderTotalRevenue={orderTotalRevenue || 0}
+          appointTotalRevenue={appointTotalRevenue || 0}
+          formatCurrency={formatCurrency}
+        />
+      </div>
 
-      {/* Biểu đồ theo ngày */}
-      <DailyRevenueChart
-        dailyData={dailyData}
-        dailyChartType={dailyChartType}
-        setDailyChartType={setDailyChartType}
-      />
 
-      {/* Biểu đồ theo tháng */}
-      <MonthlyRevenueChart
-        monthlyData={monthlyData}
-        monthlyChartType={monthlyChartType}
-        setMonthlyChartType={setMonthlyChartType}
-        year={year}
-      />
-
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <DailyRevenueChart
+          dailyData={dailyData}
+          dailyChartType={dailyChartType}
+          setDailyChartType={setDailyChartType}
+        />
+        <MonthlyRevenueChart
+          monthlyData={monthlyData}
+          monthlyChartType={monthlyChartType}
+          setMonthlyChartType={setMonthlyChartType}
+          year={year}
+        />
+      </div>
       {/* Trạng thái + Top cùng 1 hàng */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <StatusChart
@@ -193,6 +194,7 @@ export default function Dashboard() {
           setChartType={setChartType}
         />
       </div>
+    
     </div>
   );
 }

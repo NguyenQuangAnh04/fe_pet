@@ -99,7 +99,7 @@ export default function ProductDetails() {
                     <svg
                       key={star}
                       className={`w-5 h-5 ${
-                        star <= 4.5 ? "text-yellow-400" : "text-gray-300"
+                        star <= (product?.averageRating ?? 0) ? "text-yellow-400" : "text-gray-300"
                       }`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
@@ -108,7 +108,7 @@ export default function ProductDetails() {
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">4.5/5</span>
+                <span className="text-sm text-gray-600">{product?.averageRating}/5</span>
                 <span className="text-sm text-gray-500">(24 đánh giá)</span>
               </div>
 

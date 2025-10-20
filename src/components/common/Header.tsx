@@ -178,7 +178,7 @@ const Header = () => {
                   <Link to="/orders" className="block px-3 py-2 hover:bg-gray-50">Đơn hàng</Link>
                   {/* <Link to="/account" className="block px-3 py-2 hover:bg-gray-50">Tài khoản</Link> */}
                   {role === "ROLE_ADMIN" && (
-                    <Link to="/dashboard" className="block px-3 py-2 hover:bg-gray-50">Quản trị</Link>
+                    <Link to="/dashboard/dashboardHome" className="block px-3 py-2 hover:bg-gray-50">Quản trị</Link>
                   )}
                   <button onClick={() => { handleLogout() }} className="block px-3 py-2 hover:bg-gray-50">Đăng xuất</button>
 

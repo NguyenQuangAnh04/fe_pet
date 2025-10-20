@@ -56,7 +56,7 @@ export default function Examination() {
     };
 
     return (
-        <div className="p-4">
+        <div className="p-4 ml-[250px]">
             <div className="flex justify-between ">
                 <h1 className="text-2xl font-semibold">Quản lý dịch vụ khám</h1>
 
@@ -138,7 +138,7 @@ export default function Examination() {
                                 >
                                     <td className="px-4 py-2 text-sm">{item.id}</td>
                                     <td className="px-4 py-2 text-sm">{item.name}</td>
-                                    <td className="px-4 py-2 text-sm">{item.price && formatPrice(item.price)}</td>
+                                    <td className="px-4 py-2 text-sm">{formatPrice(item.price)}</td>
                                     <td className="px-4 py-2 text-sm">{item.description}</td>
                                     <td className="px-6 py-4">
                                         {item.createdAt
