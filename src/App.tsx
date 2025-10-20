@@ -13,15 +13,16 @@ import Services from "./pages/Services";
 import PrivateRoute from "./routes/PrivateRoute";
 
 import Appointment from "./components/dashboard/appointment/Appointment";
+import DashboardHome from "./components/dashboard/dashboardHome/Dashboard";
 import Examination from "./components/dashboard/examination/Examination";
 import Order from "./components/dashboard/order/Order";
 import Product from "./components/dashboard/product/Product";
 import User from "./components/dashboard/user/User";
 import Vet from "./components/dashboard/veterinarian/Veterinarian";
 import ProductFilter from "./components/product/ProductFilter";
-import DashboardHome from "./components/dashboard/dashboardHome/Dashboard";
-import OrdersPage from "./pages/OrdersPage";
+import BlogPage from "./pages/Blog";
 import BookingForm from "./pages/BookingForm";
+import OrdersPage from "./pages/OrdersPage";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/services" element={<Services />} />
         <Route path="/booking" element={<BookingForm />} />
+        <Route path="/blog" element={<BlogPage />} />
         <Route path="/" element={<Home />} />
         {/* <Route path="/account" element={<Account />} /> */}
         <Route path="/checkout" element={<Checkout />} />

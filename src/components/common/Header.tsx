@@ -4,13 +4,12 @@ import { BiSearch } from "react-icons/bi";
 import { FaUser } from "react-icons/fa";
 import { FiShoppingCart } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../api/axiosClient";
 import { findAllProduct } from "../../api/productService";
 import logo from "../../assets/logo.png";
+import { useAuth } from "../../context/AuthContext";
 import { useQueryCartByUser } from "../../hook/carts/useCart";
 import type { ProductDTO } from "../../types/product";
 import { formatPrice } from "../../utils/format";
-import { useAuth } from "../../context/AuthContext";
 
 
 const Header = () => {
@@ -85,7 +84,7 @@ const Header = () => {
   //   fetchRole();
   // }, [])
   // console.log("Vai trò người dùng:", role);
-  const {role} = useAuth();
+  const { role } = useAuth();
   return (
     <div
       className={`shadow-lg sticky top-0 left-0 z-50 transition-all duration-300 ${scrolled ? "bg-white" : "bg-white/90"
@@ -151,6 +150,7 @@ const Header = () => {
         <nav className="flex items-center gap-6 text-sm md:text-base">
           <Link to="/search" className="hidden md:inline hover:text-blue-600">SẢN PHẨM</Link>
           <Link to="/services" className="hidden md:inline hover:text-blue-600">DỊCH VỤ</Link>
+          <Link to="/blog" className="hidden md:inline hover:text-blue-600">BLOG</Link>
           <Link to="/contact" className="hidden md:inline hover:text-blue-600">LIÊN HỆ</Link>
 
           <div className="flex items-center gap-4">

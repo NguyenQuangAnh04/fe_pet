@@ -33,7 +33,6 @@ export default function ProductDetails() {
     };
     getData();
   }, [slug]);
-  console.log(selectedSize);
   const handleAddToCart = (id: number) => {
     const cartItem: CartDTOItem = {
       productId: id,
@@ -51,7 +50,6 @@ export default function ProductDetails() {
             id: null,
             productId: product.id,
             price: selectedSize?.price && selectedSize?.price * quantity,
-
             size: selectedSize?.size,
             quantity: quantity,
             product: {
