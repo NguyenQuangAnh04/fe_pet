@@ -58,7 +58,7 @@ export function useAddProduct() {
       queryClient.invalidateQueries({ queryKey: ["product"] }),
         toast.success("Thêm sản phẩm thành công!");
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err) => {toast.error(err.message)},
   });
 }
 

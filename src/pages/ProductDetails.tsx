@@ -1,17 +1,16 @@
+import { CheckCircle, Package, ShoppingCart, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
-
-import type { ProductDTO } from "../types/product";
-import { findProductBySlug } from "../api/productService";
 import { useNavigate, useParams } from "react-router-dom";
-import { formatPrice } from "../utils/format";
-import type { CartDTOItem } from "../types/cart";
-import { useAddCart } from "../hook/carts/useCart";
-import Header from "../components/common/Header";
-import ProductImages from "../components/product/ProductImages";
-import ProductDescription from "../components/product/ProductDescription";
-import Rating from "../components/product/Rateting";
+import { findProductBySlug } from "../api/productService";
 import Footer from "../components/common/Footer";
+import Header from "../components/common/Header";
+import ProductDescription from "../components/product/ProductDescription";
+import ProductImages from "../components/product/ProductImages";
+import { useAddCart } from "../hook/carts/useCart";
+import type { CartDTOItem } from "../types/cart";
+import type { ProductDTO } from "../types/product";
 import type { VariantDTO } from "../types/variant";
+import { formatPrice } from "../utils/format";
 
 export default function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
@@ -21,6 +20,7 @@ export default function ProductDetails() {
   const [selectedSize, setSelectedSize] = useState<VariantDTO>();
   const { slug } = useParams();
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!slug) return;
     const getData = async () => {
@@ -33,6 +33,7 @@ export default function ProductDetails() {
     };
     getData();
   }, [slug]);
+
   const handleAddToCart = (id: number) => {
     const cartItem: CartDTOItem = {
       productId: id,
@@ -68,195 +69,196 @@ export default function ProductDetails() {
   return (
     <>
       <Header />
-      <div className="max-w-6xl mx-auto p-4 md:p-6 mt-5">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-          {/* Hình ảnh sản phẩm */}
-          <div className="order-2 lg:order-1">
-            {product?.imagesDTO && (
-              <ProductImages
-                images={product.imagesDTO.map((item) => item.imageUrl)}
-              />
-            )}
+      <div className="bg-gray-50 min-h-screen">
+        <div className="max-w-6xl mx-auto p-4 md:p-6 mt-4">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+            <a href="/" className="hover:text-orange-600 transition">Trang chủ</a>
+            <span>›</span>
+            <span className="text-gray-700">{product?.namePro}</span>
           </div>
 
-          {/* Thông tin sản phẩm */}
-          <div className="order-1 lg:order-2 space-y-6">
-            {/* Tiêu đề và thông tin cơ bản */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Hình ảnh sản phẩm */}
+            <div>
+              {product?.imagesDTO && (
+                <div className="bg-white rounded-lg border border-gray-200 p-4 sticky top-20">
+                  <ProductImages
+                    images={product.imagesDTO.map((item) => item.imageUrl)}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Thông tin sản phẩm */}
             <div className="space-y-4">
-              <p className="flex gap-2 text-gray-400 text-sm">
-                <a href="/">Trang Chủ</a>
-                <span>&gt;</span>
-                <p>{product?.namePro}</p>
-              </p>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
-                {product?.namePro}
-              </h1>
+              <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+                {/* Tiêu đề */}
+                <div>
+                  <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight mb-2">
+                    {product?.namePro}
+                  </h1>
 
-              {/* Rating hiển thị */}
-              {/* <div className="flex items-center space-x-2">
-                <div className="flex items-center">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg
-                      key={star}
-                      className={`w-5 h-5 ${
-                        star <= (product?.averageRating ?? 0) ? "text-yellow-400" : "text-gray-300"
-                      }`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
+                  {/* Category badge */}
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-3.5 h-3.5 text-blue-600" />
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                      {product?.categoryName}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-sm text-gray-600">{product?.averageRating}/5</span>
-                <span className="text-sm text-gray-500">(24 đánh giá)</span>
-              </div> */}
 
-              <div className="space-y-2 text-sm md:text-base">
-                {/* <p className="text-gray-700">
-                  <span className="font-medium">Thương hiệu:</span>
-                  <span className="text-orange-600 font-semibold ml-2">
-                    Royal Canin
-                  </span>
-                </p> */}
-                {/* <p className="text-gray-700">
-                  <span className="font-medium">Kho hàng:</span>
-                  <span className="text-green-600 font-semibold ml-2">
-                    {product?.sl && product?.sl > 0 ? "✓ Còn hàng" : "Hết hàng"}
-                  </span>
-                </p> */}
-                <p className="text-gray-700">
-                  <span className="font-medium">Loại sản phẩm:</span>
-                  <span className="ml-2">{product?.categoryName}</span>
-                </p>
-                {/* <p className="text-gray-700">
-                  <span className="font-medium">Xuất xứ:</span>
-                  <span className="ml-2">Pháp</span>
-                </p> */}
-              </div>
-            </div>
+                {/* Giá */}
+                <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-2xl md:text-3xl font-bold text-orange-600">
+                      {product?.variants &&
+                        product.variants[size].price &&
+                        formatPrice(product.variants[size].price)}
+                    </p>
+                    <span className="text-xs text-gray-600 bg-white px-2 py-0.5 rounded">
+                      / {selectedSize?.size}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1.5 flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                    Giá đã bao gồm VAT
+                  </p>
+                </div>
 
-            {/* Giá */}
-            <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-              <p className="text-3xl md:text-4xl font-bold text-orange-600">
-                {product?.variants &&
-                  product.variants[size].price &&
-                  formatPrice(product.variants[size].price)}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">Giá đã bao gồm VAT</p>
-            </div>
+                {/* Chọn size */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-gray-900 text-sm">Chọn kích thước:</p>
+                    {selectedSize && (
+                      <span className="text-xs text-gray-600">
+                        <Package className="w-3.5 h-3.5 inline mr-1" />
+                        Còn <span className="font-semibold text-green-600">{selectedSize.stock}</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                    {product?.variants &&
+                      product?.variants.map((s, index) => (
+                        <button
+                          key={s.id}
+                          onClick={() => {
+                            setSize(index);
+                            setQuantity(1);
+                            setSelectedSize(s);
+                          }}
+                          className={`relative border-2 px-3 py-2.5 rounded-lg font-semibold transition-all text-sm ${size === index
+                              ? "border-orange-500 bg-orange-50 text-orange-700"
+                              : "border-gray-300 hover:border-orange-300 text-gray-700"
+                            }`}
+                        >
+                          <div className="text-center">
+                            <div className="font-bold">{s.size}</div>
+                            <div className="text-xs text-gray-500">
+                              {formatPrice(s.price || 0)}
+                            </div>
+                          </div>
+                          {size === index && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                  </div>
+                </div>
 
-            {/* Chọn size */}
-            <div className="space-y-3">
-              <p className="font-semibold text-gray-900">Chọn kích thước:</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {product?.variants &&
-                  product?.variants.map((s, index) => (
-                    <button
-                      key={s.id}
-                      onClick={() => {
-                        setSize(index);
-                        setQuantity(1);
-                        setSelectedSize(s);
-                      }}
-                      className={`border-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-                        size === index
-                          ? "border-orange-500 bg-orange-50 text-orange-700"
-                          : "border-gray-300 hover:border-orange-300 text-gray-700"
-                      }`}
-                    >
-                      {s.size}
-                    </button>
-                  ))}
-              </div>
-            </div>
+                {/* Số lượng */}
+                <div className="space-y-2">
+                  <p className="font-semibold text-gray-900 text-sm">Số lượng:</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden">
+                      <button
+                        disabled={quantity <= 1}
+                        onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                        className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                      >
+                        −
+                      </button>
+                      <span className="px-4 py-2 text-base font-bold border-x-2 border-gray-300 min-w-[60px] text-center bg-gray-50">
+                        {quantity}
+                      </span>
+                      {product?.variants && product?.variants[size].stock && (
+                        <button
+                          disabled={quantity >= product?.variants[size].stock}
+                          onClick={() => setQuantity((prev) => prev + 1)}
+                          className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                        >
+                          +
+                        </button>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      Tối đa: {selectedSize?.stock || 0}
+                    </span>
+                  </div>
+                </div>
 
-            {/* Số lượng */}
-            <div className="space-y-3">
-              <p className="font-semibold text-gray-900">Số lượng:</p>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center border border-gray-300 rounded-lg">
+                {/* Tổng tiền */}
+                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-gray-700">
+                      Tổng tiền:
+                    </span>
+                    {product?.variants && product?.variants[size].price && (
+                      <span className="text-2xl font-bold text-orange-600">
+                        {formatPrice(product.variants[size].price * quantity)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Nút hành động */}
+                <div className="space-y-2 pt-2">
                   <button
-                    disabled={quantity < 1}
-                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                    className="px-4 py-2 text-gray-600 hover:text-orange-600 transition-colors"
+                    onClick={() => product && handleBuyNow(product)}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition shadow-sm hover:shadow flex items-center justify-center gap-2 text-sm"
                   >
-                    −
+                    <ShoppingCart className="w-4 h-4" />
+                    Mua ngay
                   </button>
-                  <span className="px-4 py-2 text-lg font-medium border-x border-gray-300 min-w-[60px] text-center">
-                    {quantity}
-                  </span>
-                  {product?.variants && product?.variants[size].stock && (
-                    <button
-                      disabled={quantity > product?.variants[size].stock}
-                      onClick={() => setQuantity((prev) => prev + 1)}
-                      className="px-4 py-2 text-gray-600 hover:text-orange-600 transition-colors"
-                    >
-                      +
-                    </button>
-                  )}
+                  <button
+                    onClick={() => product && handleAddToCart(product.id)}
+                    className="w-full bg-white hover:bg-orange-50 text-orange-600 font-semibold py-3 px-4 rounded-lg border-2 border-orange-500 transition hover:shadow-sm flex items-center justify-center gap-2 text-sm"
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    Thêm vào giỏ
+                  </button>
+                </div>
+              </div>
+
+              {/* Thông tin bổ sung */}
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <div className="space-y-2 text-xs text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                    <span>Miễn phí vận chuyển toàn quốc</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                    <span>Đổi trả trong 7 ngày</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                    <span>Thanh toán khi nhận hàng</span>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* Tổng tiền */}
-            <div className="bg-gray-50 p-4 rounded-lg border">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-700">
-                  Tổng tiền:
-                </span>
-                {product?.variants && product?.variants[size].price && (
-                  <span className="text-2xl font-bold text-orange-600">
-                    {formatPrice(product.variants[size].price * quantity)}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Nút hành động */}
-            <div className="space-y-3">
-              <button
-                onClick={() => product && handleBuyNow(product)}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
-              >
-                Mua ngay
-              </button>
-              <button
-                onClick={() => product && handleAddToCart(product.id)}
-                className="w-full bg-white hover:bg-orange-50 text-orange-600 font-semibold py-4 px-6 rounded-lg border-2 border-orange-500 transition-colors duration-200"
-              >
-                Thêm vào giỏ hàng
-              </button>
-            </div>
-
-            {/* Thông tin bổ sung */}
-            {/* <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 space-y-2">
-              <h3 className="font-semibold text-blue-900">Đặc điểm nổi bật:</h3>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Dành riêng cho mèo trưởng thành nuôi trong nhà</li>
-                <li>• Giảm mùi phân nhờ công thức đặc biệt</li>
-                <li>• Hỗ trợ tiêu hóa và kiểm soát cân nặng</li>
-                <li>• Chất lượng Premium từ Pháp</li>
-              </ul>
-            </div> */}
           </div>
+
+          {/* Mô tả sản phẩm */}
+          {product && (
+            <div className="mt-8">
+              <ProductDescription product={product} />
+            </div>
+          )}
         </div>
-
-        {product && (
-          <div className="mt-12">
-            <ProductDescription product={product} />
-          </div>
-        )}
-
-        {/* Phần đánh giá sản phẩm */}
-        {/* <div className="mt-12 border-t border-gray-200 pt-12">
-          <Rating />
-        </div> */}
-
-        {/* Phần gợi ý sản phẩm */}
-        {/* <div className="mt-12 border-t border-gray-200 pt-12">
-          <SimpleProductSuggestions currentProductId={1} maxProducts={4} />
-        </div> */}
       </div>
       <Footer />
     </>

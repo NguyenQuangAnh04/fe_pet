@@ -257,7 +257,7 @@ const BlogPage = () => {
                 date: "16/10/2025",
                 author: "Huấn luyện viên Phạm Hương",
                 image:
-                    "https://images.unsplash.com/photo-1552053831-71594a27c62d?w=800&h=400&fit=crop",
+                    "https://petcorner.vn/wp-content/uploads/2025/05/Phuong-phap-huan-luyen-meo-tich-cuc-Positive-Reinforcement.png",
                 readTime: "8 phút",
             },
             {
@@ -302,7 +302,7 @@ const BlogPage = () => {
                 date: "14/10/2025",
                 author: "Bác sĩ Nguyễn Thị Hoa",
                 image:
-                    "https://images.unsplash.com/photo-1601758228658-3befa6c83ee7?w=800&h=400&fit=crop",
+                    "https://cdn.shopify.com/s/files/1/0624/1746/9697/files/m3_f1d68c02-9051-4239-8af3-16ee0a6e7022_600x600.jpg?v=1684988884",
                 readTime: "4 phút",
             },
             {
@@ -336,7 +336,7 @@ const BlogPage = () => {
                 date: "12/10/2025",
                 author: "Huấn luyện viên Phạm Hương",
                 image:
-                    "https://images.unsplash.com/photo-1633722715463-d30628cbc5f0?w=800&h=400&fit=crop",
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUTJdZ08abExgCkRDkCoK-Qhgh-6k-EYbfpg&s",
                 readTime: "5 phút",
             },
         ];
@@ -367,7 +367,7 @@ const BlogPage = () => {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="mb-8">
+                    {/* <div className="mb-8">
                         <input
                             type="text"
                             placeholder="Tìm kiếm bài viết..."
@@ -375,7 +375,7 @@ const BlogPage = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full px-6 py-3 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none text-gray-700 placeholder-gray-500"
                         />
-                    </div>
+                    </div> */}
 
                     {/* Blog Posts */}
                     {selectedBlog ? (

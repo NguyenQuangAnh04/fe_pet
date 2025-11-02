@@ -15,6 +15,7 @@ const Product = () => {
   const [page, setPage] = useState(0);
   const [name, setName] = useState<string>("");
   const { data } = useQueryProduct({ page, name });
+  console.log(data?.content);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setEditShowModal] = useState(false);
   const [showModalViewProduct, setModalShowProduct] = useState(false);
@@ -116,10 +117,9 @@ const Product = () => {
           ))}
         </tbody>
       </table>
-      {showModal && selectedProduct && (
+      {showModal && (
         <ModalProduct
           mode="create"
-          initialData={selectedProduct}
           isOpen={showModal}
           onClose={() => setShowModal(false)}
         />

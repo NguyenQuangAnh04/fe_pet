@@ -20,78 +20,134 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <div className=" flex-1 pl-2">
-        <h2 className="text-xl font-semibold  ">
-          Hiển thị {data.content.length} sản phẩm liên quan
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      {/* Header */}
+      <div className="mb-6 pb-4 border-b border-gray-200">
+        <h2 className="text-2xl font-bold text-gray-800">
+          Tìm thấy <span className="text-blue-600">{data.content.length}</span> sản phẩm
         </h2>
-        <div className="grid grid-cols-6 gap-5 mt-5">
-          {data.content.map((item) => (
-            <div className="max-h-[380px] p-3 ">
-              <div className="relative group">
-                <button
-                  onClick={() => {
-                    setShowModalProductCart(true);
-                    setSelectedProduct(item);
-                  }}
-                  className="absolute top-8 right-2 z-10 opacity-0 transition-all translate-x-full group-hover:opacity-100 group-hover:translate-x-0
-                 bg-white text-black rounded-full shadow  flex items-center h-8 w-8 justify-center duration-500"
-                >
-                  <BsEye size={20} />
-                </button>
+      </div>
+
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {data.content.length > 0 && data.content.map((item) => (
+          <div
+            key={item.id}
+            className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-all duration-300 hover:border-blue-300 group"
+          >
+            <div className="relative overflow-hidden rounded-lg mb-4">
+              {/* Quick View Button */}
+              <button
+                onClick={() => {
+                  setShowModalProductCart(true);
+                  setSelectedProduct(item);
+                }}
+                className="absolute top-3 right-3 z-10 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 rounded-full shadow-md flex items-center h-10 w-10 justify-center"
+              >
+                <BsEye size={20} />
+              </button>
+
+              {/* Product Images */}
+              <div className="aspect-square relative">
                 <img
                   src={item.imageUrl}
                   onClick={() => navigate(`/product-details/${item.slug}`)}
-                  alt=""
-                  className="w-[250px] h-[250px] object-contain cursor-pointer"
+                  alt={item.namePro}
+                  className="w-full h-full object-contain cursor-pointer transition-opacity duration-300"
                 />
-                <img
-                  src={item.imagesDTO[1].imageUrl}
-                  onClick={() => navigate(`/product-details/${item.slug}`)}
-                  alt=""
-                  className={`absolute w-[250px] h-[250px] object-contain top-0 left-0 right-0 opacity-0 transition-all group-hover:opacity-100 duration-500 cursor-pointer`}
-                />
-                {/* <button>
-                  <button
-                    onClick={() => addToCart(item.id)}
-                    className="absolute border border-gray-400 rounded-xl px-2 py-2 bg-white bottom-0 left-0 right-0 opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500"
-                  >
-                    Thêm vào giỏ hàng
-                  </button>
-                </button> */}
+                {item.imagesDTO[1] && (
+                  <img
+                    src={item.imagesDTO[1].imageUrl}
+                    onClick={() => navigate(`/product-details/${item.slug}`)}
+                    alt={item.namePro}
+                    className="absolute inset-0 w-full h-full object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                  />
+                )}
               </div>
-              <p className="font-semibold line-clamp-2">{item.namePro}</p>
-              <p className="text-red-500 font-semibold">
-                {formatPrice(item.price)}
-              </p>
             </div>
-          ))}
+
+            {/* Product Info */}
+            <div className="space-y-2">
+              <h3
+                onClick={() => navigate(`/product-details/${item.slug}`)}
+                className="font-semibold text-gray-800 line-clamp-2 min-h-[48px] cursor-pointer hover:text-blue-600 transition-colors"
+              >
+                {item.namePro}
+              </h3>
+              <div className="flex items-center justify-between">
+                <p className="text-lg font-bold text-red-500">
+                  {formatPrice(item.price)}
+                </p>
+                {/* {item.averageRating > 0 && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-yellow-500">★</span>
+                    <span className="text-sm text-gray-600">{item.averageRating}</span>
+                  </div>
+                )} */}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Empty State */}
+      {data.content.length === 0 && (
+        <div className="text-center py-16">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">Không tìm thấy sản phẩm</h3>
+          <p className="text-gray-600">Vui lòng thử lại với bộ lọc khác</p>
         </div>
-        {data.totalPages && data.totalPages > 0 && (
-          <div className="flex gap-2 mt-5 justify-center">
-            <button
-              onClick={() => setPage((prev) => (prev === 0 ? 0 : prev - 1))}
-              className="border border-gray-400 rounded w-8 h-8 "
-              disabled={page === 0}
-              aria-label="previous page"
-            >
-              &lt;
-            </button>
+      )}
+
+      {/* Pagination */}
+      {data.totalPages && data.totalPages > 1 && (
+        <div className="flex gap-2 mt-8 pt-6 border-t border-gray-200 justify-center items-center">
+          <button
+            onClick={() => setPage(page === 0 ? 0 : page - 1)}
+            disabled={page === 0}
+            className={`w-10 h-10 rounded-lg border-2 font-semibold transition-all duration-200 ${page === 0
+                ? "border-gray-200 text-gray-400 cursor-not-allowed"
+                : "border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
+              }`}
+            aria-label="previous page"
+          >
+            ‹
+          </button>
+
+          <div className="flex gap-2">
             {Array.from({ length: data.totalPages }, (_, i) => (
               <button
+                key={i}
                 onClick={() => setPage(i)}
-                className={`w-8 h-8 rounded shadow-lg flex items-center justify-center ${i === page ? "bg-blue-500 text-white" : ""
+                className={`w-10 h-10 rounded-lg font-semibold transition-all duration-200 ${i === page
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md transform scale-110"
+                    : "bg-white border-2 border-gray-300 text-gray-700 hover:border-blue-400 hover:text-blue-600 hover:shadow-sm"
                   }`}
               >
                 {i + 1}
               </button>
             ))}
-            <button className="border border-gray-400 rounded w-8 h-8">
-              &gt;
-            </button>
           </div>
-        )}
-      </div>
+
+          <button
+            onClick={() => setPage(page === data.totalPages - 1 ? page : page + 1)}
+            disabled={page === data.totalPages - 1}
+            className={`w-10 h-10 rounded-lg border-2 font-semibold transition-all duration-200 ${page === data.totalPages - 1
+                ? "border-gray-200 text-gray-400 cursor-not-allowed"
+                : "border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
+              }`}
+            aria-label="next page"
+          >
+            ›
+          </button>
+        </div>
+      )}
+
+      {/* Product Card Modal */}
       {showModalProductCart && selectProduct && (
         <ProductCard
           isOpen={showModalProductCart}

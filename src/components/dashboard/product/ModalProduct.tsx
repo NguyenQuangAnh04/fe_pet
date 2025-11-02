@@ -15,7 +15,7 @@ type ModalProduct = {
   isOpen: boolean;
   onClose: () => void;
   mode: "create" | "update";
-  initialData: ProductDTO;
+  initialData?: ProductDTO;
 };
 
 const ModalProduct: React.FC<ModalProduct> = ({
@@ -71,6 +71,22 @@ const ModalProduct: React.FC<ModalProduct> = ({
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      if (variants.length === 0) {
+        toast.error("Bạn phải thêm ít nhất 1 biến thể cho sản phẩm!");
+        setLoading(false);
+        return;
+      }
+
+      // Kiểm tra thông tin variant
+      const invalidVariant = variants.find(variant =>
+        !variant.size?.trim() || !variant.price || variant.price <= 0 || !variant.stock || variant.stock <= 0
+      );
+
+      if (invalidVariant) {
+        toast.error("Tất cả biến thể phải có đầy đủ thông tin: kích cỡ, giá > 0 và số lượng > 0!");
+        setLoading(false);
+        return;
+      }
       if (mode === "create") {
         if (images.length === 0) {
           toast.error("Bạn chưa chọn ảnh!");
@@ -112,7 +128,6 @@ const ModalProduct: React.FC<ModalProduct> = ({
   const validateForm = () => {
     return (
       formData.namePro.trim() !== "" &&
-      formData.price > 0 &&
       formData.description.trim() !== "" &&
       (mode === "update" || images.length > 0)
     );
@@ -126,8 +141,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
       {
         id: null,
         size: "",
-        price: 0,
-        stock: 1,
+        stock: 0,
         productId: initialData?.id,
       },
     ]);
@@ -356,7 +370,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
                     }}
                     className="absolute right-0 top-0 bg-red-500 rounded-full text-white"
                   >
-                    <BsX /> 
+                    <BsX />
                   </button>
                 </div>
               ))}
@@ -374,8 +388,8 @@ const ModalProduct: React.FC<ModalProduct> = ({
             onClick={handleSubmit}
             disabled={loading || !validateForm()}
             className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${loading || !validateForm()
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
               }`}
           >
             {loading ? (
