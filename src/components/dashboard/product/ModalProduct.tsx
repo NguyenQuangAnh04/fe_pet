@@ -35,6 +35,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
     description: "",
     price: 0,
     imagesDTO: [],
+    averageRating: 0
   });
 
   const { mutateAsync: mutateAddProduct } = useAddProduct();
@@ -180,7 +181,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
               />
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
                 Giá sản phẩm *
               </label>
@@ -194,7 +195,7 @@ const ModalProduct: React.FC<ModalProduct> = ({
                 }
                 min="0"
               />
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">

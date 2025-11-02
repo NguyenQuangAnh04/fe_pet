@@ -93,7 +93,7 @@ export default function ProductDetails() {
               </h1>
 
               {/* Rating hiển thị */}
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <svg
@@ -110,7 +110,7 @@ export default function ProductDetails() {
                 </div>
                 <span className="text-sm text-gray-600">{product?.averageRating}/5</span>
                 <span className="text-sm text-gray-500">(24 đánh giá)</span>
-              </div>
+              </div> */}
 
               <div className="space-y-2 text-sm md:text-base">
                 {/* <p className="text-gray-700">
@@ -119,12 +119,12 @@ export default function ProductDetails() {
                     Royal Canin
                   </span>
                 </p> */}
-                <p className="text-gray-700">
+                {/* <p className="text-gray-700">
                   <span className="font-medium">Kho hàng:</span>
                   <span className="text-green-600 font-semibold ml-2">
                     {product?.sl && product?.sl > 0 ? "✓ Còn hàng" : "Hết hàng"}
                   </span>
-                </p>
+                </p> */}
                 <p className="text-gray-700">
                   <span className="font-medium">Loại sản phẩm:</span>
                   <span className="ml-2">{product?.categoryName}</span>
@@ -249,9 +249,9 @@ export default function ProductDetails() {
         )}
 
         {/* Phần đánh giá sản phẩm */}
-        <div className="mt-12 border-t border-gray-200 pt-12">
+        {/* <div className="mt-12 border-t border-gray-200 pt-12">
           <Rating />
-        </div>
+        </div> */}
 
         {/* Phần gợi ý sản phẩm */}
         {/* <div className="mt-12 border-t border-gray-200 pt-12">

@@ -94,7 +94,7 @@ export default function AppointmentForm() {
   };
 
   return (
-    <section className="py-12">
+    <section className="py-12 " id="service">
       <div className="max-w-4xl mx-auto px-4">
         <h2 className="text-4xl font-extrabold text-center mb-6">Đặt lịch thăm khám!</h2>
 

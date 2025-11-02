@@ -71,6 +71,25 @@ const Header = () => {
       console.error("Logout failed", error);
     }
   }
+
+  const handleNavigateToService = () => {
+    // Nếu div "service" ở trang chủ
+    navigate('/#service');
+
+    // Hoặc nếu ở trang khác, ví dụ trang services
+    // navigate('/services#service');
+
+    // Đợi một chút để trang load xong rồi cuộn
+    setTimeout(() => {
+      const serviceElement = document.getElementById('service');
+      if (serviceElement) {
+        serviceElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }
+    }, 100);
+  };
   // const [role, setRole] = useState<string | null>(null);
   // useEffect(() => {
   //   const fetchRole = async () => {
@@ -149,7 +168,12 @@ const Header = () => {
 
         <nav className="flex items-center gap-6 text-sm md:text-base">
           <Link to="/search" className="hidden md:inline hover:text-blue-600">SẢN PHẨM</Link>
-          <Link to="/services" className="hidden md:inline hover:text-blue-600">DỊCH VỤ</Link>
+          <button
+            onClick={handleNavigateToService}
+            className="hidden md:inline hover:text-blue-600 bg-transparent border-none cursor-pointer font-inherit text-inherit"
+          >
+            DỊCH VỤ
+          </button>
           <Link to="/blog" className="hidden md:inline hover:text-blue-600">BLOG</Link>
           <Link to="/contact" className="hidden md:inline hover:text-blue-600">LIÊN HỆ</Link>
 
