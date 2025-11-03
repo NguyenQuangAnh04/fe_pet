@@ -11,7 +11,7 @@ import logo from "../../assets/logo.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 text-gray-800 border-t border-orange-100">
+    <footer id="contact" className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 text-gray-800 border-t border-orange-100">
       <div className="py-8">
         <div className="container mx-auto  max-w-[1440px] px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">

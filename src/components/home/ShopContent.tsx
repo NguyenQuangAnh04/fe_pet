@@ -1,4 +1,5 @@
-import {  useState } from "react";
+import { Star } from "lucide-react";
+import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 
 import { useNavigate } from "react-router-dom";
@@ -6,9 +7,9 @@ import { useQueryAllProducts } from "../../hook/product/useProduct";
 import type { ProductDTO } from "../../types/product";
 // import { useAddCart } from "../../hook/carts/useCart";
 // import type { CartDTOItem } from "../../types/cart";
+import { formatPrice } from "../../utils/format";
 import ProductCard from "../common/ProductCard";
 import ViewAll from "../common/ViewAll";
-import { formatPrice } from "../../utils/format";
 
 const ShopContent = () => {
   const { data } = useQueryAllProducts();
@@ -31,20 +32,20 @@ const ShopContent = () => {
         <h2 className="text-2xl font-bold mb-6">Sản phẩm nổi bật</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {data?.map((p) => (
-            <div key={p.id} className=" rounded-xl p-4  cursor-pointer ">
+            <div key={p.id} className="rounded-xl p-4 cursor-pointer flex flex-col h-full">
               <div className="relative group">
                 <img
                   src={p.imageUrl}
                   alt={p.namePro}
                   onClick={() => navigate(`product-details/${p.slug}`)}
-                  className="w-[250px] h-[250px] object-cover rounded-lg"
+                  className="w-full h-[250px] object-cover rounded-lg"
                 />
                 {p.imagesDTO && (
                   <img
                     src={p.imagesDTO[1].imageUrl}
                     alt=""
                     onClick={() => navigate(`product-details/${p.slug}`)}
-                    className="w-[250px] h-[250px] object-cover rounded-lg absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    className="w-full h-[250px] object-cover rounded-lg absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   />
                 )}
                 {/* <button
@@ -64,14 +65,31 @@ const ShopContent = () => {
                   </button>
                 </button>
               </div>
-              <h3 className="mt-3 font-semibold line-clamp-2">{p.namePro}</h3>
-              <p className="text-pink-600 font-bold">
-                {p.price && formatPrice(p.price)}
-              </p>
+              <h3 className="mt-3 font-semibold line-clamp-2 min-h-[3rem]">{p.namePro}</h3>
+
+              {/* Rating */}
+              <div className="flex items-center gap-1 mt-1">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-3.5 h-3.5 ${star <= Math.round(p.averageRating || 0)
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-300"
+                        }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs font-medium text-gray-700">
+                  {(p.averageRating || 0).toFixed(1)}
+                </span>
+              </div>
+
+              <p className="text-pink-600 font-bold mt-auto pt-2">{p.price && formatPrice(p.price)}</p>
             </div>
           ))}
         </div>
-        <ViewAll/>
+        <ViewAll />
       </section>
       {showModalProductCart && selectProduct && (
         <ProductCard

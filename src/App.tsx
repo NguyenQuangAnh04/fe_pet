@@ -17,10 +17,12 @@ import DashboardHome from "./components/dashboard/dashboardHome/Dashboard";
 import Examination from "./components/dashboard/examination/Examination";
 import Order from "./components/dashboard/order/Order";
 import Product from "./components/dashboard/product/Product";
+import Review from "./components/dashboard/review/Review";
 import User from "./components/dashboard/user/User";
 import Vet from "./components/dashboard/veterinarian/Veterinarian";
 import ProductFilter from "./components/product/ProductFilter";
 import BlogPage from "./pages/Blog";
+import BlogDetail from "./pages/BlogDetail";
 import BookingForm from "./pages/BookingForm";
 import OrdersPage from "./pages/OrdersPage";
 
@@ -35,6 +37,7 @@ function App() {
         <Route path="/services" element={<Services />} />
         <Route path="/booking" element={<BookingForm />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/:slug" element={<BlogDetail />} />
         <Route path="/" element={<Home />} />
         {/* <Route path="/account" element={<Account />} /> */}
         <Route path="/checkout" element={<Checkout />} />
@@ -53,6 +56,7 @@ function App() {
             <Route path="vet" element={<Vet />} />
             <Route path="exam" element={<Examination />} />
             <Route path="appoint" element={<Appointment />} />
+            <Route path="reviews" element={<Review />} />
           </Route>
         </Route>
       </Routes>

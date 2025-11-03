@@ -14,10 +14,12 @@ export type ProductResponse = {};
 const Product = () => {
   const [page, setPage] = useState(0);
   const [name, setName] = useState<string>("");
-  const { data } = useQueryProduct({ page, name });
+  const { data } = useQueryProduct({ page, keyword: name });
   console.log(data?.content);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setEditShowModal] = useState(false);
+  console.log(name);
+  
   const [showModalViewProduct, setModalShowProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO>();
   const { mutateAsync: mutateDeleteProduct } = useDeleteProduct();

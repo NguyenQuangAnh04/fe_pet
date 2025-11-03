@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +34,7 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
         {data.content.length > 0 && data.content.map((item) => (
           <div
             key={item.id}
-            className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-all duration-300 hover:border-blue-300 group"
+            className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-all duration-300 hover:border-blue-300 group flex flex-col h-full"
           >
             <div className="relative overflow-hidden rounded-lg mb-4">
               {/* Quick View Button */}
@@ -67,23 +68,36 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
             </div>
 
             {/* Product Info */}
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col flex-grow">
               <h3
                 onClick={() => navigate(`/product-details/${item.slug}`)}
-                className="font-semibold text-gray-800 line-clamp-2 min-h-[48px] cursor-pointer hover:text-blue-600 transition-colors"
+                className="font-semibold text-gray-800 line-clamp-2 min-h-[3rem] cursor-pointer hover:text-blue-600 transition-colors"
               >
                 {item.namePro}
               </h3>
-              <div className="flex items-center justify-between">
+
+              {/* Rating */}
+              <div className="flex items-center gap-1">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-3.5 h-3.5 ${star <= Math.round(item.averageRating || 0)
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-300"
+                        }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs font-medium text-gray-700">
+                  {(item.averageRating || 0).toFixed(1)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between mt-auto pt-2">
                 <p className="text-lg font-bold text-red-500">
                   {formatPrice(item.price)}
                 </p>
-                {/* {item.averageRating > 0 && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-yellow-500">★</span>
-                    <span className="text-sm text-gray-600">{item.averageRating}</span>
-                  </div>
-                )} */}
               </div>
             </div>
           </div>
@@ -110,8 +124,8 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
             onClick={() => setPage(page === 0 ? 0 : page - 1)}
             disabled={page === 0}
             className={`w-10 h-10 rounded-lg border-2 font-semibold transition-all duration-200 ${page === 0
-                ? "border-gray-200 text-gray-400 cursor-not-allowed"
-                : "border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
+              ? "border-gray-200 text-gray-400 cursor-not-allowed"
+              : "border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
               }`}
             aria-label="previous page"
           >
@@ -124,8 +138,8 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
                 key={i}
                 onClick={() => setPage(i)}
                 className={`w-10 h-10 rounded-lg font-semibold transition-all duration-200 ${i === page
-                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md transform scale-110"
-                    : "bg-white border-2 border-gray-300 text-gray-700 hover:border-blue-400 hover:text-blue-600 hover:shadow-sm"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md transform scale-110"
+                  : "bg-white border-2 border-gray-300 text-gray-700 hover:border-blue-400 hover:text-blue-600 hover:shadow-sm"
                   }`}
               >
                 {i + 1}
@@ -137,8 +151,8 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
             onClick={() => setPage(page === data.totalPages - 1 ? page : page + 1)}
             disabled={page === data.totalPages - 1}
             className={`w-10 h-10 rounded-lg border-2 font-semibold transition-all duration-200 ${page === data.totalPages - 1
-                ? "border-gray-200 text-gray-400 cursor-not-allowed"
-                : "border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
+              ? "border-gray-200 text-gray-400 cursor-not-allowed"
+              : "border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:shadow-md"
               }`}
             aria-label="next page"
           >

@@ -16,8 +16,8 @@ const Home = () => {
         <ShopContent />
         <NewArrivals />
         <PetCareBlogs />
-        <CustomerFeedback />
         <AppointmentForm />
+        <CustomerFeedback />
       </div>
       <Footer />
     </>

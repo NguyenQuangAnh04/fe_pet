@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 interface BlogPost {
     id: number;
+    slug: string;
     title: string;
     description: string;
     category: string;
@@ -17,6 +18,7 @@ const PetCareBlogs = () => {
         const blogData: BlogPost[] = [
             {
                 id: 1,
+                slug: "cach-chon-do-an-phu-hop-cho-thu-cung",
                 title: "Cách chọn đồ ăn phù hợp",
                 description:
                     "Chọn đồ ăn có đầy đủ chất dinh dưỡng, phù hợp với tuổi và tình trạng sức khỏe của thú cưng để đảm bảo sức khỏe tối ưu.",
@@ -25,6 +27,7 @@ const PetCareBlogs = () => {
             },
             {
                 id: 2,
+                slug: "dau-hieu-thu-cung-bi-benh",
                 title: "Dấu hiệu thú cưng bị bệnh",
                 description:
                     "Chú ý đến những dấu hiệu bất thường như mất ăn, tiêu chảy, thay đổi hành vi. Nếu phát hiện, hãy đưa thú cưng đi khám ngay.",
@@ -33,6 +36,7 @@ const PetCareBlogs = () => {
             },
             {
                 id: 3,
+                slug: "meo-huan-luyen-thu-cung-hieu-qua",
                 title: "Mẹo huấn luyện hiệu quả",
                 description:
                     "Sử dụng phương pháp tích cực, nhất quán và kiên nhẫn. Tập huấn luyện trong khoảng thời gian ngắn nhưng thường xuyên mỗi ngày.",
@@ -80,7 +84,7 @@ const PetCareBlogs = () => {
                             </p>
 
                             <button
-                                onClick={() => navigate("/blog")}
+                                onClick={() => navigate(`/blog/${blog.slug}`)}
                                 className="mt-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 w-full transform hover:scale-105 hover:shadow-md active:scale-95"
                             >
                                 Đọc thêm →

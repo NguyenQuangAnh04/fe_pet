@@ -90,6 +90,25 @@ const Header = () => {
       }
     }, 100);
   };
+
+  const handleNavigateToContact = () => {
+    // Nếu div "service" ở trang chủ
+    navigate('/#contact');
+
+    // Hoặc nếu ở trang khác, ví dụ trang services
+    // navigate('/services#service');
+
+    // Đợi một chút để trang load xong rồi cuộn
+    setTimeout(() => {
+      const serviceElement = document.getElementById('contact');
+      if (serviceElement) {
+        serviceElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end'
+        });
+      }
+    }, 100);
+  };
   // const [role, setRole] = useState<string | null>(null);
   // useEffect(() => {
   //   const fetchRole = async () => {
@@ -175,7 +194,7 @@ const Header = () => {
             DỊCH VỤ
           </button>
           <Link to="/blog" className="hidden md:inline hover:text-blue-600">BLOG</Link>
-          <Link to="/contact" className="hidden md:inline hover:text-blue-600">LIÊN HỆ</Link>
+          <button onClick={handleNavigateToContact} className="hidden md:inline hover:text-blue-600">LIÊN HỆ</button>
 
           <div className="flex items-center gap-4">
             <Link to="/cart" className="relative text-gray-700 hover:text-blue-600">

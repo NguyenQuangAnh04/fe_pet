@@ -1,10 +1,12 @@
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Footer from "../components/common/Footer";
 import Header from "../components/common/Header";
 
 interface BlogPost {
     id: number;
+    slug: string;
     title: string;
     description: string;
     fullContent: string;
@@ -17,14 +19,16 @@ interface BlogPost {
 }
 
 const BlogPage = () => {
+    const navigate = useNavigate();
     const [blogs, setBlogs] = useState<BlogPost[]>([]);
     const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
-
+  
     useEffect(() => {
         const blogData: BlogPost[] = [
             {
                 id: 1,
+                slug: "cach-chon-do-an-phu-hop-cho-thu-cung",
                 title: "Cách chọn đồ ăn phù hợp",
                 description:
                     "Chọn đồ ăn có đầy đủ chất dinh dưỡng, phù hợp với tuổi và tình trạng sức khỏe của thú cưng.",
@@ -82,6 +86,7 @@ const BlogPage = () => {
             },
             {
                 id: 2,
+                slug: "dau-hieu-thu-cung-bi-benh",
                 title: "Dấu hiệu thú cưng bị bệnh",
                 description:
                     "Chú ý đến những dấu hiệu bất thường như mất ăn, tiêu chảy, thay đổi hành vi.",
@@ -168,6 +173,7 @@ const BlogPage = () => {
             },
             {
                 id: 3,
+                slug: "meo-huan-luyen-thu-cung-hieu-qua",
                 title: "Mẹo huấn luyện hiệu quả",
                 description:
                     "Sử dụng phương pháp tích cực, nhất quán và kiên nhẫn. Tập huấn luyện trong khoảng thời gian ngắn nhưng thường xuyên.",
@@ -262,6 +268,7 @@ const BlogPage = () => {
             },
             {
                 id: 4,
+                slug: "cach-cham-soc-long-thu-cung",
                 title: "Cách chăm sóc lông thú cưng",
                 description:
                     "Bí quyết giữ lông chó mèo luôn sáng bóng và khỏe mạnh qua việc tắm rửa và chải lông định kỳ.",
@@ -307,6 +314,7 @@ const BlogPage = () => {
             },
             {
                 id: 5,
+                slug: "van-dong-va-tap-the-duc-cho-thu-cung",
                 title: "Vận động và tập thể dục cho thú cưng",
                 description:
                     "Lượng vận động cần thiết hàng ngày để thú cưng luôn khỏe mạnh và vui vẻ.",
@@ -500,7 +508,7 @@ const BlogPage = () => {
                                     <article
                                         key={blog.id}
                                         className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer group"
-                                        onClick={() => setSelectedBlog(blog)}
+                                        onClick={() => navigate(`/blog/${blog.slug}`)}
                                     >
                                         {/* Image */}
                                         <div className="relative overflow-hidden h-48">

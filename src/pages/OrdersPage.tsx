@@ -5,6 +5,7 @@ import {
   MapPin,
   Package,
   Phone,
+  Star,
   Truck,
   User,
   XCircle
@@ -13,6 +14,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/common/Footer";
 import Header from "../components/common/Header";
+import ReviewModal from "../components/product/ReviewModal";
 import {
   useCancelOrderUser,
   useQueryOrderByUser,
@@ -35,6 +37,40 @@ export default function OrdersPage() {
 
   const navigate = useNavigate();
   const { mutateAsync: mutateCancelOrder } = useCancelOrderUser();
+
+  // State cho review modal
+  const [reviewModal, setReviewModal] = useState<{
+    isOpen: boolean;
+    productId: number;
+    productName: string;
+    variantId: number;
+    variantSize: string;
+    orderId: number;
+    productImage?: string;
+  } | null>(null);
+
+  const openReviewModal = (
+    productId: number,
+    productName: string,
+    variantId: number,
+    variantSize: string,
+    orderId: number,
+    productImage?: string
+  ) => {
+    setReviewModal({
+      isOpen: true,
+      productId,
+      productName,
+      variantId,
+      variantSize,
+      orderId,
+      productImage,
+    });
+  };
+
+  const closeReviewModal = () => {
+    setReviewModal(null);
+  };
 
   const getStatusColor = (status: OrderStatus) => {
     const colors: Record<OrderStatus, string> = {
@@ -69,7 +105,7 @@ export default function OrdersPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [loading] = useState(false);
   const { data } = useQueryOrderByUser(selectedStatus);
-
+  console.log(data)
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -228,12 +264,43 @@ export default function OrdersPage() {
                             <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
                               {orderItem.productName}
                             </h4>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                               <span className="px-2 py-0.5 bg-gray-100 rounded">
                                 {orderItem.size}
                               </span>
                               <span>x{orderItem.quantity}</span>
                             </div>
+
+                            {/* Nút đánh giá cho đơn hàng hoàn thành */}
+                            {order.status === OrderStatus.COMPLETED && orderItem.productId && (
+                             <>
+                                {orderItem.reviewed ? (
+                                  // ĐÃ ĐÁNH GIÁ - Hiển thị badge xanh
+                                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg">
+                                    <CheckCircle className="w-3.5 h-3.5" />
+                                    Đã đánh giá
+                                  </div>
+                                ) : (
+                                  // CHƯA ĐÁNH GIÁ - Hiển thị nút đánh giá
+                                  <button
+                                    onClick={() =>
+                                      openReviewModal(
+                                        orderItem.productId!,
+                                        orderItem.productName || "",
+                                        orderItem.variantId || 0,
+                                        orderItem.size || "",
+                                        order.id,
+                                        orderItem.urlProductImage
+                                      )
+                                    }
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition shadow-sm hover:shadow"
+                                  >
+                                    <Star className="w-3.5 h-3.5 fill-white" />
+                                    Đánh giá sản phẩm
+                                  </button>
+                                )}
+                              </>
+                            )}
                           </div>
 
                           <div className="text-right">
@@ -265,9 +332,9 @@ export default function OrdersPage() {
                             Hủy đơn
                           </button>
                         )}
-                        <button className="text-xs font-medium text-orange-600 hover:text-orange-700 px-3 py-1.5 border border-orange-300 hover:border-orange-400 rounded-lg transition">
+                        {/* <button className="text-xs font-medium text-orange-600 hover:text-orange-700 px-3 py-1.5 border border-orange-300 hover:border-orange-400 rounded-lg transition">
                           Chi tiết
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </div>
@@ -277,6 +344,20 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+
+      {/* Review Modal - CALL API KHI SUBMIT */}
+      {reviewModal && (
+        <ReviewModal
+          isOpen={reviewModal.isOpen}
+          onClose={closeReviewModal}
+          productId={reviewModal.productId}
+          productName={reviewModal.productName}
+          variantId={reviewModal.variantId}
+          variantSize={reviewModal.variantSize}
+          orderId={reviewModal.orderId}
+          productImage={reviewModal.productImage}
+        />
+      )}
 
       <Footer />
     </div>

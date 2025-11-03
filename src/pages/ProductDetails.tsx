@@ -1,4 +1,4 @@
-import { CheckCircle, Package, ShoppingCart, Tag } from "lucide-react";
+import { CheckCircle, Package, ShoppingCart, Star, Tag } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { findProductBySlug } from "../api/productService";
@@ -6,6 +6,7 @@ import Footer from "../components/common/Footer";
 import Header from "../components/common/Header";
 import ProductDescription from "../components/product/ProductDescription";
 import ProductImages from "../components/product/ProductImages";
+import ProductReviews from "../components/product/ProductReviews";
 import { useAddCart } from "../hook/carts/useCart";
 import type { CartDTOItem } from "../types/cart";
 import type { ProductDTO } from "../types/product";
@@ -21,11 +22,18 @@ export default function ProductDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
+  // Scroll to top when component mounts or slug changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
+
   useEffect(() => {
     if (!slug) return;
     const getData = async () => {
       const res = await findProductBySlug(slug);
       setProduct(res.data);
+      console.log(res);
+
       if (res.data?.variants && res.data.variants.length > 0) {
         setSelectedSize(res.data.variants[0]);
         setSize(0);
@@ -99,12 +107,35 @@ export default function ProductDetails() {
                     {product?.namePro}
                   </h1>
 
-                  {/* Category badge */}
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-3.5 h-3.5 text-blue-600" />
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                      {product?.categoryName}
-                    </span>
+                  {/* Rating & Category */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {/* Rating */}
+                    {product?.averageRating !== undefined && product.averageRating > 0 && (
+                      <div className="flex items-center gap-1">
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`w-4 h-4 ${star <= Math.round(product.averageRating)
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-gray-300"
+                                }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm font-medium text-gray-700">
+                          {product.averageRating.toFixed(1)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Category badge */}
+                    <div className="flex items-center gap-2">
+                      <Tag className="w-3.5 h-3.5 text-blue-600" />
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                        {product?.categoryName}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -148,8 +179,8 @@ export default function ProductDetails() {
                             setSelectedSize(s);
                           }}
                           className={`relative border-2 px-3 py-2.5 rounded-lg font-semibold transition-all text-sm ${size === index
-                              ? "border-orange-500 bg-orange-50 text-orange-700"
-                              : "border-gray-300 hover:border-orange-300 text-gray-700"
+                            ? "border-orange-500 bg-orange-50 text-orange-700"
+                            : "border-gray-300 hover:border-orange-300 text-gray-700"
                             }`}
                         >
                           <div className="text-center">
@@ -254,8 +285,11 @@ export default function ProductDetails() {
 
           {/* Mô tả sản phẩm */}
           {product && (
-            <div className="mt-8">
+            <div className="mt-8 space-y-6">
               <ProductDescription product={product} />
+
+              {/* Phần đánh giá sản phẩm - CALL API */}
+              {slug && <ProductReviews slug={slug} />}
             </div>
           )}
         </div>

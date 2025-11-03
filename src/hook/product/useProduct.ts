@@ -28,7 +28,7 @@ export function useQueryProduct({
   maxPrice,
 }: UseQueryProductProps) {
   return useQuery<ProductResponse>({
-    queryKey: ["product", page, keyword, categoryId, size, minPrice, maxPrice],
+    queryKey: ["product", page, keyword, categoryId, size, minPrice,maxPrice],
     queryFn: async () => {
       const res = await findAllProduct(
         page,

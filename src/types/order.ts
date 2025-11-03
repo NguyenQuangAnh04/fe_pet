@@ -1,5 +1,5 @@
 export enum OrderStatus {
-  ALL= "",
+  ALL = "",
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
   SHIPPING = "SHIPPING",
@@ -23,6 +23,7 @@ export interface OrderDTO {
   totalAmount?: number;
   status?: OrderStatus;
   orderDate?: string;
+  createdAt?: string;
   note?: string;
   items?: ItemDTO[];
   paymentMethod?: PaymentMethod;
@@ -32,7 +33,10 @@ export interface OrderDTO {
 
 export interface OrderDetailDTO {
   id?: number;
+  productId?: number;
+  variantId?: number;
   quantity?: number;
+  reviewed?: boolean;
   price?: number;
   size?: string;
   productName?: string;

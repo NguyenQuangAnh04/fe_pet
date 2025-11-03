@@ -122,11 +122,7 @@ const CustomerFeedback = () => {
                 </div>
 
                 {/* View All Reviews Button */}
-                <div className="text-center mt-8">
-                    <button className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg active:scale-95">
-                        Xem tất cả đánh giá →
-                    </button>
-                </div>
+
             </div>
         </section>
     );

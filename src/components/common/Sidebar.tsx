@@ -6,6 +6,7 @@ import {
   FaClipboardList,
   FaListAlt,
   FaSignOutAlt,
+  FaStar,
   FaStethoscope,
   FaUser,
   FaUserMd,
@@ -84,6 +85,12 @@ const Sidebar = () => {
             className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
           >
             <FaCalendarCheck /> Quản lý lịch khám
+          </Link>
+          <Link
+            to="/dashboard/reviews"
+            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+          >
+            <FaStar /> Quản lý đánh giá
           </Link>
         </nav>
         <div className=" px-6 text-white mb-2">
