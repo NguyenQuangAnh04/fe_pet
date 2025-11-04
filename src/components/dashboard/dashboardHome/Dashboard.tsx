@@ -17,7 +17,6 @@ import { DailyRevenueChart } from "./Charts/DailyRevenueChart";
 import { MonthlyRevenueChart } from "./Charts/MonthlyRevenueChart";
 import { StatusChart } from "./Charts/StatusChart";
 import { TopItemsChart } from "./Charts/TopItemsChart";
-import { DashboardSkeleton } from "./Shared/SkeletonLoader";
 import { RefreshButton } from "./Shared/RefreshButton";
 
 export default function Dashboard() {
@@ -26,9 +25,8 @@ export default function Dashboard() {
   const [statusChartType, setStatusChartType] = useState<"order" | "appoint">("order");
   const [dailyChartType, setDailyChartType] = useState<"order" | "appoint">("order");
   const [monthlyChartType, setMonthlyChartType] = useState<"order" | "appoint">("order");
-  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Gọi API với refreshKey để trigger refetch khi cần
+  // Gọi API - không block UI, mỗi query tự load
   const { data: appointStatusCounts, isLoading: appointStatusLoading, refetch: refetchAppointStatus } = useQueryAppointCountStatus();
   const { data: appointTotalRevenue, isLoading: appointRevenueLoading, refetch: refetchAppointRevenue } = useQueryAppointTotalRevenue();
   const { data: appointDaily, isLoading: appointDailyLoading, refetch: refetchAppointDaily } = useQueryAppointDailyRevenue();
@@ -40,17 +38,6 @@ export default function Dashboard() {
   const { data: topProduct, isLoading: topProductLoading, refetch: refetchTopProduct } = useQueryTopProduct();
   const { data: orderStatusCounts, isLoading: orderStatusLoading, refetch: refetchOrderStatus } = useQueryCountStatus();
   const { data: orderTotalRevenue, isLoading: orderRevenueLoading, refetch: refetchOrderRevenue } = useQueryTotalRevenue();
-
-  // Kiểm tra trạng thái loading tổng thể
-  const isLoading = useMemo(() =>
-    appointStatusLoading || appointRevenueLoading || appointDailyLoading ||
-    appointMonthlyLoading || topExamLoading || orderDailyLoading ||
-    orderMonthlyLoading || topProductLoading || orderStatusLoading || orderRevenueLoading,
-    [
-      appointStatusLoading, appointRevenueLoading, appointDailyLoading,
-      appointMonthlyLoading, topExamLoading, orderDailyLoading,
-      orderMonthlyLoading, topProductLoading, orderStatusLoading, orderRevenueLoading
-    ]);
 
   // Hàm refresh tất cả data
   const refreshAllData = () => {
@@ -64,7 +51,6 @@ export default function Dashboard() {
     refetchTopProduct();
     refetchOrderStatus();
     refetchOrderRevenue();
-    setRefreshKey(prev => prev + 1);
   };
 
   // Xử lý dữ liệu chung
@@ -79,7 +65,7 @@ export default function Dashboard() {
       merged[idx].count = item.orderCount ?? 0;
     });
     return merged;
-  }, [orderMonthly, refreshKey]);
+  }, [orderMonthly, monthsBase]);
 
   const monthlyAppointData = useMemo(() => {
     if (!appointMonthly) return monthsBase;
@@ -90,7 +76,7 @@ export default function Dashboard() {
       merged[idx].count = item.appointCount ?? 0;
     });
     return merged;
-  }, [appointMonthly, refreshKey]);
+  }, [appointMonthly, monthsBase]);
 
   const dailyOrderData = useMemo(() =>
     (orderDaily ?? []).map((d) => ({
@@ -98,7 +84,7 @@ export default function Dashboard() {
       revenue: d.revenue ?? 0,
       count: d.orderCount ?? 0,
     })),
-    [orderDaily, refreshKey]);
+    [orderDaily]);
 
   const dailyAppointData = useMemo(() =>
     (appointDaily ?? []).map((d) => ({
@@ -106,7 +92,7 @@ export default function Dashboard() {
       revenue: d.revenue ?? 0,
       count: d.appointCount ?? 0,
     })),
-    [appointDaily, refreshKey]);
+    [appointDaily]);
 
   const dailyData = dailyChartType === "order" ? dailyOrderData : dailyAppointData;
   const monthlyData = monthlyChartType === "order" ? monthlyOrderData : monthlyAppointData;
@@ -115,7 +101,7 @@ export default function Dashboard() {
     statusChartType === "order"
       ? (orderStatusCounts ?? []).map(([status, count]) => ({ name: status, value: count }))
       : (appointStatusCounts ?? []).map(([status, count]) => ({ name: status, value: count })),
-    [orderStatusCounts, appointStatusCounts, statusChartType, refreshKey]);
+    [orderStatusCounts, appointStatusCounts, statusChartType]);
 
   const COLORS = useMemo(() =>
     statusChartType === "order"
@@ -127,13 +113,16 @@ export default function Dashboard() {
     chartType === "product"
       ? (topProduct ?? []).map((item) => ({ name: item.productName, total: item.totalPro, fullName: item.productName }))
       : (topExam ?? []).map((item) => ({ name: item.examinationName, total: item.totalExamination, fullName: item.examinationName })),
-    [topProduct, topExam, chartType, refreshKey]);
+    [topProduct, topExam, chartType]);
 
   const formatCurrency = (value: number) => value.toLocaleString("vi-VN");
 
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
+  // Progressive loading - hiển thị từng phần khi data sẵn sàng
+  const isLoadingRevenue = orderRevenueLoading || appointRevenueLoading;
+  const isLoadingDaily = dailyChartType === "order" ? orderDailyLoading : appointDailyLoading;
+  const isLoadingMonthly = monthlyChartType === "order" ? orderMonthlyLoading : appointMonthlyLoading;
+  const isLoadingStatus = statusChartType === "order" ? orderStatusLoading : appointStatusLoading;
+  const isLoadingTop = chartType === "product" ? topProductLoading : topExamLoading;
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen ml-[250px]">
@@ -157,44 +146,86 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Cards */}
+      {/* Cards - Hiển thị ngay khi có data hoặc loading */}
       <div className="gap-5">
-        <RevenueCards
-          orderTotalRevenue={orderTotalRevenue || 0}
-          appointTotalRevenue={appointTotalRevenue || 0}
-          formatCurrency={formatCurrency}
-        />
+        {isLoadingRevenue ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-white rounded-2xl shadow-md p-6 animate-pulse">
+                <div className="h-6 w-32 bg-gray-200 rounded mb-2"></div>
+                <div className="h-8 w-40 bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 w-24 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <RevenueCards
+            orderTotalRevenue={orderTotalRevenue || 0}
+            appointTotalRevenue={appointTotalRevenue || 0}
+            formatCurrency={formatCurrency}
+          />
+        )}
       </div>
 
-
+      {/* Charts - Hiển thị từng chart khi data sẵn sàng */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <DailyRevenueChart
-          dailyData={dailyData}
-          dailyChartType={dailyChartType}
-          setDailyChartType={setDailyChartType}
-        />
-        <MonthlyRevenueChart
-          monthlyData={monthlyData}
-          monthlyChartType={monthlyChartType}
-          setMonthlyChartType={setMonthlyChartType}
-          year={year}
-        />
+        {isLoadingDaily ? (
+          <div className="bg-white rounded-lg shadow p-5">
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-5"></div>
+            <div className="h-72 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+        ) : (
+          <DailyRevenueChart
+            dailyData={dailyData}
+            dailyChartType={dailyChartType}
+            setDailyChartType={setDailyChartType}
+          />
+        )}
+        
+        {isLoadingMonthly ? (
+          <div className="bg-white rounded-lg shadow p-5">
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-5"></div>
+            <div className="h-72 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+        ) : (
+          <MonthlyRevenueChart
+            monthlyData={monthlyData}
+            monthlyChartType={monthlyChartType}
+            setMonthlyChartType={setMonthlyChartType}
+            year={year}
+          />
+        )}
       </div>
+
       {/* Trạng thái + Top cùng 1 hàng */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <StatusChart
-          statusData={statusData}
-          statusChartType={statusChartType}
-          setStatusChartType={setStatusChartType}
-          COLORS={COLORS}
-        />
-        <TopItemsChart
-          topItemsData={topItemsData}
-          chartType={chartType}
-          setChartType={setChartType}
-        />
+        {isLoadingStatus ? (
+          <div className="bg-white rounded-2xl shadow-lg p-5">
+            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse mb-5"></div>
+            <div className="h-72 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+        ) : (
+          <StatusChart
+            statusData={statusData}
+            statusChartType={statusChartType}
+            setStatusChartType={setStatusChartType}
+            COLORS={COLORS}
+          />
+        )}
+        
+        {isLoadingTop ? (
+          <div className="bg-white rounded-lg shadow p-5">
+            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-5"></div>
+            <div className="h-72 bg-gray-100 rounded animate-pulse"></div>
+          </div>
+        ) : (
+          <TopItemsChart
+            topItemsData={topItemsData}
+            chartType={chartType}
+            setChartType={setChartType}
+          />
+        )}
       </div>
-    
     </div>
   );
 }
