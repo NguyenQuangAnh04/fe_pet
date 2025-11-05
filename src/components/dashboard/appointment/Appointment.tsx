@@ -61,7 +61,7 @@ export default function Appointment() {
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDTO>();
   const [showModalAppointment, setShowModalAppointment] = useState(false);
   const { mutateAsync: mutateUpdateAppointment } = useUpdateAppointment();
-  const { data } = useQueryAppoint({ page });
+  const { data } = useQueryAppoint({ ownerName: ownerName, phoneNumber: phoneNumber, petName: petName, status: status, email: email, vetName: vetName, page });
 
   const handleSearch = () => {
     setSearchParams({
@@ -71,9 +71,9 @@ export default function Appointment() {
       petName: petName.trim(),
       vetName: vetName.trim(),
       status: status.trim(),
-
     });
   };
+  console.log(ownerName);
 
   const handleClearSearch = () => {
     setOwnerName("");
