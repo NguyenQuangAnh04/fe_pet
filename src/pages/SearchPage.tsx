@@ -38,7 +38,7 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
           >
             <div className="relative overflow-hidden rounded-lg mb-4">
               {/* Quick View Button */}
-              <button
+              {/* <button
                 onClick={() => {
                   setShowModalProductCart(true);
                   setSelectedProduct(item);
@@ -46,7 +46,7 @@ export default function SearchPage({ data, page, setPage }: SearchPageProps) {
                 className="absolute top-3 right-3 z-10 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-600 rounded-full shadow-md flex items-center h-10 w-10 justify-center"
               >
                 <BsEye size={20} />
-              </button>
+              </button> */}
 
               {/* Product Images */}
               <div className="aspect-square relative">

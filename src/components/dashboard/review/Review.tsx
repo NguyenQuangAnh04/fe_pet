@@ -72,7 +72,7 @@ const Review = () => {
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">Quản lý đánh giá</h1>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-[10px] text-gray-600 mt-1">
                     Duyệt và quản lý đánh giá sản phẩm từ khách hàng
                 </p>
             </div>
@@ -81,7 +81,7 @@ const Review = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
                 <div className="flex gap-4">
                     <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-[10px] font-medium text-gray-700 mb-2">
                             Tìm theo số điện thoại
                         </label>
                         <input
@@ -100,7 +100,7 @@ const Review = () => {
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-yellow-800">Chờ duyệt</p>
+                            <p className="text-[10px] font-medium text-yellow-800">Chờ duyệt</p>
                             <p className="text-2xl font-bold text-yellow-900">
                                 {data?.data.reviews.content.filter((r) => r.status === "PENDING").length || 0}
                             </p>
@@ -114,7 +114,7 @@ const Review = () => {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-green-800">Đã duyệt</p>
+                            <p className="text-[10px] font-medium text-green-800">Đã duyệt</p>
                             <p className="text-2xl font-bold text-green-900">
                                 {data?.data.reviews.content.filter((r) => r.status === "APPROVED").length || 0}
                             </p>
@@ -128,7 +128,7 @@ const Review = () => {
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-red-800">Đã từ chối</p>
+                            <p className="text-[10px] font-medium text-red-800">Đã từ chối</p>
                             <p className="text-2xl font-bold text-red-900">
                                 {data?.data.reviews.content.filter((r) => r.status === "REJECTED").length || 0}
                             </p>
@@ -142,7 +142,7 @@ const Review = () => {
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-700">Đã gỡ</p>
+                            <p className="text-[10px] font-medium text-gray-700">Đã gỡ</p>
                             <p className="text-2xl font-bold text-gray-900">
                                 {data?.data.reviews.content.filter((r) => r.status === "ARCHIVED").length || 0}
                             </p>
@@ -204,16 +204,16 @@ const Review = () => {
                             ) : (
                                 data?.data.reviews.content.map((review) => (
                                     <tr key={review.id} className="hover:bg-gray-50 transition">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap text-[10px] font-medium text-gray-900">
                                             #{review.id}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">
+                                            <div className="text-[10px] font-medium text-gray-900">
                                                 {review.fullName}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-gray-900 max-w-xs truncate">
+                                            <div className="text-[10px] text-gray-900 max-w-xs truncate">
                                                 {review.productName || "N/A"}
                                             </div>
                                             <div className="text-xs text-gray-500">{review.variant}</div>
@@ -222,7 +222,7 @@ const Review = () => {
                                             {renderStars(review.rating)}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-gray-900 max-w-md truncate">
+                                            <div className="text-[10px] text-gray-900 max-w-md truncate">
                                                 {review.comment}
                                             </div>
                                         </td>
@@ -235,7 +235,7 @@ const Review = () => {
                                                 {getStatusLabel(review.status)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td className="px-6 py-4 whitespace-nowrap text-[10px] text-gray-500">
                                             {formatDate(review.createdAt)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -298,21 +298,21 @@ const Review = () => {
                 {data && data.data.reviews.totalPages > 1 && (
                     <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
                         <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-700">
+                            <div className="text-[10px] text-gray-700">
                                 Trang <span className="font-medium">{page + 1}</span> / {data.data.reviews.totalPages}
                             </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setPage(Math.max(0, page - 1))}
                                     disabled={page === 0}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                    className="px-4 py-2 text-[10px] font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
                                 >
                                     Trước
                                 </button>
                                 <button
                                     onClick={() => setPage(Math.min(data.data.reviews.totalPages - 1, page + 1))}
                                     disabled={page >= data.data.reviews.totalPages - 1}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                                    className="px-4 py-2 text-[10px] font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
                                 >
                                     Sau
                                 </button>

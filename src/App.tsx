@@ -25,6 +25,7 @@ import BlogPage from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import BookingForm from "./pages/BookingForm";
 import OrdersPage from "./pages/OrdersPage";
+import PaymentResult from "./pages/PaymentResult";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         <Route path="/" element={<Home />} />
         {/* <Route path="/account" element={<Account />} /> */}
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/payment-result" element={<PaymentResult />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
         <Route path="/search" element={<ProductFilter />} />
         <Route element={<PrivateRoute />}>

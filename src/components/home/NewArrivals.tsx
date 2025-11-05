@@ -35,7 +35,7 @@ const NewArrivals = () => {
                 {/* <button className="absolute bottom-0 left-0 right-0 border border-gray-400 rounded-xl px-2 py-2 bg-white translate-y-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ">
                   Thêm vào giỏ hàng
                 </button> */}
-                <button
+                {/* <button
                   onClick={() => {
                     setSelectedProduct(p);
                     setShowModalProductCart(true);
@@ -43,7 +43,7 @@ const NewArrivals = () => {
                   className="absolute w-8 h-8 rounded-full bg-white text-black shadow flex items-center justify-center right-0 top-2 opacity-0 translate-x-full group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
                 >
                   <BsEye size={20} />
-                </button>
+                </button> */}
               </div>
               <p className="font-semibold line-clamp-2 mt-2 min-h-[3rem]">{p.namePro}</p>
 

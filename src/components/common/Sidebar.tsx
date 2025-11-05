@@ -25,80 +25,79 @@ const Sidebar = () => {
     }
   }
   return (
-    <div className="fixed min-h-screen h-full bg-blue-950 w-[250px] overflow-y-auto">
-      <div className="mt-10">
+    <div className="fixed min-h-screen h-full bg-gradient-to-b from-blue-900 to-blue-950 w-[250px] overflow-y-auto shadow-xl">
+      <div className="py-6 border-b border-blue-800">
         <a
           href="/"
-          className="text-2xl text-white font-semibold px-5 text-center"
+          className="text-xl text-white font-bold px-5 flex items-center justify-center gap-2"
         >
-          ADMIN
+          {/* <FaChartBar className="text-orange-400" /> */}
+          PET ADMIN
         </a>
       </div>
-      <div className="flex justify-between flex-col gap-5">
-        <nav className="flex flex-col mt-10 text-white">
+      <div className="flex justify-between flex-col h-[calc(100vh-80px)]">
+        <nav className="flex flex-col mt-4 text-white">
           <Link
             to="/dashboard/dashboardHome"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaChartBar /> Thống kê
+            <FaChartBar size={16} /> Thống kê
           </Link>
           <Link
             to="/dashboard/products"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaBoxOpen /> Sản phẩm
+            <FaBoxOpen size={16} /> Sản phẩm
           </Link>
           <Link
             to="/dashboard/categories"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaListAlt /> Danh mục
+            <FaListAlt size={16} /> Danh mục
           </Link>
-
-
           <Link
             to="/dashboard/orders"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaClipboardList /> Đơn hàng
+            <FaClipboardList size={16} /> Đơn hàng
           </Link>
           <Link
             to="/dashboard/account"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaUser /> Tài khoản
+            <FaUser size={16} /> Tài khoản
           </Link>
           <Link
             to="/dashboard/vet"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaUserMd /> Bác sĩ
+            <FaUserMd size={16} /> Bác sĩ
           </Link>
           <Link
             to="/dashboard/exam"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaStethoscope /> Dịch vụ khám
+            <FaStethoscope size={16} /> Dịch vụ khám
           </Link>
           <Link
             to="/dashboard/appoint"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaCalendarCheck /> Quản lý lịch khám
+            <FaCalendarCheck size={16} /> Lịch khám
           </Link>
           <Link
             to="/dashboard/reviews"
-            className="flex items-center gap-4 hover:bg-blue-800 px-5 py-5"
+            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
-            <FaStar /> Quản lý đánh giá
+            <FaStar size={16} /> Đánh giá
           </Link>
         </nav>
-        <div className=" px-6 text-white mb-2">
+        <div className="px-5 text-white border-t border-blue-800 py-4 mt-auto">
           <button
             onClick={handleLogout}
-            className="text-white text-sm flex items-center gap-2"
+            className="text-white text-sm flex items-center gap-2 hover:text-orange-400 transition-colors w-full"
           >
-            <FaSignOutAlt /> Đăng xuất
+            <FaSignOutAlt size={16} /> Đăng xuất
           </button>
         </div>
       </div>

@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { BiPackage, BiPhone, BiUser } from "react-icons/bi";
-import { BsClock, BsCheckCircle, BsEye, BsTrash } from "react-icons/bs";
-import { FaMoneyBillWave, FaTruck, FaEnvelope, FaDog } from "react-icons/fa";
+import { BsCheckCircle, BsClock, BsEye, BsTrash } from "react-icons/bs";
+import { FaDog, FaEnvelope, FaMoneyBillWave, FaTruck } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
 import { MdCancel } from "react-icons/md";
-import { AppointStatus, type AppointmentDTO } from "../../../types/appointment";
 import {
   useDeleteAppointment,
   useQueryAppoint,
   useUpdateAppointment
 } from "../../../hook/appointment/useAppointment";
-import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useStatistics"
+import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useStatistics";
+import { AppointStatus, type AppointmentDTO } from "../../../types/appointment";
 import { formatPrice } from "../../../utils/format";
 import ModalAppoint from "./ModalAppointment";
 
@@ -61,7 +61,7 @@ export default function Appointment() {
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDTO>();
   const [showModalAppointment, setShowModalAppointment] = useState(false);
   const { mutateAsync: mutateUpdateAppointment } = useUpdateAppointment();
-  const { data} = useQueryAppoint({page});
+  const { data } = useQueryAppoint({ page });
 
   const handleSearch = () => {
     setSearchParams({
@@ -71,7 +71,7 @@ export default function Appointment() {
       petName: petName.trim(),
       vetName: vetName.trim(),
       status: status.trim(),
-  
+
     });
   };
 
@@ -96,107 +96,105 @@ export default function Appointment() {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen ml-[250px]">
-      <h1 className="text-2xl font-semibold">Quản lý Lịch khám</h1>
-      <p className="text-gray-600 text-[15px]">
+      <h1 className="text-xl font-semibold">Quản lý Lịch khám</h1>
+      <p className="text-gray-600 text-xs">
         Theo dõi và quản lý tất cả lịch khám
       </p>
-      <div className="grid grid-cols-4 mt-4 gap-4">
-        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
+      <div className="grid grid-cols-4 mt-3 gap-3">
+        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
-            <h1 className="font-medium">Tổng lịch khám</h1>
+            <h1 className="font-medium text-sm">Tổng lịch khám</h1>
             <p className="text-gray-400 text-sm">{data?.content.length}</p>
           </div>
-          <BiPackage size={30} className="text-blue-500" />
+          <BiPackage size={26} className="text-blue-500" />
         </div>
 
-        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
+        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
-            <h1 className="font-medium">Đang xử lý</h1>
+            <h1 className="font-medium text-sm">Đang xử lý</h1>
             <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "PENDING")?.[1] ?? 0}</p>
           </div>
-          <BsClock size={30} className="text-yellow-500" />
+          <BsClock size={26} className="text-yellow-500" />
         </div>
 
-        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
+        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
-            <h1 className="font-medium">Đã xác nhận</h1>
+            <h1 className="font-medium text-sm">Đã xác nhận</h1>
             <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "CONFIRMED")?.[1] ?? 0}</p>
           </div>
-          <FaTruck size={30} className="text-purple-500" />
+          <FaTruck size={26} className="text-purple-500" />
         </div>
 
-        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
+        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
-            <h1 className="font-medium">Đã hoàn thành</h1>
+            <h1 className="font-medium text-sm">Đã hoàn thành</h1>
             <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "COMPLETED")?.[1] ?? 0}</p>
           </div>
-          <BsCheckCircle size={30} className="text-green-500" />
+          <BsCheckCircle size={26} className="text-green-500" />
         </div>
 
-        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
+        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
-            <h1 className="font-medium">Đã hủy</h1>
+            <h1 className="font-medium text-sm">Đã hủy</h1>
             <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "CANCELED")?.[1] ?? 0}</p>
           </div>
-          <MdCancel size={30} className="text-red-500" />
+          <MdCancel size={26} className="text-red-500" />
         </div>
 
-        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
+        <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
-            <h1 className="font-medium">Doanh thu</h1>
+            <h1 className="font-medium text-sm">Doanh thu</h1>
             <p className="text-sm text-green-400 font-semibold">
               {totalRevenue?.toLocaleString("vi-VN") ?? 0} VNĐ
             </p>
           </div>
-          <FaMoneyBillWave size={30} className="text-green-500" />
+          <FaMoneyBillWave size={26} className="text-green-500" />
         </div>
       </div>
-      <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">
+      <div className="mb-4 bg-white p-4 rounded-lg shadow-md mt-3">
+        <h2 className="text-base font-semibold text-gray-700 mb-3">
           Tìm kiếm
         </h2>
-        <form className="mt-4 flex gap-4">
+        <form className="flex gap-3 flex-wrap">
           <div className="relative">
             <input
               type="text"
               value={ownerName}
               onChange={(e) => setOwnerName(e.target.value)}
               placeholder="Tên khách hàng"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
+              className="border border-gray-300 rounded-lg pl-8 py-1.5 placeholder:text-sm text-sm w-44"
             />
             <BiUser
-              size={25}
-              className="absolute top-[9px]  left-1 text-gray-400 "
+              size={20}
+              className="absolute top-[7px] left-1 text-gray-400"
             />
           </div>
 
-          <div className="relative ">
+          <div className="relative">
             <input
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Nhập số điện thoại"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
+              placeholder="Số điện thoại"
+              className="border border-gray-300 rounded-lg pl-8 py-1.5 placeholder:text-sm text-sm w-44"
             />
             <BiPhone
-              size={25}
-              className="absolute top-[9px]  left-1 text-gray-400 "
+              size={20}
+              className="absolute top-[7px] left-1 text-gray-400"
             />
           </div>
 
           <div className="relative">
             <input
               type="text"
-              name=""
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              id=""
-              placeholder="  Tìm kiếm theo email"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
+              placeholder="Email"
+              className="border border-gray-300 rounded-lg pl-8 py-1.5 placeholder:text-sm text-sm w-44"
             />
             <FaEnvelope
-              size={25}
-              className="absolute top-[9px]  left-1 text-gray-400 "
+              size={20}
+              className="absolute top-[7px] left-1 text-gray-400"
             />
           </div>
 
@@ -205,12 +203,12 @@ export default function Appointment() {
               type="text"
               value={petName}
               onChange={(e) => setPetName(e.target.value)}
-              placeholder=" Tên thú cưng"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
+              placeholder="Tên thú cưng"
+              className="border border-gray-300 rounded-lg pl-8 py-1.5 placeholder:text-sm text-sm w-44"
             />
             <FaDog
-              size={25}
-              className="absolute top-[9px]  left-1 text-gray-400 "
+              size={20}
+              className="absolute top-[7px] left-1 text-gray-400"
             />
           </div>
 
@@ -220,11 +218,11 @@ export default function Appointment() {
               value={vetName}
               onChange={(e) => setVetName(e.target.value)}
               placeholder="Tên bác sĩ"
-              className="border border-gray-300 rounded-lg pl-8 py-2 placeholder:text-sm w-50"
+              className="border border-gray-300 rounded-lg pl-8 py-1.5 placeholder:text-sm text-sm w-44"
             />
             <BiUser
-              size={25}
-              className="absolute top-[9px]  left-1 text-gray-400 "
+              size={20}
+              className="absolute top-[7px] left-1 text-gray-400"
             />
           </div>
 
@@ -232,7 +230,7 @@ export default function Appointment() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="focus:ring-0 focus:outline-none border border-gray-300 rounded-lg px-3 py-2 w-50"
+              className="focus:ring-0 focus:outline-none border border-gray-300 rounded-lg px-3 py-1.5 text-sm w-44"
             >
               <option value="">Tất cả trạng thái</option>
               {Object.values(AppointStatus)
@@ -248,69 +246,69 @@ export default function Appointment() {
           <button
             type="button"
             onClick={handleSearch}
-            className="flex items-center justify-center border border-gray-300  rounded-lg px-3 py-2 bg-blue-500 text-white"
+            className="flex items-center justify-center gap-1 border border-gray-300 rounded-lg px-3 py-1.5 bg-blue-500 text-white text-sm"
           >
-            <FiFilter size={25} />
+            <FiFilter size={18} />
             Lọc
           </button>
           <button
             type="button"
             onClick={handleClearSearch}
-            className="flex items-center justify-center border border-gray-300  rounded-lg px-3 py-2 bg-blue-500 text-white"
+            className="flex items-center justify-center border border-gray-300 rounded-lg px-3 py-1.5 bg-gray-500 text-white text-sm"
           >
             Xoá lọc
           </button>
         </form>
       </div>
-      <div className="mt-5 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ">
+      <div className="mt-4 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full overflow-x-auto">
           <thead className="bg-gray-50 border-b border-b-gray-200">
-            <tr className="">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ">
-                Mã lịch khám
+            <tr>
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                Mã lịch
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                 Khách hàng
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                 Dịch vụ
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                 Tổng tiền
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                 Trạng thái
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ">
-                Thời gian khám
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                Thời gian
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                 Ngày đặt
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase ">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                 Thao tác
               </th>
             </tr>
           </thead>
           <tbody>
             {data?.content.map((item) => (
-              <tr key={item.id} className="shadown border-b border-b-gray-200 hover:bg-gray-50">
-                <td className="text-left px-6 py-3">#{item.id}</td>
-                <td className="text-left px-6 py-3 flex flex-col">
+              <tr key={item.id} className="shadow border-b border-b-gray-200 hover:bg-gray-50">
+                <td className="text-left px-3 py-2.5 text-sm">#{item.id}</td>
+                <td className="text-left px-3 py-2.5 flex flex-col text-sm">
                   {item.ownerName}{" "}
-                  <span className="text-[12px] text-gray-400">
+                  <span className="text-xs text-gray-400">
                     {item.phoneNumber}
                   </span>
                 </td>
 
-                <td className="text-left px-6 py-3 text-sm">
+                <td className="text-left px-3 py-2.5 text-sm">
                   {item.examination?.length}{" "}
-                  <span className="">Dịch vụ</span>
+                  <span>Dịch vụ</span>
                 </td>
-                <td className="text-left px-6 py-3 text-sm font-semibold">
+                <td className="text-left px-3 py-2.5 text-sm font-semibold">
                   {item.totalPrice && formatPrice(item.totalPrice)}
                 </td>
-                <td className="text-left px-6 py-3">
+                <td className="text-left px-3 py-2.5">
                   <select
                     value={item.appointStatus}
                     onChange={(e) =>
@@ -319,7 +317,7 @@ export default function Appointment() {
                         appointment: { appointStatus: e.target.value as AppointStatus },
                       })
                     }
-                    className={`rounded-xl px-3 inline-flex text-sm focus:ring-0 focus:outline-none cursor-pointer 
+                    className={`rounded-xl px-2.5 py-1 inline-flex text-xs focus:ring-0 focus:outline-none cursor-pointer 
                       ${item.appointStatus ? getStatusColor(item.appointStatus) : ""}`}
                   >
                     <option value={item.age} className="bg-white text-black">
@@ -334,20 +332,20 @@ export default function Appointment() {
                       ))}
                   </select>
                 </td>
-                <td className="text-left px-6 py-3">
+                <td className="text-left px-3 py-2.5 text-sm">
                   {item.appointmentTime}
                   -
                   {item.appointmentDay
                     ? new Date(item.appointmentDay).toLocaleDateString("vi-VN")
                     : "-"}
                 </td>
-                <td className="text-left px-6 py-3">
+                <td className="text-left px-3 py-2.5 text-sm">
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleDateString("vi-VN")
                     : "-"}
                 </td>
-                <td className="px-6 py-3  text-left text-sm font-medium">
-                  <div className="flex items-center gap-2">
+                <td className="px-3 py-2.5 text-left text-sm font-medium">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => {
                         setSelectedAppointment(item);

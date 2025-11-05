@@ -54,7 +54,7 @@ const ShopContent = () => {
                 >
                   Thêm vào giỏ hàng
                 </button> */}
-                <button className="absolute w-8 h-8 rounded-full bg-white text-black shadow flex items-center justify-center right-0 top-2 opacity-0 translate-x-full group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
+                {/* <button className="absolute w-8 h-8 rounded-full bg-white text-black shadow flex items-center justify-center right-0 top-2 opacity-0 translate-x-full group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
                   <button
                     onClick={() => {
                       setShowModalProductCart(true);
@@ -63,7 +63,7 @@ const ShopContent = () => {
                   >
                     <BsEye size={20} />
                   </button>
-                </button>
+                </button> */}
               </div>
               <h3 className="mt-3 font-semibold line-clamp-2 min-h-[3rem]">{p.namePro}</h3>
 

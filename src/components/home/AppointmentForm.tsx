@@ -60,8 +60,32 @@ export default function AppointmentForm() {
     if (!formData.appointmentDay || !formData.appointmentTime) {
       return alert("Vui lòng chọn ngày và giờ.");
     }
+
+    // Validate ngày không được trong quá khứ
+    const selectedDate = new Date(formData.appointmentDay);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset giờ để so sánh chỉ ngày
+
+    if (selectedDate < today) {
+      return alert("Không thể đặt lịch cho ngày trong quá khứ. Vui lòng chọn ngày hôm nay hoặc sau này.");
+    }
+
     if (!formData.ownerName || !formData.phoneNumber) {
       return alert("Vui lòng nhập tên và số điện thoại.");
+    }
+
+    // Validate số điện thoại (10 số, bắt đầu bằng 0)
+    const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      return alert("Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam (10 số, bắt đầu bằng 0).");
+    }
+
+    // Validate email nếu có nhập
+    if (formData.email && formData.email.trim() !== "") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        return alert("Email không hợp lệ. Vui lòng nhập đúng định dạng email (ví dụ: example@gmail.com).");
+      }
     }
     const appointmentTimeForBackend = formData.appointmentTime.length === 5
       ? formData.appointmentTime + ":00"
@@ -170,6 +194,7 @@ export default function AppointmentForm() {
                   <input
                     className="w-full mt-1 px-3 py-2 border border-gray-400 rounded-lg"
                     type="date"
+                    min={new Date().toISOString().split('T')[0]}
                     value={formData.appointmentDay}
                     onChange={(e) => handleChangeInput("appointmentDay", e.target.value)}
                   />
@@ -247,19 +272,24 @@ export default function AppointmentForm() {
                 <div className="flex-1">
                   <label htmlFor="">Email</label>
                   <input
-                    type="text"
+                    type="email"
                     className="w-full mt-1 px-3 py-2 border border-gray-400 rounded-lg"
                     value={formData.email}
                     onChange={(e) => handleChangeInput("email", e.target.value)}
+                    placeholder="example@gmail.com"
                   />
                 </div>
                 <div className="flex-1">
-                  <label htmlFor="">Số điện thoại</label>
+                  <label htmlFor="">Số điện thoại *</label>
                   <input
-                    type="text"
+                    type="tel"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
                     className="w-full mt-1 px-3 py-2 border border-gray-400 rounded-lg"
                     value={formData.phoneNumber}
                     onChange={(e) => handleChangeInput("phoneNumber", e.target.value)}
+                    placeholder="0987654321"
+                    required
                   />
                 </div>
               </div>

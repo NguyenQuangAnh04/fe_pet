@@ -1,7 +1,8 @@
-import { AlertCircle, CheckCircle, CreditCard, Home, MapPin, Package, Phone, User } from "lucide-react";
+import { AlertCircle, CheckCircle, CreditCard, Home, MapPin, Package, Phone, User, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
+import { createPayment } from "../api/vnPayService";
 import Footer from "../components/common/Footer";
 import Header from "../components/common/Header";
 import { useQueryCartByUser } from "../hook/carts/useCart";
@@ -12,6 +13,7 @@ import { formatPrice } from "../utils/format";
 
 export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"COD" | "VNPAY">("COD");
   const location = useLocation();
   const buyNowItems = location.state?.mode === "buyNow" ? location.state.items : null;
   const { data } = useQueryCartByUser();
@@ -107,8 +109,25 @@ export default function Checkout() {
         price: item.price,
       }));
 
-      await mutateAddOrder({ ...formData, items: itemToSend });
-      window.location.href = "/orders";
+      const orderResponse = await mutateAddOrder({ ...formData, items: itemToSend });
+      console.log(orderResponse.data);
+
+      // If payment method is VNPay, redirect to VNPay
+      if (paymentMethod === "VNPAY") {
+        try {
+          const response = await createPayment(String(orderResponse.data), totalMoney);
+          console.log(response.data);
+
+          // Redirect to VNPay payment URL
+          window.location.href = response.data;
+        } catch (error) {
+          toast.error("Không thể tạo thanh toán VNPay. Vui lòng thử lại!");
+          setIsSubmitting(false);
+        }
+      } else {
+        // COD payment - redirect to orders page
+        window.location.href = "/orders";
+      }
     } catch (error) {
       toast.error("Đặt hàng thất bại. Vui lòng thử lại!");
       setIsSubmitting(false);
@@ -336,16 +355,66 @@ export default function Checkout() {
                     </div>
                   </div>
 
-                  <div className="p-6">
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <div className="p-6 space-y-3">
+                    {/* COD Payment */}
+                    <div
+                      onClick={() => {
+                        setPaymentMethod("COD");
+                        handleInputChange("paymentMethod", "COD")
+                      }}
+                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${paymentMethod === "COD"
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                        }`}
+                    >
                       <div className="flex items-start gap-3">
-                        <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <h3 className="font-semibold text-blue-900 mb-1">
-                            Thanh toán khi nhận hàng (COD)
-                          </h3>
-                          <p className="text-sm text-blue-700">
-                            Quý khách vui lòng thanh toán bằng tiền mặt khi nhận hàng
+                        <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${paymentMethod === "COD" ? "border-blue-500" : "border-gray-300"
+                          }`}>
+                          {paymentMethod === "COD" && (
+                            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <CreditCard className="w-5 h-5 text-blue-600" />
+                            <h3 className="font-semibold text-gray-900">
+                              Thanh toán khi nhận hàng (COD)
+                            </h3>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            Thanh toán bằng tiền mặt khi nhận hàng
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* VNPay Payment */}
+                    <div
+                      onClick={() => {
+                        setPaymentMethod("VNPAY");
+                        handleInputChange("paymentMethod", "VNPAY")
+                      }}
+                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${paymentMethod === "VNPAY"
+                        ? "border-orange-500 bg-orange-50"
+                        : "border-gray-200 hover:border-gray-300"
+                        }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${paymentMethod === "VNPAY" ? "border-orange-500" : "border-gray-300"
+                          }`}>
+                          {paymentMethod === "VNPAY" && (
+                            <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Wallet className="w-5 h-5 text-orange-600" />
+                            <h3 className="font-semibold text-gray-900">
+                              Thanh toán qua VNPay
+                            </h3>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            Thanh toán an toàn qua cổng VNPay
                           </p>
                         </div>
                       </div>
@@ -454,8 +523,17 @@ export default function Checkout() {
                         </>
                       ) : (
                         <>
-                          <CheckCircle className="w-5 h-5" />
-                          Đặt hàng ngay
+                          {paymentMethod === "VNPAY" ? (
+                            <>
+                              <Wallet className="w-5 h-5" />
+                              Thanh toán qua VNPay
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="w-5 h-5" />
+                              Đặt hàng ngay
+                            </>
+                          )}
                         </>
                       )}
                     </button>
