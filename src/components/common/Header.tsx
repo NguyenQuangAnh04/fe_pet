@@ -10,6 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useQueryCartByUser } from "../../hook/carts/useCart";
 import type { ProductDTO } from "../../types/product";
 import { formatPrice } from "../../utils/format";
+import api from "../../api/axiosClient";
 
 
 const Header = () => {
@@ -64,7 +65,7 @@ const Header = () => {
   }, []);
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:8080/api/auth/logout", {}, { withCredentials: true });
+      await api.post("/auth/logout", {}, { withCredentials: true });
       localStorage.removeItem("accessToken");
       navigate("/login");
     } catch (error) {
