@@ -13,6 +13,7 @@ type FormErrors = {
   userNameOrEmail?: string;
   password?: string;
 };
+const BACKEND_URL = "http://localhost:8080";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +21,11 @@ export default function Login() {
     userName: "",
     password: "",
   });
+ 
+  const handleLoginGoogle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    window.location.href = BACKEND_URL + "/oauth2/authorization/google";
+  };
   const [error, setError] = useState<FormErrors>({});
   const { setAccessToken, setRole } = useAuth();
   const handleChangeInput = (field: keyof userLogin, value: string) => {
@@ -164,7 +170,7 @@ export default function Login() {
                 </div>
 
                 <a
-                  href="#"
+                  href="/forgot-password"
                   className="text-amber-950 text-xs text-right hover:underline pt-2"
                 >
                   Quên mật khẩu?
@@ -177,7 +183,41 @@ export default function Login() {
                 >
                   {mutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
                 </button>
-
+                <div className="flex items-center my-6">
+                  <div className="flex-1 border-t border-gray-300"></div>
+                  <span className="px-4 text-sm text-gray-500">
+                    Or continue with
+                  </span>
+                  <div className="flex-1 border-t border-gray-300"></div>
+                </div>
+                <div className="grid grid-cols-1">
+                  <button
+                    onClick={handleLoginGoogle}
+                    className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 533.5 544.3">
+                      <path
+                        fill="#4285F4"
+                        d="M533.5 278.4c0-17.2-1.5-33.7-4.4-49.7H272v94.1h147.2c-6.4 34.3-25.4 63.3-54.2 82.8v68h87.3c51.1-47 80.2-116.1 80.2-195.2z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M272 544.3c73.6 0 135.4-24.4 180.5-66.2l-87.3-68c-24.2 16.2-55 25.8-93.2 25.8-71.7 0-132.5-48.4-154.2-113.4H28.6v71.2C73.8 481.6 167.1 544.3 272 544.3z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M117.8 323.5c-4.4-12.8-6.9-26.5-6.9-40.5s2.5-27.7 6.9-40.5v-71.2H28.6C10.2 213.1 0 242.9 0 278s10.2 64.9 28.6 85.2l89.2-39.7z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M272 107.7c39.9 0 75.6 13.8 103.8 40.9l77.7-77.7C407.2 24.1 345.4 0 272 0 167.1 0 73.8 62.7 28.6 159.8l89.2 71.2C139.5 156.1 200.3 107.7 272 107.7z"
+                      />
+                    </svg>
+                    <span className="font-medium text-gray-700">
+                      Sign up with Google
+                    </span>
+                  </button>
+                </div>
                 <p className="mt-3 text-center text-amber-950 text-xs">
                   Chưa có tài khoản?{" "}
                   <a

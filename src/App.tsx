@@ -26,6 +26,9 @@ import BlogDetail from "./pages/BlogDetail";
 import BookingForm from "./pages/BookingForm";
 import OrdersPage from "./pages/OrdersPage";
 import PaymentResult from "./pages/PaymentResult";
+import OAuth2Success from "./components/OAuth2Success";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -34,6 +37,10 @@ function App() {
         {/* Routes public */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/oauth2/success" element={<OAuth2Success />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
         <Route path="/cart" element={<Cart />} />
         <Route path="/services" element={<Services />} />
         <Route path="/booking" element={<BookingForm />} />
