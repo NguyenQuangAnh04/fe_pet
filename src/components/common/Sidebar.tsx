@@ -12,18 +12,19 @@ import {
   FaUserMd,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../../api/authService";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:8080/api/auth/logout", {}, { withCredentials: true });
+      await logout();
       localStorage.removeItem("accessToken");
       navigate("/login");
     } catch (error) {
       console.error("Logout failed", error);
     }
-  }
+  };
   return (
     <div className="fixed min-h-screen h-full bg-gradient-to-b from-blue-900 to-blue-950 w-[250px] overflow-y-auto shadow-xl">
       <div className="py-6 border-b border-blue-800">

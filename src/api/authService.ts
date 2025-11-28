@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { userLogin, userRegister } from "../types/user";
+import api from "./axiosClient";
 
 const register = (userRegister: userRegister) => {
   return axios.post("http://localhost:8080/api/auth/register", userRegister);
@@ -10,4 +11,8 @@ const login = (userLogin: userLogin) => {
     withCredentials: true,
   });
 };
-export { login, register };
+
+const logout = () => {
+  return api.post("/auth/logout");
+}
+export { login, register, logout };

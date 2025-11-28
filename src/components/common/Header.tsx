@@ -12,7 +12,6 @@ import type { ProductDTO } from "../../types/product";
 import { formatPrice } from "../../utils/format";
 import api from "../../api/axiosClient";
 
-
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const { data } = useQueryCartByUser();
@@ -51,7 +50,7 @@ const Header = () => {
     }, 300);
     return () => clearTimeout(handle);
   }, [searchTerm, product]);
-
+  const token = localStorage.getItem("accessToken");
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -71,22 +70,22 @@ const Header = () => {
     } catch (error) {
       console.error("Logout failed", error);
     }
-  }
+  };
 
   const handleNavigateToService = () => {
     // Nếu div "service" ở trang chủ
-    navigate('/#service');
+    navigate("/#service");
 
     // Hoặc nếu ở trang khác, ví dụ trang services
     // navigate('/services#service');
 
     // Đợi một chút để trang load xong rồi cuộn
     setTimeout(() => {
-      const serviceElement = document.getElementById('service');
+      const serviceElement = document.getElementById("service");
       if (serviceElement) {
         serviceElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
+          behavior: "smooth",
+          block: "center",
         });
       }
     }, 100);
@@ -94,18 +93,18 @@ const Header = () => {
 
   const handleNavigateToContact = () => {
     // Nếu div "service" ở trang chủ
-    navigate('/#contact');
+    navigate("/#contact");
 
     // Hoặc nếu ở trang khác, ví dụ trang services
     // navigate('/services#service');
 
     // Đợi một chút để trang load xong rồi cuộn
     setTimeout(() => {
-      const serviceElement = document.getElementById('contact');
+      const serviceElement = document.getElementById("contact");
       if (serviceElement) {
         serviceElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'end'
+          behavior: "smooth",
+          block: "end",
         });
       }
     }, 100);
@@ -123,11 +122,12 @@ const Header = () => {
   //   fetchRole();
   // }, [])
   // console.log("Vai trò người dùng:", role);
-  const { role } = useAuth();
+  const { user } = useAuth();
   return (
     <div
-      className={`shadow-lg sticky top-0 left-0 z-50 transition-all duration-300 ${scrolled ? "bg-white" : "bg-white/90"
-        } backdrop-blur-sm`}
+      className={`shadow-lg sticky top-0 left-0 z-50 transition-all duration-300 ${
+        scrolled ? "bg-white" : "bg-white/90"
+      } backdrop-blur-sm`}
     >
       <div className="container mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between ">
         <div className="flex items-center gap-6 md:gap-8">
@@ -149,8 +149,8 @@ const Header = () => {
                   handleSearch();
                 }
               }}
-            // onFocus={() => setIsSearchFocused(true)}
-            // onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+              // onFocus={() => setIsSearchFocused(true)}
+              // onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
             />
             <button
               onClick={handleSearch}
@@ -187,18 +187,30 @@ const Header = () => {
         </div>
 
         <nav className="flex items-center gap-6 text-sm md:text-base">
-          <Link to="/search" className="hidden md:inline hover:text-blue-600">SẢN PHẨM</Link>
+          <Link to="/search" className="hidden md:inline hover:text-blue-600">
+            SẢN PHẨM
+          </Link>
           <button
             onClick={handleNavigateToService}
             className="hidden md:inline hover:text-blue-600 bg-transparent border-none cursor-pointer font-inherit text-inherit"
           >
             DỊCH VỤ
           </button>
-          <Link to="/blog" className="hidden md:inline hover:text-blue-600">BLOG</Link>
-          <button onClick={handleNavigateToContact} className="hidden md:inline hover:text-blue-600">LIÊN HỆ</button>
+          <Link to="/blog" className="hidden md:inline hover:text-blue-600">
+            BLOG
+          </Link>
+          <button
+            onClick={handleNavigateToContact}
+            className="hidden md:inline hover:text-blue-600"
+          >
+            LIÊN HỆ
+          </button>
 
           <div className="flex items-center gap-4">
-            <Link to="/cart" className="relative text-gray-700 hover:text-blue-600">
+            <Link
+              to="/cart"
+              className="relative text-gray-700 hover:text-blue-600"
+            >
               <FiShoppingCart size={22} />
               {data && data.cartItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-3 h-3 rounded-full flex items-center justify-center">
@@ -219,13 +231,38 @@ const Header = () => {
               {/* simple user menu */}
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-40 bg-white shadow rounded py-2 text-sm space-y-1">
-                  <Link to="/orders" className="block px-3 py-2 hover:bg-gray-50">Đơn hàng</Link>
+                  <Link
+                    to="/orders"
+                    className="block px-3 py-2 hover:bg-gray-50"
+                  >
+                    Đơn hàng
+                  </Link>
                   {/* <Link to="/account" className="block px-3 py-2 hover:bg-gray-50">Tài khoản</Link> */}
-                  {role === "ROLE_ADMIN" && (
-                    <Link to="/dashboard/dashboardHome" className="block px-3 py-2 hover:bg-gray-50">Quản trị</Link>
+                  {/* {user?.nameRole !== "CUSTOMER" && (
+                    <Link
+                      to="/dashboard/dashboardHome"
+                      className="block px-3 py-2 hover:bg-gray-50"
+                    >
+                      Quản trị
+                    </Link>
+                  )} */}
+                  {token ? (
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                      }}
+                      className="block px-3 py-2 hover:bg-gray-50"
+                    >
+                      Đăng xuất
+                    </button>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className="block px-3 py-2 hover:bg-gray-50"
+                    >
+                      Đăng nhập
+                    </Link>
                   )}
-                  <button onClick={() => { handleLogout() }} className="block px-3 py-2 hover:bg-gray-50">Đăng xuất</button>
-
                 </div>
               )}
             </div>

@@ -8,10 +8,8 @@ interface ProductReviewsProps {
 }
 
 export default function ProductReviews({ slug }: ProductReviewsProps) {
-    // CALL API THỰC TẾ - Lấy reviews từ backend
     const { data, isLoading, error } = useProductReviewsBySlug(slug, 0);
 
-    // Tính toán thống kê từ dữ liệu reviews (chỉ APPROVED)
     const stats: ReviewStats = useMemo(() => {
         if (!data?.data.reviews.content) {
             return {
@@ -21,7 +19,6 @@ export default function ProductReviews({ slug }: ProductReviewsProps) {
             };
         }
 
-        // Chỉ lấy review đã được duyệt
         const approvedReviews = data.data.reviews.content.filter(
             (r) => r.status === "APPROVED"
         );

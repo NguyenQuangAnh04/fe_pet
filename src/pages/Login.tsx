@@ -8,6 +8,7 @@ import illustration from "/src/assets/posterlogin.png";
 import hiddenAnimal from "/src/assets/cat2.png";
 import hiddenAnimal2 from "/src/assets/ngunhubo.png";
 import { useAuth } from "../context/AuthContext";
+import api from "../api/axiosClient";
 
 type FormErrors = {
   userNameOrEmail?: string;
@@ -21,30 +22,34 @@ export default function Login() {
     userName: "",
     password: "",
   });
- 
+  const { setAccessToken } = useAuth();
+
   const handleLoginGoogle = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     window.location.href = BACKEND_URL + "/oauth2/authorization/google";
   };
   const [error, setError] = useState<FormErrors>({});
-  const { setAccessToken, setRole } = useAuth();
   const handleChangeInput = (field: keyof userLogin, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-
   const mutation = useMutation({
     mutationFn: async (formData: userLogin) => {
-      const response = await login(formData);
-      setAccessToken(response.data.data.token);
-      setRole(response.data.data.nameRole);
-      console.log(response.data.data.nameRole);
+      const res = await login(formData);
+      localStorage.setItem("accessToken", res.data.data.token);
+      setAccessToken(res.data.data.token);
     },
     onSuccess: () => {
       toast.success("Đăng nhập thành công!");
       window.location.href = "/";
+    },
+    onError: (error: any) => {
+      console.error("Login error:", error);
+      toast.error(
+        error.response?.data.Error || "Đăng nhập thất bại. Vui lòng thử lại."
+      );
     },
   });
 
@@ -192,6 +197,7 @@ export default function Login() {
                 </div>
                 <div className="grid grid-cols-1">
                   <button
+                    type="button"
                     onClick={handleLoginGoogle}
                     className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >

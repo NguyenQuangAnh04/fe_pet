@@ -6,6 +6,7 @@ import {
   updateCart,
 } from "../../api/cartService";
 import type { CartDTO, CartDTOItem } from "../../types/cart";
+import { toast } from "react-toastify";
 
 export function useQueryCartByUser() {
   return useQuery<CartDTO>({
@@ -25,6 +26,7 @@ export function useAddCart() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast.success("Thêm vào giỏ hàng thành công!");
     },
   });
 }

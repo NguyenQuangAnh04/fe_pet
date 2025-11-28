@@ -11,6 +11,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Register from "./pages/Register";
 import Services from "./pages/Services";
 import PrivateRoute from "./routes/PrivateRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 import Appointment from "./components/dashboard/appointment/Appointment";
 import DashboardHome from "./components/dashboard/dashboardHome/Dashboard";
@@ -41,18 +42,20 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/booking" element={<BookingForm />} />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/blog/:slug" element={<BlogDetail />} />
-        <Route path="/" element={<Home />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/booking" element={<BookingForm />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
+        </Route>
         {/* <Route path="/account" element={<Account />} /> */}
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment-result" element={<PaymentResult />} />
         <Route path="/product-details/:slug" element={<ProductDetails />} />
         <Route path="/search" element={<ProductFilter />} />
-        <Route element={<PrivateRoute />}>
+        <Route>
           <Route path="orders" element={<OrdersPage />} />
         </Route>
         <Route element={<PrivateRoute />}>

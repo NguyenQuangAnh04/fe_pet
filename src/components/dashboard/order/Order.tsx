@@ -9,7 +9,10 @@ import {
   useQueryOrder,
   useUpdateOrderAdmin,
 } from "../../../hook/order/useOrder";
-import { useQueryCountStatus, useQueryTotalRevenue } from "../../../hook/dashboard/useStatistics";
+import {
+  useQueryCountStatus,
+  useQueryTotalRevenue,
+} from "../../../hook/dashboard/useStatistics";
 import { OrderStatus, type OrderDTO } from "../../../types/order";
 import { formatPrice } from "../../../utils/format";
 import ModalOrder from "./ModalOrder";
@@ -39,6 +42,8 @@ export default function Order() {
       [OrderStatus.SHIPPING]: "text-purple-700 bg-purple-200",
       [OrderStatus.COMPLETED]: "text-emerald-700 bg-emerald-200",
       [OrderStatus.CANCELED]: "text-red-700 bg-red-200",
+      [OrderStatus.FAILED_PAYMENT]: "text-red-700 bg-red-200",
+      [OrderStatus.NOT_RECEIVED]: "text-red-700 bg-red-200",
     };
     return color[status];
   };
@@ -51,6 +56,8 @@ export default function Order() {
       [OrderStatus.SHIPPING]: "Đang giao hàng",
       [OrderStatus.COMPLETED]: "Hoàn thành",
       [OrderStatus.CANCELED]: "Đã hủy",
+      [OrderStatus.FAILED_PAYMENT]: "Thanh toán thất bại",
+      [OrderStatus.NOT_RECEIVED]: "Khách hàng không nhận hàng",
     };
     return label[status];
   };
@@ -111,7 +118,11 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã xác nhận</h1>
-            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "CONFIRMED")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {" "}
+              {countStatus?.find(([status]) => status === "CONFIRMED")?.[1] ??
+                0}
+            </p>
           </div>
           <FaTruck size={30} className="text-purple-500" />
         </div>
@@ -119,7 +130,10 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đang giao</h1>
-            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "SHIPPING")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {" "}
+              {countStatus?.find(([status]) => status === "SHIPPING")?.[1] ?? 0}
+            </p>
           </div>
           <FaTruck size={30} className="text-purple-500" />
         </div>
@@ -127,7 +141,11 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã giao</h1>
-            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "COMPLETED")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {" "}
+              {countStatus?.find(([status]) => status === "COMPLETED")?.[1] ??
+                0}
+            </p>
           </div>
           <BsCheckCircle size={30} className="text-green-500" />
         </div>
@@ -135,7 +153,10 @@ export default function Order() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-4 py-2">
           <div>
             <h1 className="font-medium">Đã hủy</h1>
-            <p className="text-gray-400 text-sm"> {countStatus?.find(([status]) => status === "CANCELED")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {" "}
+              {countStatus?.find(([status]) => status === "CANCELED")?.[1] ?? 0}
+            </p>
           </div>
           <MdCancel size={30} className="text-red-500" />
         </div>
@@ -329,10 +350,11 @@ export default function Order() {
           {Array.from({ length: data?.totalPages }, (_, index) => (
             <button
               onClick={() => setPage(index)}
-              className={`w-7 h-7 rounded shadow ${page === index
-                ? "text-white bg-blue-500 flex items-center justify-center"
-                : ""
-                }`}
+              className={`w-7 h-7 rounded shadow ${
+                page === index
+                  ? "text-white bg-blue-500 flex items-center justify-center"
+                  : ""
+              }`}
             >
               {index + 1}
             </button>

@@ -5,6 +5,8 @@ export enum OrderStatus {
   SHIPPING = "SHIPPING",
   COMPLETED = "COMPLETED",
   CANCELED = "CANCELED",
+  FAILED_PAYMENT = "FAILED_PAYMENT",
+  NOT_RECEIVED = "NOT_RECEIVED",
 }
 
 export enum PaymentMethod {

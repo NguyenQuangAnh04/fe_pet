@@ -1,21 +1,36 @@
 import { useState } from "react";
 import { BiPackage, BiPhone, BiUser } from "react-icons/bi";
-import { BsCheckCircle, BsClock, BsEye, BsTrash } from "react-icons/bs";
+import {
+  BsCheckCircle,
+  BsClock,
+  BsEye,
+  BsFileMedical,
+  BsPlusSquare,
+  BsTrash,
+} from "react-icons/bs";
 import { FaDog, FaEnvelope, FaMoneyBillWave, FaTruck } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
 import { MdCancel } from "react-icons/md";
 import {
   useDeleteAppointment,
   useQueryAppoint,
-  useUpdateAppointment
+  useUpdateAppointment,
 } from "../../../hook/appointment/useAppointment";
-import { useQueryAppointCountStatus, useQueryAppointTotalRevenue } from "../../../hook/dashboard/useStatistics";
+import {
+  useQueryAppointCountStatus,
+  useQueryAppointTotalRevenue,
+} from "../../../hook/dashboard/useStatistics";
 import { AppointStatus, type AppointmentDTO } from "../../../types/appointment";
 import { formatPrice } from "../../../utils/format";
 import ModalAppoint from "./ModalAppointment";
+import { useAuth } from "../../../context/AuthContext";
+import axios from "axios";
+import api from "../../../api/axiosClient";
+import ModalExamSpecial from "./ModalExamSpecial";
 
 export default function Appointment() {
   const [ownerName, setOwnerName] = useState<string>("");
+  const { user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [petName, setPetName] = useState<string>("");
@@ -32,6 +47,25 @@ export default function Appointment() {
     vetName: "",
     status: "",
   });
+
+  const downloadInvoice = async (id: number) => {
+    const response = await api.get(`/appointment/generateInvoice/${id}`, {
+      responseType: "blob", // bắt buộc để nhận file
+    });
+
+    // Tạo URL từ Blob
+    const url = window.URL.createObjectURL(
+      new Blob([response.data], { type: "application/pdf" })
+    );
+
+    // Tạo link ẩn và click để tải về
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `invoice_${id}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
   const { mutateAsync: mutateDeleteOrder } = useDeleteAppointment();
   const handleDelete = (id: number) => {
     return mutateDeleteOrder(id);
@@ -42,7 +76,9 @@ export default function Appointment() {
       [AppointStatus.PENDING]: "text-yellow-700 bg-yellow-200",
       [AppointStatus.CONFIRMED]: "text-blue-700  bg-blue-200",
       [AppointStatus.COMPLETED]: "text-emerald-700 bg-emerald-200",
-      [AppointStatus.CANCELED]: "text-red-700 bg-red-200",
+      [AppointStatus.CANCELLED]: "text-red-700 bg-red-200",
+      [AppointStatus.IN_QUEUE]: "text-indigo-700 bg-indigo-200",
+      [AppointStatus.IN_PROGRESS]: "text-purple-700 bg-purple-200",
     };
     return color[status];
   };
@@ -52,16 +88,72 @@ export default function Appointment() {
       [AppointStatus.ALL]: "",
       [AppointStatus.PENDING]: "Đang xử lý",
       [AppointStatus.CONFIRMED]: "Đã xác nhận",
+      [AppointStatus.IN_QUEUE]: "Đang chờ",
+      [AppointStatus.IN_PROGRESS]: "Đang tiến hành",
       [AppointStatus.COMPLETED]: "Hoàn thành",
-      [AppointStatus.CANCELED]: "Đã hủy",
+      [AppointStatus.CANCELLED]: "Đã hủy",
     };
     return label[status];
   };
 
-  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentDTO>();
+  const statusSequence: AppointStatus[] = [
+    AppointStatus.PENDING,
+    AppointStatus.CONFIRMED,
+    AppointStatus.IN_QUEUE,
+    AppointStatus.IN_PROGRESS,
+    AppointStatus.COMPLETED,
+  ];
+
+  const getForwardStatusOptions = (currentStatus?: AppointStatus) => {
+    const indexOf = (s: AppointStatus) => {
+      const idx = statusSequence.indexOf(s);
+      if (idx >= 0) return idx;
+      if (s === AppointStatus.CANCELLED) return statusSequence.length; // treat CANCELLED as final
+      return -1;
+    };
+
+    if (!currentStatus) {
+      return [...statusSequence, AppointStatus.CANCELLED];
+    }
+
+    if (currentStatus === AppointStatus.CANCELLED) return [];
+
+    const currentIndex = indexOf(currentStatus);
+
+    const forwardForAll =
+      currentIndex >= 0
+        ? statusSequence.slice(currentIndex + 1).concat(AppointStatus.CANCELLED)
+        : [...statusSequence, AppointStatus.CANCELLED];
+
+    if (user?.nameRole === "USER") {
+      const allowedForUser: AppointStatus[] = [
+        AppointStatus.PENDING,
+        AppointStatus.CONFIRMED,
+        AppointStatus.IN_QUEUE,
+        AppointStatus.CANCELLED,
+      ];
+      return forwardForAll.filter(
+        (s) => allowedForUser.includes(s) && s !== currentStatus
+      );
+    }
+
+    return forwardForAll.filter((s) => s !== currentStatus);
+  };
+
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<AppointmentDTO>();
   const [showModalAppointment, setShowModalAppointment] = useState(false);
   const { mutateAsync: mutateUpdateAppointment } = useUpdateAppointment();
-  const { data } = useQueryAppoint({ ownerName: ownerName, phoneNumber: phoneNumber, petName: petName, status: status, email: email, vetName: vetName, page });
+  const { data } = useQueryAppoint({
+    ownerName: ownerName,
+    phoneNumber: phoneNumber,
+    petName: petName,
+    status: status,
+    email: email,
+    vetName: vetName,
+    page,
+  });
+  const [showModal, setShowModal] = useState(false);
 
   const handleSearch = () => {
     setSearchParams({
@@ -73,7 +165,6 @@ export default function Appointment() {
       status: status.trim(),
     });
   };
-  console.log(ownerName);
 
   const handleClearSearch = () => {
     setOwnerName("");
@@ -82,6 +173,7 @@ export default function Appointment() {
     setPetName("");
     setVetName("");
     setStatus("");
+    setPage(0);
     setSearchParams({
       ownerName: "",
       phoneNumber: "",
@@ -89,7 +181,6 @@ export default function Appointment() {
       petName: "",
       vetName: "",
       status: "",
-      page: 0,
     });
   };
   console.log(data);
@@ -112,7 +203,9 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
             <h1 className="font-medium text-sm">Đang xử lý</h1>
-            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "PENDING")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {countStatus?.find(([status]) => status === "PENDING")?.[1] ?? 0}
+            </p>
           </div>
           <BsClock size={26} className="text-yellow-500" />
         </div>
@@ -120,7 +213,10 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
             <h1 className="font-medium text-sm">Đã xác nhận</h1>
-            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "CONFIRMED")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {countStatus?.find(([status]) => status === "CONFIRMED")?.[1] ??
+                0}
+            </p>
           </div>
           <FaTruck size={26} className="text-purple-500" />
         </div>
@@ -128,7 +224,10 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
             <h1 className="font-medium text-sm">Đã hoàn thành</h1>
-            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "COMPLETED")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {countStatus?.find(([status]) => status === "COMPLETED")?.[1] ??
+                0}
+            </p>
           </div>
           <BsCheckCircle size={26} className="text-green-500" />
         </div>
@@ -136,7 +235,9 @@ export default function Appointment() {
         <div className="flex justify-between items-center shadow rounded-xl border border-gray-200 px-3 py-2.5">
           <div>
             <h1 className="font-medium text-sm">Đã hủy</h1>
-            <p className="text-gray-400 text-sm">{countStatus?.find(([status]) => status === "CANCELED")?.[1] ?? 0}</p>
+            <p className="text-gray-400 text-sm">
+              {countStatus?.find(([status]) => status === "CANCELED")?.[1] ?? 0}
+            </p>
           </div>
           <MdCancel size={26} className="text-red-500" />
         </div>
@@ -152,9 +253,7 @@ export default function Appointment() {
         </div>
       </div>
       <div className="mb-4 bg-white p-4 rounded-lg shadow-md mt-3">
-        <h2 className="text-base font-semibold text-gray-700 mb-3">
-          Tìm kiếm
-        </h2>
+        <h2 className="text-base font-semibold text-gray-700 mb-3">Tìm kiếm</h2>
         <form className="flex gap-3 flex-wrap">
           <div className="relative">
             <input
@@ -240,7 +339,6 @@ export default function Appointment() {
                     {getStatusLabel(it)}
                   </option>
                 ))}
-
             </select>
           </div>
           <button
@@ -292,7 +390,10 @@ export default function Appointment() {
           </thead>
           <tbody>
             {data?.content.map((item) => (
-              <tr key={item.id} className="shadow border-b border-b-gray-200 hover:bg-gray-50">
+              <tr
+                key={item.id}
+                className="shadow border-b border-b-gray-200 hover:bg-gray-50"
+              >
                 <td className="text-left px-3 py-2.5 text-sm">#{item.id}</td>
                 <td className="text-left px-3 py-2.5 flex flex-col text-sm">
                   {item.ownerName}{" "}
@@ -302,43 +403,74 @@ export default function Appointment() {
                 </td>
 
                 <td className="text-left px-3 py-2.5 text-sm">
-                  {item.examination?.length}{" "}
-                  <span>Dịch vụ</span>
+                  {item.examination?.length} <span>Dịch vụ</span>
                 </td>
                 <td className="text-left px-3 py-2.5 text-sm font-semibold">
                   {item.totalPrice && formatPrice(item.totalPrice)}
                 </td>
                 <td className="text-left px-3 py-2.5">
                   <select
-                    value={item.appointStatus}
-                    onChange={(e) =>
+                    value={item.appointStatus ?? ""}
+                    onChange={(e) => {
+                      const nextStatus = e.target.value as AppointStatus;
+                      if (!nextStatus || nextStatus === item.appointStatus)
+                        return;
                       mutateUpdateAppointment({
                         id: item.id,
-                        appointment: { appointStatus: e.target.value as AppointStatus },
-                      })
-                    }
+                        appointment: {
+                          appointStatus: nextStatus,
+                        },
+                      });
+                    }}
                     className={`rounded-xl px-2.5 py-1 inline-flex text-xs focus:ring-0 focus:outline-none cursor-pointer 
-                      ${item.appointStatus ? getStatusColor(item.appointStatus) : ""}`}
+                      ${
+                        item.appointStatus
+                          ? getStatusColor(item.appointStatus)
+                          : ""
+                      }`}
                   >
-                    <option value={item.age} className="bg-white text-black">
-                      {item.appointStatus && getStatusLabel(item.appointStatus)}
-                    </option>
-                    {Object.values(AppointStatus)
-                      .filter((i) => i !== item.appointStatus && i !== "")
-                      .map((it) => (
-                        <option className="bg-white text-black" value={it}>
-                          {getStatusLabel(it)}
+                    {item.appointStatus ? (
+                      <option
+                        value={item.appointStatus}
+                        className="bg-white text-black"
+                        disabled
+                      >
+                        {getStatusLabel(item.appointStatus)}
+                      </option>
+                    ) : (
+                      <option value="" disabled className="bg-white text-black">
+                        Chọn trạng thái
+                      </option>
+                    )}
+                    {getForwardStatusOptions(item.appointStatus).map(
+                      (status) => (
+                        <option
+                          key={status}
+                          className="bg-white text-black"
+                          value={status}
+                        >
+                          {getStatusLabel(status)}
                         </option>
-                      ))}
+                      )
+                    )}
                   </select>
                 </td>
                 <td className="text-left px-3 py-2.5 text-sm">
-                  {item.appointmentTime}
+                  {item.start
+                    ? new Date(item.start).toLocaleTimeString("vi-VN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "-"}
                   -
-                  {item.appointmentDay
-                    ? new Date(item.appointmentDay).toLocaleDateString("vi-VN")
+                  {item.end
+                    ? new Date(item.end).toLocaleTimeString("vi-VN", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                     : "-"}
                 </td>
+
                 <td className="text-left px-3 py-2.5 text-sm">
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleDateString("vi-VN")
@@ -362,6 +494,36 @@ export default function Appointment() {
                     >
                       <BsTrash className="w-4 h-4" />
                     </button>
+                    {item.appointStatus === AppointStatus.COMPLETED &&
+                      user?.nameRole === "DOCTOR" && (
+                        <>
+                          <button
+                            onClick={() => setShowModal(!showModal)}
+                            className="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-purple-50"
+                          >
+                            <BsPlusSquare className="w-4 h-4" />{" "}
+                          </button>
+                          <button
+                            onClick={() => downloadInvoice(item.id)}
+                            className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
+                          >
+                            <BsFileMedical className="w-4 h-4" />{" "}
+                          </button>
+                        </>
+                      )}
+                    {showModal && (
+                      <ModalExamSpecial
+                        appointmentId={item.id}
+                        initialSelectedIds={
+                          item.examination
+                            ?.map((it) => it.id)
+                            .filter(
+                              (id): id is number => typeof id === "number"
+                            ) || []
+                        }
+                        onClose={() => setShowModal(false)}
+                      />
+                    )}
                   </div>
                 </td>
               </tr>
@@ -381,10 +543,11 @@ export default function Appointment() {
           </button>
           {Array.from({ length: data?.totalPages }, (_, index) => (
             <button
-              className={`w-7 h-7 rounded shadow ${page === index
-                ? "text-white bg-blue-500 flex items-center justify-center"
-                : ""
-                }`}
+              className={`w-7 h-7 rounded shadow ${
+                page === index
+                  ? "text-white bg-blue-500 flex items-center justify-center"
+                  : ""
+              }`}
             >
               {index + 1}
             </button>

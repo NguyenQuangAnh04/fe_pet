@@ -4,5 +4,6 @@ export interface ExaminationDTO {
   price: number;
   description?: string;
   createdAt?: string;
+  active?: boolean;
   updatedAt?: string;
 }

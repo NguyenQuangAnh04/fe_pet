@@ -28,7 +28,7 @@ const NewArrivals = () => {
                 />
                 <img
                   onClick={() => navigate(`/product-details/${p.slug}`)}
-                  src={p.imagesDTO[1].imageUrl}
+                  src={p.imagesDTO?.[1]?.imageUrl ?? p.imageUrl}
                   className="w-full h-[250px] object-cover rounded-lg absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   alt=""
                 />
@@ -45,7 +45,9 @@ const NewArrivals = () => {
                   <BsEye size={20} />
                 </button> */}
               </div>
-              <p className="font-semibold line-clamp-2 mt-2 min-h-[3rem]">{p.namePro}</p>
+              <p className="font-semibold line-clamp-2 mt-2 min-h-[3rem]">
+                {p.namePro}
+              </p>
 
               {/* Rating */}
               <div className="flex items-center gap-1 mt-1">
@@ -53,10 +55,11 @@ const NewArrivals = () => {
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`w-3.5 h-3.5 ${star <= Math.round(p.averageRating || 0)
+                      className={`w-3.5 h-3.5 ${
+                        star <= Math.round(p.averageRating || 0)
                           ? "text-yellow-400 fill-yellow-400"
                           : "text-gray-300"
-                        }`}
+                      }`}
                     />
                   ))}
                 </div>

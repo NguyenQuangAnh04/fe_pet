@@ -6,48 +6,56 @@ import {
   type ReactNode,
 } from "react";
 import api from "../api/axiosClient";
+import type { AuthDTO } from "../types/auth";
 
 type AuthContextType = {
+  user: AuthDTO | null;
+  loading: boolean;
   accessToken: string | null;
   setAccessToken: (token: string | null) => void;
-  role: string | null;
-  setRole: (role: string | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("accessToken")
   );
-  const [role, setRole] = useState<string | null>(null);
-  useEffect(() => {
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-    } else {
-      localStorage.removeItem("accessToken");
-    }
-  }, [accessToken]);
+  const [user, setUser] = useState<AuthDTO | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (accessToken === null) {
-      setRole(null);
+    console.log("AuthContext: accessToken changed", accessToken);
+    if (!accessToken) {
+      setUser(null);
+      setLoading(false);
       return;
     }
-    const fetchRole = async () => {
+
+    const fetchUser = async () => {
+      setLoading(true);
+
+      console.log("AuthContext: fetching user info");
+      
       try {
-        const res = await api.get("/auth/me");
-        setRole(res.data.role);
+        const res = await api.get("/auth/getInfoUser");
+        setUser(res.data);
+        console.log("AuthContext: fetched user", res.data);
       } catch (err) {
-        console.error("Lỗi khi gọi /auth/me:", err);
+        console.error(err);
         setAccessToken(null);
-        setRole(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchRole();
+
+    fetchUser();
   }, [accessToken]);
+
   return (
     <AuthContext.Provider
-      value={{ accessToken, setAccessToken, role, setRole }}
+      value={{ user, loading, accessToken, setAccessToken }}
     >
       {children}
     </AuthContext.Provider>
@@ -56,8 +64,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 }
