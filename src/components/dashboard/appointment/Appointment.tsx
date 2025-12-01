@@ -24,7 +24,6 @@ import { AppointStatus, type AppointmentDTO } from "../../../types/appointment";
 import { formatPrice } from "../../../utils/format";
 import ModalAppoint from "./ModalAppointment";
 import { useAuth } from "../../../context/AuthContext";
-import axios from "axios";
 import api from "../../../api/axiosClient";
 import ModalExamSpecial from "./ModalExamSpecial";
 
@@ -153,7 +152,10 @@ export default function Appointment() {
     vetName: vetName,
     page,
   });
-  const [showModal, setShowModal] = useState(false);
+
+  // State cho modal exam special - lưu appointment được chọn thay vì boolean
+  const [selectedAppointmentForExam, setSelectedAppointmentForExam] =
+    useState<AppointmentDTO | null>(null);
 
   const handleSearch = () => {
     setSearchParams({
@@ -165,6 +167,7 @@ export default function Appointment() {
       status: status.trim(),
     });
   };
+  console.log(data);
 
   const handleClearSearch = () => {
     setOwnerName("");
@@ -494,36 +497,26 @@ export default function Appointment() {
                     >
                       <BsTrash className="w-4 h-4" />
                     </button>
-                    {item.appointStatus === AppointStatus.COMPLETED &&
-                      user?.nameRole === "DOCTOR" && (
-                        <>
-                          <button
-                            onClick={() => setShowModal(!showModal)}
-                            className="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-purple-50"
-                          >
-                            <BsPlusSquare className="w-4 h-4" />{" "}
-                          </button>
-                          <button
-                            onClick={() => downloadInvoice(item.id)}
-                            className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
-                          >
-                            <BsFileMedical className="w-4 h-4" />{" "}
-                          </button>
-                        </>
+                    {/* Nút thêm dịch vụ - chỉ hiện khi đang tiến hành */}
+                    {user?.nameRole === "DOCTOR" &&
+                      item.appointStatus === AppointStatus.IN_PROGRESS && (
+                        <button
+                          onClick={() => setSelectedAppointmentForExam(item)}
+                          className="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-purple-50"
+                        >
+                          <BsPlusSquare className="w-4 h-4" />
+                        </button>
                       )}
-                    {showModal && (
-                      <ModalExamSpecial
-                        appointmentId={item.id}
-                        initialSelectedIds={
-                          item.examination
-                            ?.map((it) => it.id)
-                            .filter(
-                              (id): id is number => typeof id === "number"
-                            ) || []
-                        }
-                        onClose={() => setShowModal(false)}
-                      />
-                    )}
+                    {/* Nút in hóa đơn - chỉ hiện khi hoàn thành */}
+                    {user?.nameRole === "DOCTOR" &&
+                      item.appointStatus === AppointStatus.COMPLETED && (
+                        <button
+                          onClick={() => downloadInvoice(item.id)}
+                          className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
+                        >
+                          <BsFileMedical className="w-4 h-4" />
+                        </button>
+                      )}
                   </div>
                 </td>
               </tr>
@@ -566,6 +559,18 @@ export default function Appointment() {
         <ModalAppoint
           initialData={selectedAppointment}
           onClose={() => setShowModalAppointment(false)}
+        />
+      )}
+
+      {selectedAppointmentForExam && (
+        <ModalExamSpecial
+          appointmentId={selectedAppointmentForExam.id}
+          initialSelectedIds={
+            selectedAppointmentForExam.examination
+              ?.map((it) => it.id)
+              .filter((id): id is number => typeof id === "number") || []
+          }
+          onClose={() => setSelectedAppointmentForExam(null)}
         />
       )}
     </div>

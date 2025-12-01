@@ -15,7 +15,8 @@ type UseQueryProductProps = {
   keyword?: string;
   page?: number;
   categoryId?: number;
-  size?: string;
+  sizeVariant?: string;
+  size?: number;
   minPrice?: number | null;
   maxPrice?: number | null;
 };
@@ -23,20 +24,31 @@ export function useQueryProduct({
   page = 0,
   keyword = "",
   categoryId,
-  size,
+  sizeVariant,
   minPrice,
   maxPrice,
+  size,
 }: UseQueryProductProps) {
   return useQuery<ProductResponse>({
-    queryKey: ["product", page, keyword, categoryId, size, minPrice,maxPrice],
+    queryKey: [
+      "product",
+      page,
+      keyword,
+      categoryId,
+      sizeVariant,
+      size,
+      minPrice,
+      maxPrice,
+    ],
     queryFn: async () => {
       const res = await findAllProduct(
         page,
         keyword,
         categoryId,
-        size,
+        sizeVariant,
         minPrice,
-        maxPrice
+        maxPrice,
+        size
       );
       const data = res.data.data;
       return { content: data.content, totalPages: data.totalPages };
@@ -58,7 +70,9 @@ export function useAddProduct() {
       queryClient.invalidateQueries({ queryKey: ["product"] }),
         toast.success("Thêm sản phẩm thành công!");
     },
-    onError: (err) => {toast.error(err.message)},
+    onError: (err) => {
+      toast.error(err.message);
+    },
   });
 }
 

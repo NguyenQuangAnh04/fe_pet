@@ -7,9 +7,9 @@ import {
   editOrderAdmin,
   findAllOrder,
   findAllOrderUser,
+  updateClient,
 } from "../../api/orderService";
 import { toast } from "react-toastify";
-
 
 type OrderResponse = {
   content: OrderDTO[];
@@ -116,6 +116,28 @@ export function useCancelOrderUser() {
       toast.success("Huỷ đơn hàng thành công");
     },
 
+    onError: (err) => {
+      console.error(err.message);
+    },
+  });
+}
+
+export function useUpdateOrderClient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      orderDTO,
+      orderId,
+    }: {
+      orderDTO: OrderDTO;
+      orderId: number;
+    }) => {
+      return await updateClient(orderDTO, orderId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["order"] });
+      toast.success("Cập nhật đơn hàng thành công");
+    },
     onError: (err) => {
       console.error(err.message);
     },

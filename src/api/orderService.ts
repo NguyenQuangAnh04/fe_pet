@@ -27,6 +27,10 @@ const deleteOrder = (orderId: number) => {
 const cancelOrder = (orderId: number) => {
   return api.put(`/order/cancel/${orderId}`);
 };
+
+const updateClient = (orderDTO: OrderDTO, orderId: number) => {
+  return api.put(`/order/update_client/${orderId} `, orderDTO);
+};
 export {
   addOrder,
   editOrderAdmin,
@@ -34,4 +38,5 @@ export {
   findAllOrder,
   deleteOrder,
   cancelOrder,
+  updateClient,
 };

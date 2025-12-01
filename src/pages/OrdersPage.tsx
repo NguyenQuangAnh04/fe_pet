@@ -2,13 +2,15 @@ import {
   Calendar,
   CheckCircle,
   Clock,
+  Edit,
   MapPin,
   Package,
   Phone,
   Star,
   Truck,
   User,
-  XCircle
+  X,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,8 +20,10 @@ import ReviewModal from "../components/product/ReviewModal";
 import {
   useCancelOrderUser,
   useQueryOrderByUser,
+  useUpdateOrderClient,
 } from "../hook/order/useOrder";
 import { OrderStatus } from "../types/order";
+import type { OrderDTO } from "../types/order";
 import { formatPrice } from "../utils/format";
 
 export default function OrdersPage() {
@@ -31,12 +35,83 @@ export default function OrdersPage() {
       [OrderStatus.SHIPPING]: "Đang giao",
       [OrderStatus.COMPLETED]: "Hoàn thành",
       [OrderStatus.CANCELED]: "Đã hủy",
+      [OrderStatus.FAILED_PAYMENT]: "Thanh toán thất bại",
+      [OrderStatus.NOT_RECEIVED]: "Chưa nhận hàng",
     };
     return label[status];
   };
 
   const navigate = useNavigate();
   const { mutateAsync: mutateCancelOrder } = useCancelOrderUser();
+
+  // State cho shipping modal
+  const [shippingModal, setShippingModal] = useState<{
+    isOpen: boolean;
+    order: OrderDTO | null;
+  }>({ isOpen: false, order: null });
+
+  const [formData, setFormData] = useState<OrderDTO>({
+    id: 0,
+    fullName: "",
+    phoneNumber: "",
+    addressDTO: {
+      homeAddress: "",
+      city: "",
+      district: "",
+      commune: "",
+    },
+  });
+
+  const handleChangeInput = (field: keyof OrderDTO, value: string) => {
+    if (!formData) return;
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleChangeAddressDTO = (
+    field: keyof NonNullable<OrderDTO["addressDTO"]>,
+    value: string
+  ) => {
+    if (!formData) return;
+    setFormData((prev) => ({
+      ...prev,
+      addressDTO: {
+        ...prev.addressDTO,
+        [field]: value,
+      },
+    }));
+  };
+
+  const openShippingModal = (order: OrderDTO) => {
+    setShippingModal({ isOpen: true, order });
+    setFormData({
+      id: order.id,
+      fullName: order.fullName || "",
+      phoneNumber: order.phoneNumber || "",
+      addressDTO: {
+        homeAddress: order.addressDTO?.homeAddress || "",
+        city: order.addressDTO?.city || "",
+        district: order.addressDTO?.district || "",
+        commune: order.addressDTO?.commune || "",
+      },
+    });
+  };
+
+  const closeShippingModal = () => {
+    setShippingModal({ isOpen: false, order: null });
+  };
+
+  const { mutateAsync: mutateUpdateOrderClient } = useUpdateOrderClient();
+  const handleUpdateShipping = async () => {
+    if (!shippingModal.order) return;
+    await mutateUpdateOrderClient({
+      orderDTO: formData,
+      orderId: shippingModal.order.id,
+    });
+    closeShippingModal();
+  };
 
   // State cho review modal
   const [reviewModal, setReviewModal] = useState<{
@@ -80,6 +155,8 @@ export default function OrdersPage() {
       [OrderStatus.SHIPPING]: "bg-purple-50 text-purple-700",
       [OrderStatus.COMPLETED]: "bg-green-50 text-green-700",
       [OrderStatus.CANCELED]: "bg-red-50 text-red-700",
+      [OrderStatus.FAILED_PAYMENT]: "bg-red-50 text-red-700",
+      [OrderStatus.NOT_RECEIVED]: "bg-orange-50 text-orange-700",
     };
     return colors[status];
   };
@@ -92,6 +169,8 @@ export default function OrdersPage() {
       [OrderStatus.SHIPPING]: <Truck className="w-3.5 h-3.5" />,
       [OrderStatus.COMPLETED]: <CheckCircle className="w-3.5 h-3.5" />,
       [OrderStatus.CANCELED]: <XCircle className="w-3.5 h-3.5" />,
+      [OrderStatus.FAILED_PAYMENT]: <XCircle className="w-3.5 h-3.5" />,
+      [OrderStatus.NOT_RECEIVED]: <Package className="w-3.5 h-3.5" />,
     };
     return icons[status];
   };
@@ -105,7 +184,7 @@ export default function OrdersPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [loading] = useState(false);
   const { data } = useQueryOrderByUser(selectedStatus);
-  console.log(data)
+  console.log(data);
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
@@ -122,9 +201,7 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
             Đơn hàng của tôi
           </h1>
-          <p className="text-sm text-gray-600">
-            Quản lý đơn hàng của bạn
-          </p>
+          <p className="text-sm text-gray-600">Quản lý đơn hàng của bạn</p>
         </div>
 
         {/* Status Tabs */}
@@ -136,9 +213,10 @@ export default function OrdersPage() {
                 onClick={() => setSelectedStatus(item)}
                 className={`
                   flex-1 min-w-max px-4 py-3 text-sm font-medium transition-all relative
-                  ${selectedStatus === item
-                    ? "text-orange-600 bg-orange-50"
-                    : "text-gray-600 hover:bg-gray-50"
+                  ${
+                    selectedStatus === item
+                      ? "text-orange-600 bg-orange-50"
+                      : "text-gray-600 hover:bg-gray-50"
                   }
                 `}
               >
@@ -195,17 +273,22 @@ export default function OrdersPage() {
                       <div className="flex items-center gap-4">
                         <div>
                           <p className="text-xs text-gray-500">Mã đơn hàng</p>
-                          <p className="text-sm font-semibold text-gray-900">#{order.id}</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            #{order.id}
+                          </p>
                         </div>
                         {order.createdAt && (
                           <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-600">
                             <Calendar className="w-3.5 h-3.5" />
                             <span>
-                              {new Date(order.createdAt).toLocaleDateString("vi-VN", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                              })}
+                              {new Date(order.createdAt).toLocaleDateString(
+                                "vi-VN",
+                                {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                }
+                              )}
                             </span>
                           </div>
                         )}
@@ -225,20 +308,33 @@ export default function OrdersPage() {
 
                   {/* Customer Info */}
                   <div className="px-4 py-3 bg-white border-b border-gray-100">
-                    <div className="grid grid-cols-2 gap-3 text-xs">
-                      <div className="flex items-center gap-1.5 text-gray-600">
-                        <User className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span className="truncate">{order.fullName}</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="grid grid-cols-2 gap-3 text-xs flex-1">
+                        <div className="flex items-center gap-1.5 text-gray-600">
+                          <User className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span className="truncate">{order.fullName}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-gray-600">
+                          <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span>{order.phoneNumber}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-gray-600">
-                        <Phone className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span>{order.phoneNumber}</span>
-                      </div>
+                      {(order.status === OrderStatus.PENDING ||
+                        order.status === OrderStatus.CONFIRMED) && (
+                        <button
+                          onClick={() => openShippingModal(order)}
+                          className="flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700 font-medium px-2 py-1 border border-orange-300 hover:border-orange-400 rounded-lg transition"
+                        >
+                          <Edit className="w-3 h-3" />
+                          Sửa
+                        </button>
+                      )}
                     </div>
-                    <div className="flex items-start gap-1.5 text-xs text-gray-600 mt-2">
+                    <div className="flex items-start gap-1.5 text-xs text-gray-600">
                       <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
                       <span className="line-clamp-2">
-                        {order.addressDTO?.homeAddress}, {order.addressDTO?.district},{" "}
+                        {order.addressDTO?.homeAddress},{" "}
+                        {order.addressDTO?.district},{" "}
                         {order.addressDTO?.commune}, {order.addressDTO?.city}
                       </span>
                     </div>
@@ -247,7 +343,10 @@ export default function OrdersPage() {
                   {/* Order Items */}
                   <div className="divide-y divide-gray-100">
                     {order.orderDetailDTO?.map((orderItem, itemIndex) => (
-                      <div key={itemIndex} className="px-4 py-3 hover:bg-gray-50 transition">
+                      <div
+                        key={itemIndex}
+                        className="px-4 py-3 hover:bg-gray-50 transition"
+                      >
                         <div className="flex gap-3">
                           <div className="flex-shrink-0">
                             <img
@@ -255,7 +354,8 @@ export default function OrdersPage() {
                               className="w-16 h-16 object-cover rounded-lg border border-gray-200"
                               alt={orderItem.productName || "Product"}
                               onError={(e) => {
-                                e.currentTarget.src = "/src/assets/product_01.jpg";
+                                e.currentTarget.src =
+                                  "/src/assets/product_01.jpg";
                               }}
                             />
                           </div>
@@ -272,40 +372,43 @@ export default function OrdersPage() {
                             </div>
 
                             {/* Nút đánh giá cho đơn hàng hoàn thành */}
-                            {order.status === OrderStatus.COMPLETED && orderItem.productId && (
-                             <>
-                                {orderItem.reviewed ? (
-                                  // ĐÃ ĐÁNH GIÁ - Hiển thị badge xanh
-                                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg">
-                                    <CheckCircle className="w-3.5 h-3.5" />
-                                    Đã đánh giá
-                                  </div>
-                                ) : (
-                                  // CHƯA ĐÁNH GIÁ - Hiển thị nút đánh giá
-                                  <button
-                                    onClick={() =>
-                                      openReviewModal(
-                                        orderItem.productId!,
-                                        orderItem.productName || "",
-                                        orderItem.variantId || 0,
-                                        orderItem.size || "",
-                                        order.id,
-                                        orderItem.urlProductImage
-                                      )
-                                    }
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition shadow-sm hover:shadow"
-                                  >
-                                    <Star className="w-3.5 h-3.5 fill-white" />
-                                    Đánh giá sản phẩm
-                                  </button>
-                                )}
-                              </>
-                            )}
+                            {order.status === OrderStatus.COMPLETED &&
+                              orderItem.productId && (
+                                <>
+                                  {orderItem.reviewed ? (
+                                    // ĐÃ ĐÁNH GIÁ - Hiển thị badge xanh
+                                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg">
+                                      <CheckCircle className="w-3.5 h-3.5" />
+                                      Đã đánh giá
+                                    </div>
+                                  ) : (
+                                    // CHƯA ĐÁNH GIÁ - Hiển thị nút đánh giá
+                                    <button
+                                      onClick={() =>
+                                        openReviewModal(
+                                          orderItem.productId!,
+                                          orderItem.productName || "",
+                                          orderItem.variantId || 0,
+                                          orderItem.size || "",
+                                          order.id,
+                                          orderItem.urlProductImage
+                                        )
+                                      }
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition shadow-sm hover:shadow"
+                                    >
+                                      <Star className="w-3.5 h-3.5 fill-white" />
+                                      Đánh giá sản phẩm
+                                    </button>
+                                  )}
+                                </>
+                              )}
                           </div>
 
                           <div className="text-right">
                             <p className="text-sm font-semibold text-orange-600">
-                              {orderItem.price ? formatPrice(orderItem.price) : "N/A"}
+                              {orderItem.price
+                                ? formatPrice(orderItem.price)
+                                : "N/A"}
                             </p>
                           </div>
                         </div>
@@ -317,9 +420,13 @@ export default function OrdersPage() {
                   <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
                     <div className="flex items-center justify-between">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-sm text-gray-600">Tổng cộng:</span>
+                        <span className="text-sm text-gray-600">
+                          Tổng cộng:
+                        </span>
                         <span className="text-xl font-bold text-orange-600">
-                          {order.totalAmount ? formatPrice(order.totalAmount) : "N/A"}
+                          {order.totalAmount
+                            ? formatPrice(order.totalAmount)
+                            : "N/A"}
                         </span>
                       </div>
 
@@ -357,6 +464,146 @@ export default function OrdersPage() {
           orderId={reviewModal.orderId}
           productImage={reviewModal.productImage}
         />
+      )}
+
+      {/* Shipping Info Modal */}
+      {shippingModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Thay đổi thông tin giao hàng
+              </h3>
+              <button
+                onClick={closeShippingModal}
+                className="p-1 text-gray-400 hover:text-gray-600 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* Họ tên */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Họ và tên
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={(e) =>
+                    handleChangeInput("fullName", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Nhập họ và tên"
+                />
+              </div>
+              {/* Số điện thoại */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Số điện thoại
+                </label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={(e) =>
+                    handleChangeInput("phoneNumber", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Nhập số điện thoại"
+                />
+              </div>
+
+              {/* Địa chỉ cụ thể */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Địa chỉ cụ thể
+                </label>
+                <input
+                  type="text"
+                  name="homeAddress"
+                  value={formData.addressDTO?.homeAddress}
+                  onChange={(e) =>
+                    handleChangeAddressDTO("homeAddress", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Số nhà, tên đường..."
+                />
+              </div>
+
+              {/* Tỉnh/Thành phố */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tỉnh/Thành phố
+                </label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.addressDTO?.city}
+                  onChange={(e) =>
+                    handleChangeAddressDTO("city", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Nhập tỉnh/thành phố"
+                />
+              </div>
+
+              {/* Quận/Huyện */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Quận/Huyện
+                </label>
+                <input
+                  type="text"
+                  name="district"
+                  value={formData.addressDTO?.district}
+                  onChange={(e) =>
+                    handleChangeAddressDTO("district", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Nhập quận/huyện"
+                />
+              </div>
+
+              {/* Phường/Xã */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phường/Xã
+                </label>
+                <input
+                  type="text"
+                  name="commune"
+                  value={formData.addressDTO?.commune}
+                  onChange={(e) =>
+                    handleChangeAddressDTO("commune", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="Nhập phường/xã"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={closeShippingModal}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleUpdateShipping}
+                className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition"
+              >
+                Cập nhật
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <Footer />

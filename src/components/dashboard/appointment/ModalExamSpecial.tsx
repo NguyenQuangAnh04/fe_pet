@@ -24,14 +24,15 @@ export default function ModalExamSpecial({
   appointmentId,
   initialSelectedIds,
 }: ModalExamSpecialProps) {
-
   const { data } = useQueryExamination();
   const [selected, setSelected] = useState<number[]>([]);
+  console.log("initialSelectedIds", initialSelectedIds);
+  console.log(appointmentId)
   useEffect(() => {
     if (initialSelectedIds) {
       setSelected(initialSelectedIds);
     }
-  }, [initialSelectedIds]);
+  }, []);
   const { mutateAsync: addExaminationSpecial } = userAddExaminationSpecial();
   const toggleSelect = (id: number) => {
     setSelected((prev) => {

@@ -6,12 +6,13 @@ const findAllProduct = (
   page?: number,
   name?: string,
   categoryId?: number,
-  size?: string,
+  sizeVariant?: string,
   minPrice?: number,
-  maxPrice?: number
+  maxPrice?: number,
+  size?: number
 ) => {
   return api.get("/product", {
-    params: { page, name, categoryId, minPrice, maxPrice, size },
+    params: { page, name, categoryId, minPrice, maxPrice, sizeVariant, size },
   });
 };
 const addProduct = async (

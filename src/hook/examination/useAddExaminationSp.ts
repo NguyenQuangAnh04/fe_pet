@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addExaminationSpecial } from "../../api/examinationService";
+import { toast } from "react-toastify";
 
 export function userAddExaminationSpecial() {
   const queryClient = useQueryClient();
@@ -15,7 +16,11 @@ export function userAddExaminationSpecial() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointment"] });
-      
+      toast.success("Thêm dịch vụ khám đặc biệt thành công");
+    },
+    onError: (err) => {
+      toast.error(err.message);
+      console.error(err.message);
     },
   });
 }

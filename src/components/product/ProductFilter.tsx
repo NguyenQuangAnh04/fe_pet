@@ -20,7 +20,8 @@ export default function PetProductFilter() {
   const queryParams = new URLSearchParams(location.search);
   const q = queryParams.get("q") || "";
   const [size, setSize] = useState<string | null>(null);
-  const { data: productData } = useQueryProduct({ page, keyword: q, categoryId: appliedCategory ?? undefined, minPrice: appliedMinPrice, maxPrice: appliedMaxPrice, size: appliedSize ?? undefined });
+  const sizeQ= 8;
+  const { data: productData } = useQueryProduct({ page, keyword: q, categoryId: appliedCategory ?? undefined, minPrice: appliedMinPrice, maxPrice: appliedMaxPrice, sizeVariant: appliedSize ?? undefined, size: sizeQ });
   const applyFilters = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setAppliedCategory(categoryIdInput);
