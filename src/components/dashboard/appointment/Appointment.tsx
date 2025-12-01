@@ -460,6 +460,9 @@ export default function Appointment() {
                 </td>
                 <td className="text-left px-3 py-2.5 text-sm">
                   {item.start
+                    ? new Date(item.start).toLocaleDateString("vi-VN") + " "
+                    : ""}
+                  {item.start
                     ? new Date(item.start).toLocaleTimeString("vi-VN", {
                         hour: "2-digit",
                         minute: "2-digit",

@@ -1,10 +1,31 @@
-import React, { useState } from "react";
-import { BsCheckCircle } from "react-icons/bs";
+import React, { useState, useEffect, useRef } from "react";
+import { BsCheckCircle, BsClock, BsPersonCircle } from "react-icons/bs";
 import useAddAppointment from "../../hook/appointment/useAddAppointment";
 import { useQueryExamination } from "../../hook/examination/useExamination";
 import { type AppointmentDTO } from "../../types/appointment";
 import { formatPrice } from "../../utils/format";
-import { useQueryFreeTime } from "../../hook/veterinarian/useQueryFreeTime";
+import { findAllVetFreeTime } from "../../api/veterinarianService";
+import type { VeterinarianDTO } from "../../types/veterinarian";
+
+// Các khung giờ làm việc
+const TIME_SLOTS = [
+  "08:00",
+  "08:30",
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+];
 
 export default function AppointmentForm() {
   const { mutateAsync: mutateAddAppointment } = useAddAppointment();
@@ -30,7 +51,17 @@ export default function AppointmentForm() {
   });
 
   const [selectedVet, setSelectedVet] = useState<number>();
+  const [selectedVetName, setSelectedVetName] = useState<string>("");
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
+
+  // State cho time slots
+  const [activeSlot, setActiveSlot] = useState<string | null>(null);
+  const [slotVets, setSlotVets] = useState<VeterinarianDTO[]>([]);
+  const [loadingSlot, setLoadingSlot] = useState<string | null>(null);
+  const [timeSlotCache, setTimeSlotCache] = useState<
+    Record<string, VeterinarianDTO[]>
+  >({});
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleChangeInput = (
     field: keyof AppointmentDTO,
@@ -41,13 +72,93 @@ export default function AppointmentForm() {
       [field]: value,
     }));
   };
-  const getDateTime = () => {
-    if (!formData.appointmentDay || !formData.appointmentTime) return null;
 
-    return `${formData.appointmentDay}T${formData.appointmentTime}:00`; // "2025-11-26T16:30:00"
+  // Fetch bác sĩ rảnh khi click vào khung giờ
+  const handleSlotClick = async (slot: string) => {
+    if (!formData.appointmentDay) {
+      alert("Vui lòng chọn ngày trước");
+      return;
+    }
+
+    // Nếu đang mở slot này thì đóng
+    if (activeSlot === slot) {
+      setActiveSlot(null);
+      return;
+    }
+
+    // Kiểm tra cache
+    const cacheKey = `${formData.appointmentDay}_${slot}`;
+    if (timeSlotCache[cacheKey]) {
+      setSlotVets(timeSlotCache[cacheKey]);
+      setActiveSlot(slot);
+      return;
+    }
+
+    // Fetch API
+    setLoadingSlot(slot);
+    try {
+      const dateTime = `${formData.appointmentDay}T${slot}:00`;
+      const res = await findAllVetFreeTime(dateTime);
+      const vets = res.data || [];
+      setSlotVets(vets);
+      setTimeSlotCache((prev) => ({ ...prev, [cacheKey]: vets }));
+      setActiveSlot(slot);
+    } catch (error) {
+      console.error("Error fetching vets:", error);
+      setSlotVets([]);
+    } finally {
+      setLoadingSlot(null);
+    }
   };
 
-  const { data: vetFreeTimeData } = useQueryFreeTime(getDateTime() || "");
+  // Chọn bác sĩ từ dropdown
+  const handleSelectVet = (vet: VeterinarianDTO, slot: string) => {
+    setSelectedVet(vet.id ?? undefined);
+    setSelectedVetName(vet.name);
+    handleChangeInput("appointmentTime", slot);
+    setActiveSlot(null);
+  };
+
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setActiveSlot(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Reset cache khi đổi ngày
+  useEffect(() => {
+    setTimeSlotCache({});
+    setActiveSlot(null);
+    setSelectedVet(undefined);
+    setSelectedVetName("");
+    handleChangeInput("appointmentTime", "");
+  }, [formData.appointmentDay]);
+
+  // Lọc các khung giờ hợp lệ
+  const getValidTimeSlots = () => {
+    if (!formData.appointmentDay) return TIME_SLOTS;
+
+    const now = new Date();
+    const selectedDate = new Date(formData.appointmentDay);
+    const isToday = selectedDate.toDateString() === now.toDateString();
+
+    if (!isToday) return TIME_SLOTS;
+
+    return TIME_SLOTS.filter((slot) => {
+      const [hours, minutes] = slot.split(":").map(Number);
+      const slotTime = new Date(selectedDate);
+      slotTime.setHours(hours, minutes, 0, 0);
+      return slotTime > now;
+    });
+  };
   const toggleService = (serviceId: number) => {
     setSelectedServices((prev) =>
       prev.includes(serviceId)
@@ -64,6 +175,9 @@ export default function AppointmentForm() {
     }
     if (!formData.appointmentDay || !formData.appointmentTime) {
       return alert("Vui lòng chọn ngày và giờ.");
+    }
+    if (!selectedVet) {
+      return alert("Vui lòng chọn bác sĩ.");
     }
     if (!formData.petGender || !formData.petType) {
       return alert("Vui lòng chọn giới tính và loại thú cưng.");
@@ -104,11 +218,16 @@ export default function AppointmentForm() {
       formData.appointmentTime.length === 5
         ? formData.appointmentTime + ":00"
         : formData.appointmentTime;
+
+    // Tạo start từ ngày + giờ đã chọn (format: 2025-12-01T08:00:00)
+    const start = `${formData.appointmentDay}T${appointmentTimeForBackend}`;
+
     const selectedExams = selectedServices.map((id) => ({
       id,
     })) as unknown as any[];
     const newFormData = {
       ...formData,
+      start,
       appointmentTime: appointmentTimeForBackend,
       examination: selectedExams,
     } as unknown as AppointmentDTO;
@@ -116,6 +235,7 @@ export default function AppointmentForm() {
       vetId: selectedVet || 0,
       newAppoint: newFormData,
     });
+    console.log(appointmentTimeForBackend);
     setIsBooked(false); // reset form nếu muốn
     setFormData({
       id: 0,
@@ -135,6 +255,8 @@ export default function AppointmentForm() {
     });
     setSelectedServices([]);
     setSelectedVet(undefined);
+    console.log(start);
+    setSelectedVetName("");
   };
 
   return (
@@ -231,47 +353,123 @@ export default function AppointmentForm() {
                 </div>
               </div>
 
-              {/* Ngày, giờ, bác sĩ */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-sm font-medium">Ngày</label>
-                  <input
-                    className="w-full mt-1 px-3 py-2 border border-gray-400 rounded-lg"
-                    type="date"
-                    min={new Date().toISOString().split("T")[0]}
-                    value={formData.appointmentDay}
-                    onChange={(e) =>
-                      handleChangeInput("appointmentDay", e.target.value)
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Giờ</label>
-                  <input
-                    className="w-full mt-1 px-3 py-2 border border-gray-400 rounded-lg"
-                    type="time"
-                    value={formData.appointmentTime}
-                    onChange={(e) =>
-                      handleChangeInput("appointmentTime", e.target.value)
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Bác sĩ</label>
-                  <select
-                    value={selectedVet || ""}
-                    onChange={(e) => setSelectedVet(Number(e.target.value))}
-                    className="w-full mt-1 px-3 py-2 border border-gray-400 rounded-lg focus:ring-0 focus:outline-none"
-                  >
-                    <option value="">Chọn bác sĩ</option>
-                    {vetFreeTimeData?.map((vet) => (
-                      <option key={String(vet.id)} value={vet.id ?? ""}>
-                        {vet.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              {/* Chọn ngày */}
+              <div className="space-y-2">
+                <label className="font-semibold">Chọn ngày khám *</label>
+                <input
+                  className="w-full md:w-1/3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400"
+                  type="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  value={formData.appointmentDay}
+                  onChange={(e) =>
+                    handleChangeInput("appointmentDay", e.target.value)
+                  }
+                />
               </div>
+
+              {/* Chọn khung giờ - Grid với dropdown bác sĩ */}
+              {formData.appointmentDay && (
+                <div className="space-y-3">
+                  <label className="font-semibold flex items-center gap-2">
+                    <BsClock className="text-yellow-600" />
+                    Chọn giờ khám *{" "}
+                    <span className="text-sm font-normal text-gray-500">
+                      (Click để xem bác sĩ rảnh)
+                    </span>
+                  </label>
+                  <div
+                    className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2"
+                    ref={dropdownRef}
+                  >
+                    {getValidTimeSlots().map((slot) => {
+                      const isSelected = formData.appointmentTime === slot;
+                      const isActive = activeSlot === slot;
+                      const isLoading = loadingSlot === slot;
+
+                      return (
+                        <div key={slot} className="relative">
+                          <button
+                            type="button"
+                            onClick={() => handleSlotClick(slot)}
+                            className={`w-full p-3 rounded-lg border-2 transition-all duration-200 text-sm font-medium
+                              ${
+                                isSelected
+                                  ? "bg-yellow-500 border-yellow-600 text-white shadow-lg"
+                                  : isActive
+                                  ? "bg-yellow-100 border-yellow-400"
+                                  : "bg-white border-gray-200 hover:border-yellow-400 hover:bg-yellow-50"
+                              }`}
+                          >
+                            {isLoading ? (
+                              <div className="w-4 h-4 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            ) : (
+                              slot
+                            )}
+                          </button>
+
+                          {/* Dropdown danh sách bác sĩ */}
+                          {isActive && !isLoading && (
+                            <div className="absolute z-50 top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 animate-fadeIn">
+                              {slotVets.length === 0 ? (
+                                <div className="px-3 py-2 text-sm text-gray-500 text-center">
+                                  Không có bác sĩ rảnh
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="px-3 py-2 text-xs text-gray-500 border-b">
+                                    Bác sĩ rảnh lúc {slot}
+                                  </div>
+                                  {slotVets.map((vet) => (
+                                    <button
+                                      key={vet.id}
+                                      type="button"
+                                      onClick={() => handleSelectVet(vet, slot)}
+                                      className="w-full px-3 py-2 text-left text-sm hover:bg-yellow-50 flex items-center gap-2 transition"
+                                    >
+                                      <div className="w-7 h-7 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700 font-medium text-xs">
+                                        {vet.name?.charAt(0).toUpperCase()}
+                                      </div>
+                                      <span>{vet.name}</span>
+                                    </button>
+                                  ))}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Hiển thị lựa chọn đã chọn */}
+                  {formData.appointmentTime && selectedVetName && (
+                    <div className="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200 flex items-center gap-3">
+                      <BsPersonCircle className="text-yellow-600 text-xl" />
+                      <div>
+                        <span className="font-medium">Đã chọn:</span>{" "}
+                        <span className="text-yellow-700">
+                          {formData.appointmentTime}
+                        </span>{" "}
+                        với{" "}
+                        <span className="text-yellow-700 font-medium">
+                          {selectedVetName}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedVet(undefined);
+                          setSelectedVetName("");
+                          handleChangeInput("appointmentTime", "");
+                        }}
+                        className="ml-auto text-gray-500 hover:text-red-500"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Thông tin thú cưng */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -377,6 +575,12 @@ export default function AppointmentForm() {
                   }
                   if (!selectedServices || selectedServices.length === 0) {
                     return alert("Vui lòng chọn dịch vụ.");
+                  }
+                  if (!formData.appointmentDay || !formData.appointmentTime) {
+                    return alert("Vui lòng chọn ngày và giờ khám.");
+                  }
+                  if (!selectedVet) {
+                    return alert("Vui lòng chọn bác sĩ.");
                   }
                   setIsBooked(true);
                 }}

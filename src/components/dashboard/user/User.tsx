@@ -2,11 +2,18 @@ import { useState, useEffect } from "react";
 
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
-import { roleQuery, useDeleteUser, useQueryUser, userUpdateRoleUser } from "../../../hook/user/useUser";
+import {
+  roleQuery,
+  useDeleteUser,
+  useQueryUser,
+  userUpdateRoleUser,
+} from "../../../hook/user/useUser";
 import type { Role } from "../../../types/user";
-
+import { useAuth } from "../../../context/AuthContext";
 
 export default function User() {
+  const { user } = useAuth();
+  const isUser = user?.nameRole === "USER";
   const [page, setPage] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -163,15 +170,19 @@ export default function User() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-3">
-                      <button className="text-green-600 hover:text-green-800 transition duration-150">
-                        <BiEdit size={20} />
-                      </button>
-                      <button
-                        className="text-red-600 hover:text-red-800 transition duration-150"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <BiTrash size={20} />
-                      </button>
+                      {!isUser && (
+                        <>
+                          <button className="text-green-600 hover:text-green-800 transition duration-150">
+                            <BiEdit size={20} />
+                          </button>
+                          <button
+                            className="text-red-600 hover:text-red-800 transition duration-150"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            <BiTrash size={20} />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -192,10 +203,11 @@ export default function User() {
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
             disabled={page === 0}
-            className={`w-[30px] h-[30px] rounded border ${page === 0
+            className={`w-[30px] h-[30px] rounded border ${
+              page === 0
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-blue-400 text-white"
-              }`}
+            }`}
           >
             &lt;
           </button>
@@ -204,10 +216,11 @@ export default function User() {
             <button
               onClick={() => setPage(i)}
               className={`rounded w-[30px] h-[30px] flex items-center justify-center
-              ${page === i
+              ${
+                page === i
                   ? "bg-blue-600 text-white"
                   : " text-black shadow border border-gray-300 "
-                }
+              }
             `}
               key={i}
             >
@@ -220,10 +233,11 @@ export default function User() {
               setPage((prev) => Math.min(prev + 1, data.totalPages - 1))
             }
             disabled={page === data.totalPages - 1}
-            className={`rounded border w-[30px] h-[30px] ${page === data.totalPages - 1
+            className={`rounded border w-[30px] h-[30px] ${
+              page === data.totalPages - 1
                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "bg-blue-400 text-white"
-              }`}
+            }`}
           >
             &gt;
           </button>

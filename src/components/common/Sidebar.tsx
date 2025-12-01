@@ -13,9 +13,11 @@ import {
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { logout } from "../../api/authService";
+import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const handleLogout = async () => {
     try {
       await logout();
@@ -38,60 +40,66 @@ const Sidebar = () => {
       </div>
       <div className="flex justify-between flex-col h-[calc(100vh-80px)]">
         <nav className="flex flex-col mt-4 text-white">
-          <Link
-            to="/dashboard/dashboardHome"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaChartBar size={16} /> Thống kê
-          </Link>
-          <Link
-            to="/dashboard/products"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaBoxOpen size={16} /> Sản phẩm
-          </Link>
-          <Link
-            to="/dashboard/categories"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaListAlt size={16} /> Danh mục
-          </Link>
-          <Link
-            to="/dashboard/orders"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaClipboardList size={16} /> Đơn hàng
-          </Link>
-          <Link
-            to="/dashboard/account"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaUser size={16} /> Tài khoản
-          </Link>
-          <Link
-            to="/dashboard/vet"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaUserMd size={16} /> Bác sĩ
-          </Link>
-          <Link
-            to="/dashboard/exam"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaStethoscope size={16} /> Dịch vụ khám
-          </Link>
+          {user?.nameRole !== "DOCTOR" && (
+            <>
+              <Link
+                to="/dashboard/dashboardHome"
+                className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+              >
+                <FaChartBar size={16} /> Thống kê
+              </Link>
+              <Link
+                to="/dashboard/products"
+                className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+              >
+                <FaBoxOpen size={16} /> Sản phẩm
+              </Link>
+              <Link
+                to="/dashboard/categories"
+                className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+              >
+                <FaListAlt size={16} /> Danh mục
+              </Link>
+              <Link
+                to="/dashboard/orders"
+                className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+              >
+                <FaClipboardList size={16} /> Đơn hàng
+              </Link>
+              <Link
+                to="/dashboard/account"
+                className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+              >
+                <FaUser size={16} /> Tài khoản
+              </Link>
+              <Link
+                to="/dashboard/vet"
+                className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+              >
+                <FaUserMd size={16} /> Bác sĩ
+              </Link>
+              <Link
+                to="/dashboard/exam"
+                className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+              >
+                <FaStethoscope size={16} /> Dịch vụ khám
+              </Link>
+            </>
+          )}
           <Link
             to="/dashboard/appoint"
             className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
           >
             <FaCalendarCheck size={16} /> Lịch khám
           </Link>
-          <Link
-            to="/dashboard/reviews"
-            className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
-          >
-            <FaStar size={16} /> Đánh giá
-          </Link>
+          {user?.nameRole !== "DOCTOR" && (
+            <Link
+              to="/dashboard/reviews"
+              className="flex items-center gap-3 hover:bg-blue-800 px-5 py-3 text-sm transition-colors"
+            >
+              <FaStar size={16} /> Đánh giá
+            </Link>
+          )}
         </nav>
         <div className="px-5 text-white border-t border-blue-800 py-4 mt-auto">
           <button

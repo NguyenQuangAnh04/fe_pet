@@ -16,8 +16,11 @@ import {
 import { OrderStatus, type OrderDTO } from "../../../types/order";
 import { formatPrice } from "../../../utils/format";
 import ModalOrder from "./ModalOrder";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Order() {
+  const { user } = useAuth();
+  const isUser = user?.nameRole === "USER";
   const [name, setName] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [status, setStatus] = useState<string>("");
@@ -284,6 +287,7 @@ export default function Order() {
                 <td className="text-left px-6 py-3">
                   <select
                     value={item.status}
+                    disabled={isUser}
                     onChange={(e) =>
                       mutateUpdateOrder({
                         orderId: item.id,
@@ -291,7 +295,9 @@ export default function Order() {
                       })
                     }
                     className={`rounded-xl px-3 inline-flex text-sm focus:ring-0 focus:outline-none cursor-pointer 
-                      ${item.status ? getStatusColor(item.status) : ""}`}
+                      ${item.status ? getStatusColor(item.status) : ""} ${
+                      isUser ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
                   >
                     <option value={item.status} className="bg-white text-black">
                       {item.status && getStatusLabel(item.status)}
@@ -324,12 +330,14 @@ export default function Order() {
                       <BsEye className="w-4 h-4" />
                     </button>
 
-                    <button
-                      onClick={() => item.id && handleDelete(item.id)}
-                      className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
-                    >
-                      <BsTrash className="w-4 h-4" />
-                    </button>
+                    {!isUser && (
+                      <button
+                        onClick={() => item.id && handleDelete(item.id)}
+                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                      >
+                        <BsTrash className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

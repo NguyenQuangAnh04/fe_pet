@@ -6,8 +6,10 @@ import {
 import { BiEdit, BiTrash, BiPlus, BiSearch } from "react-icons/bi";
 import type { CategoriesDTO } from "../../../types/category";
 import CategoryModal from "./ModalCategory";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Category() {
+  const { user } = useAuth();
   const [page, setPage] = useState(0);
   const [name, setName] = useState<string>("");
   const { data } = useQueryCategory({ page, name });
@@ -18,6 +20,9 @@ export default function Category() {
   const handleDeleteCategory = async (id: number) => {
     await mutateDeleteCategory(id);
   };
+
+  const isUser = user?.nameRole === "USER";
+
   return (
     <div className="p-3 bg-gray-50 min-h-screen ml-[250px]">
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -27,13 +32,15 @@ export default function Category() {
               Danh mục sản phẩm
             </h2>
           </div>
-          <button
-            onClick={() => setShowModalCreate(true)}
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 shadow-sm"
-          >
-            <BiPlus size={20} />
-            Thêm danh mục
-          </button>
+          {!isUser && (
+            <button
+              onClick={() => setShowModalCreate(true)}
+              className="bg-blue-600 hover:bg-blue-700 px-6 py-3 text-white rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 shadow-sm"
+            >
+              <BiPlus size={20} />
+              Thêm danh mục
+            </button>
+          )}
         </div>
 
         <div className="mt-6">
@@ -143,25 +150,29 @@ export default function Category() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <button
-                          className="text-green-600 hover:text-green-800 hover:bg-blue-50 p-2 rounded-full transition-all duration-200"
-                          title="Chỉnh sửa"
-                        >
-                          <BiEdit
-                            onClick={() => {
-                              setSelectedCategory(item);
-                              setShowModalUpdate(true);
-                            }}
-                            size={18}
-                          />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCategory(item.id)}
-                          className="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-full transition-all duration-200"
-                          title="Xóa"
-                        >
-                          <BiTrash size={18} />
-                        </button>
+                        {!isUser && (
+                          <>
+                            <button
+                              className="text-green-600 hover:text-green-800 hover:bg-blue-50 p-2 rounded-full transition-all duration-200"
+                              title="Chỉnh sửa"
+                            >
+                              <BiEdit
+                                onClick={() => {
+                                  setSelectedCategory(item);
+                                  setShowModalUpdate(true);
+                                }}
+                                size={18}
+                              />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteCategory(item.id)}
+                              className="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-full transition-all duration-200"
+                              title="Xóa"
+                            >
+                              <BiTrash size={18} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -10,8 +10,11 @@ import {
 import type { ProductDTO } from "../../../types/product";
 import { formatPrice } from "../../../utils/format";
 import ModalProduct from "./ModalProduct";
+import { useAuth } from "../../../context/AuthContext";
 export type ProductResponse = {};
 const Product = () => {
+  const { user } = useAuth();
+  const isUser = user?.nameRole === "USER";
   const [page, setPage] = useState(0);
   const [name, setName] = useState<string>("");
   const { data } = useQueryProduct({ page, keyword: name });
@@ -19,7 +22,7 @@ const Product = () => {
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setEditShowModal] = useState(false);
   console.log(name);
-  
+
   const [showModalViewProduct, setModalShowProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO>();
   const { mutateAsync: mutateDeleteProduct } = useDeleteProduct();
@@ -31,12 +34,14 @@ const Product = () => {
       <div className="flex justify-between ">
         <h1 className="text-2xl font-semibold">Quản lý sản phẩm</h1>
 
-        <button
-          className="bg-blue-500 text-white px-2 py-2 rounded"
-          onClick={() => setShowModal(true)}
-        >
-          + Thêm sản phẩm
-        </button>
+        {!isUser && (
+          <button
+            className="bg-blue-500 text-white px-2 py-2 rounded"
+            onClick={() => setShowModal(true)}
+          >
+            + Thêm sản phẩm
+          </button>
+        )}
       </div>
       <div className="mt-5">
         <p>Tìm kiếm</p>
@@ -98,21 +103,25 @@ const Product = () => {
                   >
                     <BsEye size={18} />
                   </button>
-                  <button
-                    className="text-green-500"
-                    onClick={() => {
-                      setSelectedProduct(item);
-                      setEditShowModal(true);
-                    }}
-                  >
-                    <BiEdit size={18} />
-                  </button>
-                  <button
-                    className="text-red-500"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    <BiTrash size={18} />
-                  </button>
+                  {!isUser && (
+                    <>
+                      <button
+                        className="text-green-500"
+                        onClick={() => {
+                          setSelectedProduct(item);
+                          setEditShowModal(true);
+                        }}
+                      >
+                        <BiEdit size={18} />
+                      </button>
+                      <button
+                        className="text-red-500"
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        <BiTrash size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>
