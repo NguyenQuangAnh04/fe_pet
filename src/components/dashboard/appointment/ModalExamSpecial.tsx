@@ -61,6 +61,8 @@ export default function ModalExamSpecial({
   const sumPrice = selectedPreview?.reduce((sum, svc) => {
     return sum + (svc.price || 0);
   }, 0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const filterData = data?.content.filter(svc => svc.name.toLowerCase().includes(searchTerm.toLowerCase()));
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" />
@@ -91,8 +93,9 @@ export default function ModalExamSpecial({
             <div className="relative mb-4">
               <FiSearch className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400" />
               <input
-                readOnly
-                value=""
+                readOnly={false}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Tìm theo tên, mô tả hoặc nhóm dịch vụ"
                 className="w-full rounded-lg border border-gray-200 py-2.5 pl-12 pr-4 focus:border-amber-400 focus:ring-2 focus:ring-amber-200"
               />
@@ -109,8 +112,8 @@ export default function ModalExamSpecial({
             </div>
 
             <div className="border border-gray-200 rounded-xl max-h-96 overflow-y-auto divide-y divide-gray-100">
-              {data?.content
-                .filter((it) => !it.active)
+              {filterData
+                ?.filter((it) => !it.active)
                 .map((svc) => (
                   <label
                     key={svc.id}
