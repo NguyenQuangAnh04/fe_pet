@@ -8,9 +8,10 @@ export const findAllAppointment = (
   petName?: string,
   vetName?: string,
   status?: string,
-  page?: number
+  page?: number,
+  userId?: number
 ) => {
-  return api.get(`/appointment`, {
+  return api.get(`/appointment/${userId}`, {
     params: { ownerName, email, phoneNumber, petName, vetName, status, page },
   });
 };
@@ -33,3 +34,18 @@ export const addAppointment = async (
   vetId: number,
   newAppoint: AppointmentDTO
 ) => await api.post(`/appointment/add/${vetId}`, newAppoint);
+
+export const findAllAppointmentDoctor = (
+  ownerName?: string,
+  email?: string,
+  phoneNumber?: string,
+  petName?: string,
+  vetName?: string,
+  status?: string,
+  page?: number,
+  userId?: number
+) => {
+  return api.get(`/appointment/doctor/${userId}`, {
+    params: { ownerName, email, phoneNumber, petName, vetName, status, page },
+  });
+};

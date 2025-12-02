@@ -3,7 +3,7 @@ import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 
 import { useNavigate } from "react-router-dom";
-import { useQueryAllProducts } from "../../hook/product/useProduct";
+import { useQueryAllProducts, useQueryProduct } from "../../hook/product/useProduct";
 import type { ProductDTO } from "../../types/product";
 // import { useAddCart } from "../../hook/carts/useCart";
 // import type { CartDTOItem } from "../../types/cart";
@@ -12,7 +12,7 @@ import ProductCard from "../common/ProductCard";
 import ViewAll from "../common/ViewAll";
 
 const ShopContent = () => {
-  const { data } = useQueryAllProducts();
+  const { data } = useQueryProduct({size: 10});
   const [showModalProductCart, setShowModalProductCart] = useState(false);
   const [selectProduct, setSelectedProduct] = useState<ProductDTO>();
   // const { mutateAsync: useMutationAddCart } = useAddCart();
@@ -27,71 +27,71 @@ const ShopContent = () => {
 
   const navigate = useNavigate();
   return (
-    <div className=" py-12 space-y-16">
+    <div className="py-16 space-y-16">
       <section>
-        <h2 className="text-2xl font-bold mb-6">Sản phẩm nổi bật</h2>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Sản phẩm nổi bật
+            </h2>
+            <p className="text-gray-500 mt-1">
+              Những sản phẩm được yêu thích nhất
+            </p>
+          </div>
+          <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-gray-200 via-yellow-300 to-gray-200 mx-8" />
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-          {data?.map((p) => (
+          {data?.content.map((p) => (
             <div
               key={p.id}
-              className="rounded-xl p-4 cursor-pointer flex flex-col h-full"
+              className="bg-white rounded-2xl p-4 cursor-pointer flex flex-col h-full shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group"
             >
-              <div className="relative group">
+              <div className="relative group overflow-hidden rounded-xl">
                 <img
                   src={p.imageUrl}
                   alt={p.namePro}
                   onClick={() => navigate(`product-details/${p.slug}`)}
-                  className="w-full h-[250px] object-cover rounded-lg"
+                  className="w-full h-[250px] object-cover rounded-xl transition-transform duration-500 group-hover:scale-110"
                 />
                 {p.imagesDTO && (
                   <img
                     src={p.imagesDTO?.[1]?.imageUrl ?? p.imageUrl}
                     alt=""
                     onClick={() => navigate(`product-details/${p.slug}`)}
-                    className="w-full h-[250px] object-cover rounded-lg absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    className="w-full h-[250px] object-cover rounded-xl absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
                   />
                 )}
-                {/* <button
-                  onClick={() => addToCart(p.id)}
-                  className="absolute border border-gray-400 rounded-xl px-2 py-2 bg-white bottom-0 left-0 right-0 opacity-0 translate-y-full group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500"
-                >
-                  Thêm vào giỏ hàng
-                </button> */}
-                {/* <button className="absolute w-8 h-8 rounded-full bg-white text-black shadow flex items-center justify-center right-0 top-2 opacity-0 translate-x-full group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
-                  <button
-                    onClick={() => {
-                      setShowModalProductCart(true);
-                      setSelectedProduct(p);
-                    }}
-                  >
-                    <BsEye size={20} />
-                  </button>
-                </button> */}
+                {/* Badge */}
+                <div className="absolute top-3 left-3">
+                  <span className="bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
+                    HOT
+                  </span>
+                </div>
               </div>
-              <h3 className="mt-3 font-semibold line-clamp-2 min-h-[3rem]">
+              <h3 className="mt-4 font-semibold text-gray-800 line-clamp-2 min-h-[3rem] group-hover:text-yellow-600 transition-colors">
                 {p.namePro}
               </h3>
 
               {/* Rating */}
-              <div className="flex items-center gap-1 mt-1">
+              <div className="flex items-center gap-1.5 mt-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
-                      className={`w-3.5 h-3.5 ${
+                      className={`w-4 h-4 ${
                         star <= Math.round(p.averageRating || 0)
                           ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-300"
+                          : "text-gray-200"
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-xs font-medium text-gray-700">
-                  {(p.averageRating || 0).toFixed(1)}
+                <span className="text-xs font-medium text-gray-500">
+                  ({(p.averageRating || 0).toFixed(1)})
                 </span>
               </div>
 
-              <p className="text-pink-600 font-bold mt-auto pt-2">
+              <p className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500 mt-auto pt-3">
                 {p.price && formatPrice(p.price)}
               </p>
             </div>

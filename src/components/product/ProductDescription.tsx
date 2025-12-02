@@ -11,8 +11,8 @@ const ProductDescription = ({ product }: ProductDescriptionProps) => {
           <h3 className="text-lg font-semibold text-gray-900 mb-3">
             Mô tả sản phẩm
           </h3>
-          <p className="text-gray-700 leading-relaxed mb-4">
-            {product.categoryName}
+          <p className="text-gray-700 leading-relaxed mb-4 whitespace-pre-line">
+            {/* {product.categoryName} */}
             {product.description}
           </p>
 

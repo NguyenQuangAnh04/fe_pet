@@ -36,7 +36,6 @@ export function useAddVeterinarian() {
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["veterinarian"] });
-            toast.success("Them vet thanh cong");
         },
         onError: (err) => {
             toast.error(err.message);

@@ -9,18 +9,18 @@ import ShopContent from "../components/home/ShopContent";
 
 const Home = () => {
   return (
-    <>
+    <div className="bg-gray-50 min-h-screen">
       <Header />
-      <div className="mx-auto max-w-[1440px] w-full">
+      <main className="mx-auto max-w-[1440px] w-full px-4 sm:px-6 lg:px-8">
         <Banner />
         <ShopContent />
         <NewArrivals />
         <PetCareBlogs />
         <AppointmentForm />
         <CustomerFeedback />
-      </div>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

@@ -2,77 +2,88 @@ import { Star } from "lucide-react";
 import { useState } from "react";
 import { BsEye } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import { useQueryAllProducts } from "../../hook/product/useProduct";
+import {
+  useQueryAllProducts,
+  useQueryProduct,
+} from "../../hook/product/useProduct";
 import type { ProductDTO } from "../../types/product";
 import ProductCard from "../common/ProductCard";
 import ViewAll from "../common/ViewAll";
 
 const NewArrivals = () => {
-  const { data } = useQueryAllProducts();
+  const { data } = useQueryProduct({ size: 10 });
   const navigate = useNavigate();
   const [selectProduct, setSelectedProduct] = useState<ProductDTO>();
   const [showModalProductCart, setShowModalProductCart] = useState(false);
   return (
-    <div className=" py-12 space-y-16">
+    <div className="py-16 space-y-16">
       <section>
-        <h2 className="text-2xl font-bold mb-6">Hàng mới về</h2>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Hàng mới về</h2>
+            <p className="text-gray-500 mt-1">Cập nhật sản phẩm mới nhất</p>
+          </div>
+          <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-gray-200 via-green-300 to-gray-200 mx-8" />
+        </div>
         <div className="grid grid-cols-2 gap-6 md:grid-cols-5">
-          {data?.map((p) => (
-            <div className="p-4 rounded-2xl cursor-pointer flex flex-col h-full">
-              <div className="relative group">
-                <img
-                  onClick={() => navigate(`/product-details/${p.slug}`)}
-                  src={p.imageUrl}
-                  alt=""
-                  className="w-full h-[250px] object-cover rounded-lg"
-                />
-                <img
-                  onClick={() => navigate(`/product-details/${p.slug}`)}
-                  src={p.imagesDTO?.[1]?.imageUrl ?? p.imageUrl}
-                  className="w-full h-[250px] object-cover rounded-lg absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  alt=""
-                />
-                {/* <button className="absolute bottom-0 left-0 right-0 border border-gray-400 rounded-xl px-2 py-2 bg-white translate-y-full opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 ">
-                  Thêm vào giỏ hàng
-                </button> */}
-                {/* <button
-                  onClick={() => {
-                    setSelectedProduct(p);
-                    setShowModalProductCart(true);
-                  }}
-                  className="absolute w-8 h-8 rounded-full bg-white text-black shadow flex items-center justify-center right-0 top-2 opacity-0 translate-x-full group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
-                >
-                  <BsEye size={20} />
-                </button> */}
-              </div>
-              <p className="font-semibold line-clamp-2 mt-2 min-h-[3rem]">
-                {p.namePro}
-              </p>
-
-              {/* Rating */}
-              <div className="flex items-center gap-1 mt-1">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-3.5 h-3.5 ${
-                        star <= Math.round(p.averageRating || 0)
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-300"
-                      }`}
+          {data?.content
+            ?.sort((a, b) => b.id - a.id)
+            .slice(0, 5)
+            .map((p) => (
+              <div
+                key={p.id}
+                className="bg-white p-4 rounded-2xl cursor-pointer flex flex-col h-full shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group"
+              >
+                <div className="relative overflow-hidden rounded-xl">
+                  <img
+                    onClick={() => navigate(`/product-details/${p.slug}`)}
+                    src={p.imageUrl}
+                    alt=""
+                    className="w-full h-[250px] object-cover rounded-xl transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {p.imagesDTO.length > 1 && (
+                    <img
+                      onClick={() => navigate(`/product-details/${p.slug}`)}
+                      src={p.imagesDTO?.[1]?.imageUrl ?? p.imageUrl}
+                      className="w-full h-[250px] object-cover rounded-xl absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                      alt=""
                     />
-                  ))}
+                  )}
+                  {/* Badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
+                      MỚI
+                    </span>
+                  </div>
                 </div>
-                <span className="text-xs font-medium text-gray-700">
-                  {(p.averageRating || 0).toFixed(1)}
-                </span>
-              </div>
+                <p className="font-semibold text-gray-800 line-clamp-2 mt-4 min-h-[3rem] group-hover:text-green-600 transition-colors">
+                  {p.namePro}
+                </p>
 
-              <p className="font-bold text-pink-600 mt-auto pt-2">
-                {p.price.toLocaleString("vi-VN")}₫
-              </p>
-            </div>
-          ))}
+                {/* Rating */}
+                <div className="flex items-center gap-1.5 mt-2">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-4 h-4 ${
+                          star <= Math.round(p.averageRating || 0)
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-gray-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs font-medium text-gray-500">
+                    ({(p.averageRating || 0).toFixed(1)})
+                  </span>
+                </div>
+
+                <p className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500 mt-auto pt-3">
+                  {p.price.toLocaleString("vi-VN")}₫
+                </p>
+              </div>
+            ))}
         </div>
         <ViewAll />
       </section>

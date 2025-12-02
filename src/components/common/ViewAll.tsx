@@ -1,18 +1,17 @@
 import { useNavigate } from "react-router-dom";
+import { BsArrowRight } from "react-icons/bs";
 
 export default function ViewAll() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center mt-8">
       <button
         onClick={() => navigate("/search")}
-        className="relative overflow-hidden rounded-xl shadow border border-gray-300 px-6 py-2 text-black group"
+        className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
       >
-        <span className="relative z-10 transition-colors duration-300 group-hover:text-white">
-          Xem thêm
-        </span>
-        <span className="absolute inset-0 w-0 bg-blue-400 transition-all duration-300 group-hover:w-full group-hover:border-blue-400"></span>
+        <span>Xem tất cả sản phẩm</span>
+        <BsArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
       </button>
     </div>
   );
