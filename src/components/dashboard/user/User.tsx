@@ -13,7 +13,7 @@ import { useAuth } from "../../../context/AuthContext";
 
 export default function User() {
   const { user } = useAuth();
-  const isUser = user?.nameRole === "USER";
+  const isAdmin = user?.nameRole === "ADMIN";
   const [page, setPage] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,7 +24,6 @@ export default function User() {
     phoneNumber: "",
     page,
   });
-
   const { data, isLoading, error } = useQueryUser(searchParams);
   const { data: roleData } = roleQuery();
   const { mutate: mutateUpdateRoleUser } = userUpdateRoleUser();
@@ -139,24 +138,30 @@ export default function User() {
                   <td className="px-4 py-2 text-sm">{item.email}</td>
                   <td className="px-4 py-2 text-sm">{item.phoneNumber}</td>
                   <td className="px-4 py-2 text-sm">
-                    <select
-                      value={item.role?.id}
-                      className="border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      onChange={(e) =>
-                        mutateUpdateRoleUser({
-                          id: item.id,
-                          userUpdateRole: {
-                            role: { id: Number(e.target.value) },
-                          },
-                        })
-                      }
-                    >
-                      {roleData?.map((role: Role) => (
-                        <option key={role.id} value={role.id}>
-                          {role.name}
-                        </option>
-                      ))}
-                    </select>
+                    {isAdmin ? (
+                      <select
+                        value={item.role?.id}
+                        className="border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onChange={(e) =>
+                          mutateUpdateRoleUser({
+                            id: item.id,
+                            userUpdateRole: {
+                              role: { id: Number(e.target.value) },
+                            },
+                          })
+                        }
+                      >
+                        {roleData?.map((role: Role) => (
+                          <option key={role.id} value={role.id}>
+                            {role.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="px-2 py-1 bg-gray-100 rounded-lg">
+                        {item.role?.name || "-"}
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     {item.createdAt
@@ -170,7 +175,7 @@ export default function User() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-3">
-                      {!isUser && (
+                      {isAdmin && (
                         <>
                           <button className="text-green-600 hover:text-green-800 transition duration-150">
                             <BiEdit size={20} />
