@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { forgotPasswordService } from "../api/forgotPasswordService";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +19,9 @@ export default function ForgotPassword() {
       setLoading(true);
       await forgotPasswordService.forgotPassword(email);
       toast.success("Email reset password đã được gửi!");
-      window.location.href = "/Login";
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (error: any) {
       console.error(error);
       toast.error(error.response.data.Error);
