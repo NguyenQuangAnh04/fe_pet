@@ -17,6 +17,7 @@ export default function ForgotPassword() {
       setLoading(true);
       await forgotPasswordService.forgotPassword(email);
       toast.success("Email reset password đã được gửi!");
+      window.location.href = "/Login";
     } catch (error: any) {
       console.error(error);
       toast.error(error.response.data.Error);

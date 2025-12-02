@@ -237,12 +237,14 @@ const Header = () => {
                   >
                     Đơn hàng
                   </Link>
-                  <Link
-                    to="/account"
-                    className="block px-3 py-2 hover:bg-gray-50"
-                  >
-                    Profile
-                  </Link>
+                  {user?.provide !== "google" && (
+                    <Link
+                      to="/account"
+                      className="block px-3 py-2 hover:bg-gray-50"
+                    >
+                      Profile
+                    </Link>
+                  )}
                   {/* {user?.nameRole !== "CUSTOMER" && (
                     <Link
                       to="/dashboard/dashboardHome"

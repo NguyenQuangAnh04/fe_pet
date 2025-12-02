@@ -365,9 +365,11 @@ export default function AppointmentForm() {
                     const selectedDate = new Date(e.target.value);
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
-                    
+
                     if (selectedDate < today) {
-                      alert("Không thể chọn ngày trong quá khứ. Vui lòng chọn ngày hôm nay hoặc sau.");
+                      alert(
+                        "Không thể chọn ngày trong quá khứ. Vui lòng chọn ngày hôm nay hoặc sau."
+                      );
                       return;
                     }
                     handleChangeInput("appointmentDay", e.target.value);
