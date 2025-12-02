@@ -1,4 +1,15 @@
-import { AlertCircle, CheckCircle, CreditCard, Home, MapPin, Package, Phone, User, Wallet } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle,
+  ChevronDown,
+  CreditCard,
+  Home,
+  MapPin,
+  Package,
+  Phone,
+  User,
+  Wallet,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -7,6 +18,11 @@ import Footer from "../components/common/Footer";
 import Header from "../components/common/Header";
 import { useQueryCartByUser } from "../hook/carts/useCart";
 import { useAddOrder } from "../hook/order/useOrder";
+import {
+  useDistricts,
+  useProvinces,
+  useWards,
+} from "../hook/address/useAddress";
 import type { CartDTOItem } from "../types/cart";
 import type { AddressDTO, ItemDTO, OrderDTO } from "../types/order";
 import { formatPrice } from "../utils/format";
@@ -15,11 +31,22 @@ export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "VNPAY">("COD");
   const location = useLocation();
-  const buyNowItems = location.state?.mode === "buyNow" ? location.state.items : null;
+  const buyNowItems =
+    location.state?.mode === "buyNow" ? location.state.items : null;
   const { data } = useQueryCartByUser();
   const [formData, setFormData] = useState<OrderDTO>({ id: 0 });
   const [cart, setCart] = useState<CartDTOItem[]>();
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Address selection states
+  const [selectedProvince, setSelectedProvince] = useState<number>();
+  const [selectedDistrict, setSelectedDistrict] = useState<number>();
+  const [selectedWard, setSelectedWard] = useState<number>();
+
+  // Address queries
+  const { data: provinces } = useProvinces();
+  const { data: districts } = useDistricts(selectedProvince);
+  const { data: wards } = useWards(selectedDistrict);
 
   useEffect(() => {
     if (buyNowItems) {
@@ -69,20 +96,23 @@ export default function Checkout() {
     }
 
     // Validate address fields
-    if (!formData.addressDTO?.homeAddress || formData.addressDTO.homeAddress.trim().length < 5) {
+    if (
+      !formData.addressDTO?.homeAddress ||
+      formData.addressDTO.homeAddress.trim().length < 5
+    ) {
       newErrors.homeAddress = "Địa chỉ phải có ít nhất 5 ký tự";
     }
 
-    if (!formData.addressDTO?.district || formData.addressDTO.district.trim().length < 2) {
-      newErrors.district = "Vui lòng nhập Phường/Xã";
+    if (!selectedProvince) {
+      newErrors.city = "Vui lòng chọn Tỉnh/Thành phố";
     }
 
-    if (!formData.addressDTO?.commune || formData.addressDTO.commune.trim().length < 2) {
-      newErrors.commune = "Vui lòng nhập Quận/Huyện";
+    if (!selectedDistrict) {
+      newErrors.commune = "Vui lòng chọn Quận/Huyện";
     }
 
-    if (!formData.addressDTO?.city || formData.addressDTO.city.trim().length < 2) {
-      newErrors.city = "Vui lòng nhập Tỉnh/Thành phố";
+    if (!selectedWard) {
+      newErrors.district = "Vui lòng chọn Phường/Xã";
     }
 
     setErrors(newErrors);
@@ -109,13 +139,19 @@ export default function Checkout() {
         price: item.price,
       }));
 
-      const orderResponse = await mutateAddOrder({ ...formData, items: itemToSend });
+      const orderResponse = await mutateAddOrder({
+        ...formData,
+        items: itemToSend,
+      });
       console.log(orderResponse.data);
 
       // If payment method is VNPay, redirect to VNPay
       if (paymentMethod === "VNPAY") {
         try {
-          const response = await createPayment(String(orderResponse.data), totalMoney);
+          const response = await createPayment(
+            String(orderResponse.data),
+            totalMoney
+          );
           console.log(response.data);
 
           // Redirect to VNPay payment URL
@@ -155,7 +191,9 @@ export default function Checkout() {
               </h1>
             </div>
             <div className="flex items-center text-sm text-gray-600">
-              <span className="hover:text-orange-600 cursor-pointer">Giỏ hàng</span>
+              <span className="hover:text-orange-600 cursor-pointer">
+                Giỏ hàng
+              </span>
               <span className="mx-2">›</span>
               <span className="text-orange-600 font-medium">Thanh toán</span>
             </div>
@@ -187,9 +225,14 @@ export default function Checkout() {
                         <input
                           type="text"
                           value={formData?.fullName || ""}
-                          onChange={(e) => handleInputChange("fullName", e.target.value)}
-                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${errors.fullName ? "border-red-500" : "border-gray-300"
-                            }`}
+                          onChange={(e) =>
+                            handleInputChange("fullName", e.target.value)
+                          }
+                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${
+                            errors.fullName
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                           placeholder="Nguyễn Văn A"
                         />
                       </div>
@@ -211,9 +254,14 @@ export default function Checkout() {
                         <input
                           type="tel"
                           value={formData?.phoneNumber || ""}
-                          onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                            }`}
+                          onChange={(e) =>
+                            handleInputChange("phoneNumber", e.target.value)
+                          }
+                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${
+                            errors.phoneNumber
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                           placeholder="0987654321"
                         />
                       </div>
@@ -249,9 +297,17 @@ export default function Checkout() {
                         <input
                           type="text"
                           value={formData?.addressDTO?.homeAddress || ""}
-                          onChange={(e) => handleInputChangeAddress("homeAddress", e.target.value)}
-                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${errors.homeAddress ? "border-red-500" : "border-gray-300"
-                            }`}
+                          onChange={(e) =>
+                            handleInputChangeAddress(
+                              "homeAddress",
+                              e.target.value
+                            )
+                          }
+                          className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${
+                            errors.homeAddress
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                           placeholder="Số nhà, tên đường, ấp/khu phố..."
                         />
                       </div>
@@ -263,41 +319,83 @@ export default function Checkout() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Phường/Xã */}
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Phường/Xã <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={formData?.addressDTO?.district || ""}
-                          onChange={(e) => handleInputChangeAddress("district", e.target.value)}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${errors.district ? "border-red-500" : "border-gray-300"
-                            }`}
-                          placeholder="Phường 1, Xã ABC..."
-                        />
-                        {errors.district && (
-                          <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                            <AlertCircle className="w-4 h-4" />
-                            {errors.district}
-                          </p>
-                        )}
+                    {/* Tỉnh/Thành phố */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Tỉnh/Thành phố <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={selectedProvince || ""}
+                          onChange={(e) => {
+                            const provinceCode = Number(e.target.value);
+                            setSelectedProvince(provinceCode);
+                            setSelectedDistrict(undefined);
+                            setSelectedWard(undefined);
+                            const provinceName =
+                              provinces?.find((p) => p.code === provinceCode)
+                                ?.name || "";
+                            handleInputChangeAddress("city", provinceName);
+                          }}
+                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none ${
+                            errors.city ? "border-red-500" : "border-gray-300"
+                          }`}
+                        >
+                          <option value="">Chọn Tỉnh/Thành phố</option>
+                          {provinces?.map((province) => (
+                            <option key={province.code} value={province.code}>
+                              {province.name}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                       </div>
+                      {errors.city && (
+                        <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.city}
+                        </p>
+                      )}
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Quận/Huyện */}
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
                           Quận/Huyện <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          value={formData?.addressDTO?.commune || ""}
-                          onChange={(e) => handleInputChangeAddress("commune", e.target.value)}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${errors.commune ? "border-red-500" : "border-gray-300"
+                        <div className="relative">
+                          <select
+                            value={selectedDistrict || ""}
+                            onChange={(e) => {
+                              const districtCode = Number(e.target.value);
+                              setSelectedDistrict(districtCode);
+                              setSelectedWard(undefined);
+                              const districtName =
+                                districts?.find((d) => d.code === districtCode)
+                                  ?.name || "";
+                              handleInputChangeAddress("commune", districtName);
+                            }}
+                            disabled={!selectedProvince}
+                            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none ${
+                              errors.commune
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            } ${
+                              !selectedProvince
+                                ? "bg-gray-100 cursor-not-allowed"
+                                : ""
                             }`}
-                          placeholder="Quận 1, Huyện XYZ..."
-                        />
+                          >
+                            <option value="">Chọn Quận/Huyện</option>
+                            {districts?.map((district) => (
+                              <option key={district.code} value={district.code}>
+                                {district.name}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </div>
                         {errors.commune && (
                           <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
                             <AlertCircle className="w-4 h-4" />
@@ -305,27 +403,50 @@ export default function Checkout() {
                           </p>
                         )}
                       </div>
-                    </div>
 
-                    {/* Tỉnh/Thành phố */}
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Tỉnh/Thành phố <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData?.addressDTO?.city || ""}
-                        onChange={(e) => handleInputChangeAddress("city", e.target.value)}
-                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all ${errors.city ? "border-red-500" : "border-gray-300"
-                          }`}
-                        placeholder="TP. Hồ Chí Minh, Hà Nội..."
-                      />
-                      {errors.city && (
-                        <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          {errors.city}
-                        </p>
-                      )}
+                      {/* Phường/Xã */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Phường/Xã <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={selectedWard || ""}
+                            onChange={(e) => {
+                              const wardCode = Number(e.target.value);
+                              setSelectedWard(wardCode);
+                              const wardName =
+                                wards?.find((w) => w.code === wardCode)?.name ||
+                                "";
+                              handleInputChangeAddress("district", wardName);
+                            }}
+                            disabled={!selectedDistrict}
+                            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none ${
+                              errors.district
+                                ? "border-red-500"
+                                : "border-gray-300"
+                            } ${
+                              !selectedDistrict
+                                ? "bg-gray-100 cursor-not-allowed"
+                                : ""
+                            }`}
+                          >
+                            <option value="">Chọn Phường/Xã</option>
+                            {wards?.map((ward) => (
+                              <option key={ward.code} value={ward.code}>
+                                {ward.name}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </div>
+                        {errors.district && (
+                          <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" />
+                            {errors.district}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Ghi chú */}
@@ -335,7 +456,9 @@ export default function Checkout() {
                       </label>
                       <textarea
                         value={formData?.note || ""}
-                        onChange={(e) => handleInputChange("note", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("note", e.target.value)
+                        }
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
                         rows={3}
                         placeholder="Thời gian giao hàng, địa chỉ cụ thể hơn..."
@@ -360,16 +483,22 @@ export default function Checkout() {
                     <div
                       onClick={() => {
                         setPaymentMethod("COD");
-                        handleInputChange("paymentMethod", "COD")
+                        handleInputChange("paymentMethod", "COD");
                       }}
-                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${paymentMethod === "COD"
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                        }`}
+                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                        paymentMethod === "COD"
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${paymentMethod === "COD" ? "border-blue-500" : "border-gray-300"
-                          }`}>
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${
+                            paymentMethod === "COD"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                        >
                           {paymentMethod === "COD" && (
                             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                           )}
@@ -392,16 +521,22 @@ export default function Checkout() {
                     <div
                       onClick={() => {
                         setPaymentMethod("VNPAY");
-                        handleInputChange("paymentMethod", "VNPAY")
+                        handleInputChange("paymentMethod", "VNPAY");
                       }}
-                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${paymentMethod === "VNPAY"
-                        ? "border-orange-500 bg-orange-50"
-                        : "border-gray-200 hover:border-gray-300"
-                        }`}
+                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
+                        paymentMethod === "VNPAY"
+                          ? "border-orange-500 bg-orange-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${paymentMethod === "VNPAY" ? "border-orange-500" : "border-gray-300"
-                          }`}>
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${
+                            paymentMethod === "VNPAY"
+                              ? "border-orange-500"
+                              : "border-gray-300"
+                          }`}
+                        >
                           {paymentMethod === "VNPAY" && (
                             <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                           )}
@@ -438,37 +573,40 @@ export default function Checkout() {
                   <div className="p-6">
                     {/* Danh sách sản phẩm */}
                     <div className="space-y-3 mb-6 max-h-80 overflow-y-auto">
-                      {cart && cart.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-3 pb-3 border-b border-gray-100 last:border-b-0"
-                        >
-                          <div className="w-16 h-16 flex-shrink-0">
-                            <img
-                              src={item.product?.imageUrl}
-                              alt={item.product?.namePro}
-                              className="w-full h-full object-cover rounded-lg border border-gray-200"
-                              onError={(e) => {
-                                e.currentTarget.src = "/src/assets/product_01.jpg";
-                              }}
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1">
-                              {item.product?.namePro}
-                            </h4>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">
-                                {item.size}
-                              </span>
-                              <span>x{item.quantity}</span>
+                      {cart &&
+                        cart.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center gap-3 pb-3 border-b border-gray-100 last:border-b-0"
+                          >
+                            <div className="w-16 h-16 flex-shrink-0">
+                              <img
+                                src={item.product?.imageUrl}
+                                alt={item.product?.namePro}
+                                className="w-full h-full object-cover rounded-lg border border-gray-200"
+                                onError={(e) => {
+                                  e.currentTarget.src =
+                                    "/src/assets/product_01.jpg";
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-1">
+                                {item.product?.namePro}
+                              </h4>
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded font-medium">
+                                  {item.size}
+                                </span>
+                                <span>x{item.quantity}</span>
+                              </div>
+                            </div>
+                            <div className="text-sm font-bold text-orange-600">
+                              {item.product?.price &&
+                                formatPrice(item.product.price)}
                             </div>
                           </div>
-                          <div className="text-sm font-bold text-orange-600">
-                            {item.product?.price && formatPrice(item.product.price)}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
 
                     {/* Tính toán */}
@@ -481,10 +619,14 @@ export default function Checkout() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Phí vận chuyển:</span>
-                        <span className="font-semibold text-green-600">Miễn phí</span>
+                        <span className="font-semibold text-green-600">
+                          Miễn phí
+                        </span>
                       </div>
                       <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                        <span className="text-lg font-bold text-gray-900">Tổng cộng:</span>
+                        <span className="text-lg font-bold text-gray-900">
+                          Tổng cộng:
+                        </span>
                         <span className="text-3xl font-bold text-orange-600">
                           {formatPrice(totalMoney)}
                         </span>

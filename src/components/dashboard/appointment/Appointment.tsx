@@ -240,7 +240,8 @@ export default function Appointment() {
           <div>
             <h1 className="font-medium text-sm">Đã hủy</h1>
             <p className="text-gray-400 text-sm">
-              {countStatus?.find(([status]) => status === "CANCELLED")?.[1] ?? 0}
+              {countStatus?.find(([status]) => status === "CANCELLED")?.[1] ??
+                0}
             </p>
           </div>
           <MdCancel size={26} className="text-red-500" />
