@@ -7,13 +7,15 @@ import { FiFilter } from "react-icons/fi";
 import { MdNotes } from "react-icons/md";
 import { GiBabyFace } from "react-icons/gi";
 
-
 type ModalAppointProps = {
   onClose: () => void;
   initialData?: AppointmentDTO;
 };
 
-export default function ModalAppoint({ onClose, initialData }: ModalAppointProps) {
+export default function ModalAppoint({
+  onClose,
+  initialData,
+}: ModalAppointProps) {
   if (!initialData) return null;
 
   const getStatusLabel = (status: AppointStatus) => {
@@ -22,7 +24,9 @@ export default function ModalAppoint({ onClose, initialData }: ModalAppointProps
       [AppointStatus.PENDING]: "Đang xử lý",
       [AppointStatus.CONFIRMED]: "Đã xác nhận",
       [AppointStatus.COMPLETED]: "Hoàn thành",
-      [AppointStatus.CANCELED]: "Đã hủy",
+      [AppointStatus.CANCELLED]: "Đã hủy",
+      [AppointStatus.IN_QUEUE]: "Đang chờ",
+      [AppointStatus.IN_PROGRESS]: "Đang tiến hành",
     };
     return label[status];
   };
@@ -55,7 +59,9 @@ export default function ModalAppoint({ onClose, initialData }: ModalAppointProps
               </p>
               <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                 <BiPhone className="text-green-500 flex-shrink-0" />
-                <span className="font-medium text-gray-800">Số điện thoại:</span>
+                <span className="font-medium text-gray-800">
+                  Số điện thoại:
+                </span>
                 <span className="text-gray-600">{initialData.phoneNumber}</span>
               </p>
               <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
@@ -65,7 +71,6 @@ export default function ModalAppoint({ onClose, initialData }: ModalAppointProps
               </p>
             </div>
 
-
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition-all space-y-3">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">
                 Thông tin thú cưng
@@ -73,34 +78,51 @@ export default function ModalAppoint({ onClose, initialData }: ModalAppointProps
               <div className="space-y-3 text-gray-600">
                 <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                   <FaDog className="text-teal-500 hover:scale-110 transition-transform" />
-                  <span className="font-medium text-gray-800 whitespace-nowrap">Tên Pet:</span>{" "}
+                  <span className="font-medium text-gray-800 whitespace-nowrap">
+                    Tên Pet:
+                  </span>{" "}
                   {initialData.petName}
                 </p>
                 <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                   <BsGenderAmbiguous className="text-pink-500 hover:scale-110 transition-transform" />
-                  <span className="font-medium text-gray-800 whitespace-nowrap">Giới tính:</span>{" "}
+                  <span className="font-medium text-gray-800 whitespace-nowrap">
+                    Giới tính:
+                  </span>{" "}
                   {initialData.petGender}
                 </p>
                 <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                   <GiBabyFace className="text-orange-500 hover:scale-110 transition-transform" />
-                  <span className="font-medium text-gray-800 whitespace-nowrap">Tuổi:</span>{" "}
+                  <span className="font-medium text-gray-800 whitespace-nowrap">
+                    Tuổi:
+                  </span>{" "}
                   {initialData.age}
                 </p>
                 <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                   <FiFilter className="text-yellow-500 hover:scale-110 transition-transform" />
-                  <span className="font-medium text-gray-800 whitespace-nowrap">Trạng thái:</span>{" "}
-                  <span className={`px-2 py-1 rounded-full text-sm ${initialData.appointStatus === AppointStatus.PENDING ? 'bg-yellow-100 text-yellow-800' :
-                    initialData.appointStatus === AppointStatus.CONFIRMED ? 'bg-green-100 text-green-800' :
-                      initialData.appointStatus === AppointStatus.COMPLETED ? 'bg-blue-100 text-blue-800' :
-                        'bg-red-100 text-red-800'
-                    }`}>
-                    {initialData.appointStatus && getStatusLabel(initialData.appointStatus)}
+                  <span className="font-medium text-gray-800 whitespace-nowrap">
+                    Trạng thái:
+                  </span>{" "}
+                  <span
+                    className={`px-2 py-1 rounded-full text-sm ${
+                      initialData.appointStatus === AppointStatus.PENDING
+                        ? "bg-yellow-100 text-yellow-800"
+                        : initialData.appointStatus === AppointStatus.CONFIRMED
+                        ? "bg-green-100 text-green-800"
+                        : initialData.appointStatus === AppointStatus.COMPLETED
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {initialData.appointStatus &&
+                      getStatusLabel(initialData.appointStatus)}
                   </span>
                 </p>
                 {initialData.note && (
                   <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                     <MdNotes className="text-indigo-500 hover:scale-110 transition-transform" />
-                    <span className="font-medium text-gray-800 whitespace-nowrap">Ghi chú:</span>{" "}
+                    <span className="font-medium text-gray-800 whitespace-nowrap">
+                      Ghi chú:
+                    </span>{" "}
                     {initialData.note}
                   </p>
                 )}
@@ -116,21 +138,32 @@ export default function ModalAppoint({ onClose, initialData }: ModalAppointProps
               <div className="space-y-3 text-gray-600">
                 <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                   <BiUser className="text-blue-700 hover:scale-110 transition-transform" />
-                  <span className="font-medium text-gray-800 whitespace-nowrap">Họ tên:</span>  {initialData.veterinarian?.name}
+                  <span className="font-medium text-gray-800 whitespace-nowrap">
+                    Họ tên:
+                  </span>{" "}
+                  {initialData.veterinarian?.name}
                 </p>
                 <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                   <BiPhone className="text-green-700 hover:scale-110 transition-transform" />
-                  <span className="font-medium text-gray-800 whitespace-nowrap">Số điện thoại:</span> {initialData.veterinarian?.phoneNumber}
+                  <span className="font-medium text-gray-800 whitespace-nowrap">
+                    Số điện thoại:
+                  </span>{" "}
+                  {initialData.veterinarian?.phoneNumber}
                 </p>
                 <p className="flex flex-col sm:flex-row sm:items-center gap-2 break-words">
                   <FaEnvelope className="text-purple-700 hover:scale-110 transition-transform" />
-                  <span className="font-medium text-gray-800 whitespace-nowrap">Email:</span>{initialData.veterinarian?.email}
+                  <span className="font-medium text-gray-800 whitespace-nowrap">
+                    Email:
+                  </span>
+                  {initialData.veterinarian?.email}
                 </p>
               </div>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">Dịch vụ</h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                Dịch vụ
+              </h3>
               <div className="border border-gray-200 rounded-lg max-h-60 overflow-y-auto">
                 {initialData.examination?.map((item) => (
                   <div
@@ -144,7 +177,9 @@ export default function ModalAppoint({ onClose, initialData }: ModalAppointProps
                         {/* <p className="text-sm text-gray-600">{item.description}</p> */}
                       </div>
                     </div>
-                    <p className="font-semibold text-gray-800 whitespace-nowrap">{formatPrice(item.price)}</p>
+                    <p className="font-semibold text-gray-800 whitespace-nowrap">
+                      {formatPrice(item.price)}
+                    </p>
                   </div>
                 ))}
               </div>
