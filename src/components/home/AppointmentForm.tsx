@@ -361,9 +361,17 @@ export default function AppointmentForm() {
                   type="date"
                   min={new Date().toISOString().split("T")[0]}
                   value={formData.appointmentDay}
-                  onChange={(e) =>
-                    handleChangeInput("appointmentDay", e.target.value)
-                  }
+                  onChange={(e) => {
+                    const selectedDate = new Date(e.target.value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (selectedDate < today) {
+                      alert("Không thể chọn ngày trong quá khứ. Vui lòng chọn ngày hôm nay hoặc sau.");
+                      return;
+                    }
+                    handleChangeInput("appointmentDay", e.target.value);
+                  }}
                 />
               </div>
 

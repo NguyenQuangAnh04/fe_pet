@@ -675,11 +675,13 @@ export default function OrdersPage() {
                     </option>
                   ))}
                 </select>
-                {formData.addressDTO?.district && !selectedDistrict && !selectedProvince && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Địa chỉ hiện tại: {formData.addressDTO.district}
-                  </p>
-                )}
+                {formData.addressDTO?.district &&
+                  !selectedDistrict &&
+                  !selectedProvince && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Địa chỉ hiện tại: {formData.addressDTO.district}
+                    </p>
+                  )}
               </div>
 
               {/* Phường/Xã */}
@@ -702,11 +704,13 @@ export default function OrdersPage() {
                     </option>
                   ))}
                 </select>
-                {formData.addressDTO?.commune && !selectedWard && !selectedDistrict && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Địa chỉ hiện tại: {formData.addressDTO.commune}
-                  </p>
-                )}
+                {formData.addressDTO?.commune &&
+                  !selectedWard &&
+                  !selectedDistrict && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Địa chỉ hiện tại: {formData.addressDTO.commune}
+                    </p>
+                  )}
               </div>
             </div>
 
