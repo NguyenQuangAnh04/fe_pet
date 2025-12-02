@@ -30,6 +30,7 @@ import PaymentResult from "./pages/PaymentResult";
 import OAuth2Success from "./components/OAuth2Success";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Account from "./pages/Account";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
+          <Route path="/account" element={<Account />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/services" element={<Services />} />
           <Route path="/booking" element={<BookingForm />} />

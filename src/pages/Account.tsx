@@ -1,440 +1,338 @@
-// import { useState } from "react";
-// import Header from "../components/common/Header";
-// import Footer from "../components/common/Footer";
+import React, { useState, useEffect } from "react";
+import { FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
+import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
+import { useAuth } from "../context/AuthContext";
+import { getUserProfile, updateProfile } from "../api/userService";
+import {
+  getProvinces,
+  getDistricts,
+  getWards,
+  type Province,
+  type District,
+  type Ward,
+} from "../api/addressService";
+import type { userDTO } from "../types/user";
 
-// interface UserInfo {
-//   fullName: string;
-//   email: string;
-//   phone: string;
-//   dateOfBirth: string;
-//   gender: string;
-//   address: string;
-//   ward: string;
-//   district: string;
-//   city: string;
-// }
+export default function Account() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<userDTO | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
-// interface Order {
-//   id: string;
-//   date: string;
-//   status: "pending" | "confirmed" | "shipping" | "delivered" | "cancelled";
-//   total: number;
-//   items: number;
-// }
+  // Form values
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
 
-// type ActiveTab = "profile" | "orders" | "address" | "password" | "settings";
+  const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
 
-// export default function Account() {
-//   const [activeTab, setActiveTab] = useState<ActiveTab>("profile");
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [userInfo, setUserInfo] = useState<UserInfo>({
-//     fullName: "Nguyễn Văn Minus",
-//     email: "nguyenvana@example.com",
-//     phone: "0123456789",
-//     dateOfBirth: "1990-01-01",
-//     gender: "male",
-//     address: "Khu 3 hoàng cương thanh ba phú thọ",
-//     ward: "Phường One",
-//     district: "Xóm Tranh",
-//     city: "TP. Thái Bình",
-//   });
+  // Password fields
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
 
+  // Fetch profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setEmail(user?.email || "");
+        setPhoneNumber(user?.phoneNumber || "");
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
-//   const handleInputChange = (field: keyof UserInfo, value: string) => {
-//     setUserInfo((prev) => ({
-//       ...prev,
-//       [field]: value,
-//     }));
-//   };
+  const showMsg = (type: "success" | "error", text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage(null), 4000);
+  };
 
-//   const handleSaveProfile = () => {
-//     // Mock API call
-//     setIsEditing(false);
-//     alert("Cập nhật thông tin thành công!");
-//   };
+  const handleSave = async () => {
+    if (!phoneNumber.trim()) {
+      showMsg("error", "Vui lòng nhập số điện thoại");
+      return;
+    }
+    if (!/^[0-9]{10,11}$/.test(phoneNumber)) {
+      showMsg("error", "Số điện thoại phải có 10-11 chữ số");
+      return;
+    }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showMsg("error", "Email không hợp lệ");
+      return;
+    }
 
+    // Password validation if changing password
+    if (showPasswordSection) {
+      if (!currentPassword.trim()) {
+        showMsg("error", "Vui lòng nhập mật khẩu hiện tại");
+        return;
+      }
+      if (newPassword && newPassword.length < 6) {
+        showMsg("error", "Mật khẩu mới phải có ít nhất 6 ký tự");
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        showMsg("error", "Xác nhận mật khẩu không khớp");
+        return;
+      }
+    }
 
+    setSaving(true);
+    try {
+      const updateData: any = {
+        ...profile,
+        phoneNumber,
+        email,
+        id: user?.userId,
+      };
 
+      if (newPassword) {
+        updateData.password = currentPassword;
+        updateData.newPassword = newPassword;
+        updateData.confirmPassword = confirmPassword;
+      }
+      console.log(updateData);
 
-//   const tabs = [
-//     { id: "profile" as ActiveTab, label: "Thông tin cá nhân", icon: "👤" },
-//     { id: "orders" as ActiveTab, label: "Đơn hàng", icon: "📦" },
-//     { id: "address" as ActiveTab, label: "Sổ địa chỉ", icon: "📍" },
-//     { id: "password" as ActiveTab, label: "Đổi mật khẩu", icon: "🔒" },
-//     { id: "settings" as ActiveTab, label: "Cài đặt", icon: "⚙️" },
-//   ];
+      await updateProfile(updateData);
+      showMsg("success", "Cập nhật thông tin thành công!");
+      setShowPasswordSection(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      showMsg("error", error.response?.data.message || "Cập nhật thất bại");
+      console.error("Error updating profile:", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-//   const renderContent = () => {
-//     switch (activeTab) {
-//       case "profile":
-//         return (
-//           <div className="bg-white border border-gray-200 rounded-lg p-6">
-//             <div className="flex justify-between items-center mb-6">
-//               <h2 className="text-xl font-semibold text-gray-900">
-//                 Thông tin cá nhân
-//               </h2>
-//               <button
-//                 onClick={() =>
-//                   isEditing ? handleSaveProfile() : setIsEditing(true)
-//                 }
-//                 className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
-//               >
-//                 {isEditing ? "Lưu thông tin" : "Chỉnh sửa"}
-//               </button>
-//             </div>
+  const handleDiscard = () => {
+    // Reset to original values
+    if (profile) {
+      const nameParts = (profile.userName || "").split(" ");
+      setFirstName(nameParts[0] || "");
+      setLastName(nameParts.slice(1).join(" ") || "");
+      setPhoneNumber(profile.phoneNumber || "");
+      setEmail(profile.email || "");
+    }
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowPasswordSection(false);
+  };
 
-//             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Họ và tên
-//                 </label>
-//                 <input
-//                   type="text"
-//                   value={userInfo.fullName}
-//                   onChange={(e) =>
-//                     handleInputChange("fullName", e.target.value)
-//                   }
-//                   disabled={!isEditing}
-//                   aria-label="Họ và tên"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50"
-//                 />
-//               </div>
+  if (loading) {
+    return (
+      <div>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Email
-//                 </label>
-//                 <input
-//                   type="email"
-//                   value={userInfo.email}
-//                   onChange={(e) => handleInputChange("email", e.target.value)}
-//                   disabled={!isEditing}
-//                   aria-label="Email"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50"
-//                 />
-//               </div>
+  return (
+    <div>
+      <Header />
+      <div className="min-h-screen bg-gray-100 py-8 px-4">
+        <div className="max-w-3xl mx-auto">
+          {/* Modal Card */}
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Chỉnh sửa thông tin cá nhân
+              </h2>
+              <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                <FaTimes size={20} />
+              </button>
+            </div>
 
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Số điện thoại
-//                 </label>
-//                 <input
-//                   type="tel"
-//                   value={userInfo.phone}
-//                   onChange={(e) => handleInputChange("phone", e.target.value)}
-//                   disabled={!isEditing}
-//                   aria-label="Số điện thoại"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50"
-//                 />
-//               </div>
+            {/* Message */}
+            {message && (
+              <div
+                className={`mx-6 mt-4 p-3 rounded-lg ${
+                  message.type === "success"
+                    ? "bg-green-50 text-green-700 border border-green-200"
+                    : "bg-red-50 text-red-700 border border-red-200"
+                }`}
+              >
+                {message.text}
+              </div>
+            )}
 
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Ngày sinh
-//                 </label>
-//                 <input
-//                   type="date"
-//                   value={userInfo.dateOfBirth}
-//                   onChange={(e) =>
-//                     handleInputChange("dateOfBirth", e.target.value)
-//                   }
-//                   disabled={!isEditing}
-//                   aria-label="Ngày sinh"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50"
-//                 />
-//               </div>
+            {/* Content */}
+            <div className="px-6 py-6">
+              {/* Delivery contact section */}
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+                  Thông tin liên hệ
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Phone number */}
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Số điện thoại <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="0123 456 789"
+                    />
+                  </div>
 
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Giới tính
-//                 </label>
-//                 <select
-//                   value={userInfo.gender}
-//                   onChange={(e) => handleInputChange("gender", e.target.value)}
-//                   disabled={!isEditing}
-//                   aria-label="Giới tính"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50"
-//                 >
-//                   <option value="male">Nam</option>
-//                   <option value="female">Nữ</option>
-//                   <option value="other">Khác</option>
-//                 </select>
-//               </div>
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Địa chỉ email
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      placeholder="example@email.com"
+                    />
+                  </div>
+                </div>
+              </div>
 
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Tỉnh/Thành phố
-//                 </label>
-//                 <input
-//                   type="text"
-//                   value={userInfo.city}
-//                   onChange={(e) => handleInputChange("city", e.target.value)}
-//                   disabled={!isEditing}
-//                   aria-label="Tỉnh/Thành phố"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50"
-//                 />
-//               </div>
+              {/* Password section */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    Đổi mật khẩu
+                  </h3>
+                </div>
 
-//               <div className="md:col-span-2">
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Địa chỉ
-//                 </label>
-//                 <input
-//                   type="text"
-//                   value={userInfo.address}
-//                   onChange={(e) => handleInputChange("address", e.target.value)}
-//                   disabled={!isEditing}
-//                   aria-label="Địa chỉ"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-50"
-//                 />
-//               </div>
-//             </div>
-//           </div>
-//         );
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fadeIn">
+                  {/* Current password */}
+                  <div className="relative">
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Mật khẩu hiện tại <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowCurrentPassword(!showCurrentPassword)
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                  </div>
 
-//       case "orders":
-//         return (
-//           <div className="bg-white border border-gray-200 rounded-lg p-6">
-//             <h2 className="text-xl font-semibold text-gray-900 mb-6">
-//               Lịch sử đơn hàng
-//             </h2>
+                  {/* New password */}
+                  <div className="relative">
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Mật khẩu mới <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                  </div>
 
-          
-//           </div>
-//         );
+                  {/* Confirm password */}
+                  <div className="relative">
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Xác nhận mật khẩu <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-//       case "address":
-//         return (
-//           <div className="bg-white border border-gray-200 rounded-lg p-6">
-//             <div className="flex justify-between items-center mb-6">
-//               <h2 className="text-xl font-semibold text-gray-900">
-//                 Sổ địa chỉ
-//               </h2>
-//               <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
-//                 Thêm địa chỉ mới
-//               </button>
-//             </div>
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <button
+                type="button"
+                onClick={handleDiscard}
+                className="px-6 py-2 text-gray-700 font-medium hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Hủy thay đổi
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={saving}
+                className="px-6 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? "Đang lưu..." : "Lưu thay đổi"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <Footer />
 
-//             <div className="space-y-4">
-//               <div className="border border-gray-200 rounded-lg p-4">
-//                 <div className="flex justify-between items-start mb-2">
-//                   <div>
-//                     <h3 className="font-semibold text-gray-900">
-//                       {userInfo.fullName}
-//                     </h3>
-//                     <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">
-//                       Mặc định
-//                     </span>
-//                   </div>
-//                   <div className="flex gap-2">
-//                     <button className="text-orange-600 hover:text-orange-700 text-sm">
-//                       Sửa
-//                     </button>
-//                     <button className="text-red-600 hover:text-red-700 text-sm">
-//                       Xóa
-//                     </button>
-//                   </div>
-//                 </div>
-//                 <div className="text-gray-600 text-sm space-y-1">
-//                   <p>📞 {userInfo.phone}</p>
-//                   <p>
-//                     📍 {userInfo.address}, {userInfo.ward}, {userInfo.district},{" "}
-//                     {userInfo.city}
-//                   </p>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         );
-
-//       case "password":
-//         return (
-//           <div className="bg-white border border-gray-200 rounded-lg p-6">
-//             <h2 className="text-xl font-semibold text-gray-900 mb-6">
-//               Đổi mật khẩu
-//             </h2>
-
-//             <form className="space-y-6 max-w-md">
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Mật khẩu hiện tại
-//                 </label>
-//                 <input
-//                   type="password"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-//                   placeholder="Nhập mật khẩu hiện tại"
-//                 />
-//               </div>
-
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Mật khẩu mới
-//                 </label>
-//                 <input
-//                   type="password"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-//                   placeholder="Nhập mật khẩu mới"
-//                 />
-//               </div>
-
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Xác nhận mật khẩu mới
-//                 </label>
-//                 <input
-//                   type="password"
-//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-//                   placeholder="Nhập lại mật khẩu mới"
-//                 />
-//               </div>
-
-//               <div className="bg-blue-50 p-4 rounded-lg">
-//                 <h4 className="font-medium text-blue-900 mb-2">
-//                   Yêu cầu mật khẩu:
-//                 </h4>
-//                 <ul className="text-sm text-blue-800 space-y-1">
-//                   <li>• Ít nhất 8 ký tự</li>
-//                   <li>• Có ít nhất 1 chữ hoa</li>
-//                   <li>• Có ít nhất 1 chữ số</li>
-//                   <li>• Có ít nhất 1 ký tự đặc biệt</li>
-//                 </ul>
-//               </div>
-
-//               <button
-//                 type="submit"
-//                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition-colors"
-//               >
-//                 Cập nhật mật khẩu
-//               </button>
-//             </form>
-//           </div>
-//         );
-
-//       case "settings":
-//         return (
-//           <div className="bg-white border border-gray-200 rounded-lg p-6">
-//             <h2 className="text-xl font-semibold text-gray-900 mb-6">
-//               Cài đặt tài khoản
-//             </h2>
-
-//             <div className="space-y-6">
-//               <div className="border-b border-gray-200 pb-6">
-//                 <h3 className="font-medium text-gray-900 mb-4">Thông báo</h3>
-//                 <div className="space-y-4">
-//                   <label className="flex items-center">
-//                     <input
-//                       type="checkbox"
-//                       defaultChecked
-//                       className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-//                     />
-//                     <span className="ml-3 text-sm text-gray-700">
-//                       Nhận thông báo qua email về đơn hàng
-//                     </span>
-//                   </label>
-//                   <label className="flex items-center">
-//                     <input
-//                       type="checkbox"
-//                       defaultChecked
-//                       className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-//                     />
-//                     <span className="ml-3 text-sm text-gray-700">
-//                       Nhận thông báo về khuyến mãi
-//                     </span>
-//                   </label>
-//                   <label className="flex items-center">
-//                     <input
-//                       type="checkbox"
-//                       className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-//                     />
-//                     <span className="ml-3 text-sm text-gray-700">
-//                       Nhận tin tức sản phẩm mới
-//                     </span>
-//                   </label>
-//                 </div>
-//               </div>
-
-//               <div className="border-b border-gray-200 pb-6">
-//                 <h3 className="font-medium text-gray-900 mb-4">Bảo mật</h3>
-//                 <div className="space-y-3">
-//                   <button className="text-orange-600 hover:text-orange-700 text-sm">
-//                     Kích hoạt xác thực 2 bước
-//                   </button>
-//                   <br />
-//                   <button className="text-orange-600 hover:text-orange-700 text-sm">
-//                     Xem lịch sử đăng nhập
-//                   </button>
-//                 </div>
-//               </div>
-
-//               <div>
-//                 <h3 className="font-medium text-gray-900 mb-4">Tài khoản</h3>
-//                 <div className="space-y-3">
-//                   <button className="text-gray-600 hover:text-gray-700 text-sm">
-//                     Tải xuống dữ liệu cá nhân
-//                   </button>
-//                   <br />
-//                   <button className="text-red-600 hover:text-red-700 text-sm">
-//                     Xóa tài khoản
-//                   </button>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         );
-
-//       default:
-//         return null;
-//     }
-//   };
-
-//   return (
-//     <>
-//       <Header />
-//       <div className="max-w-6xl mx-auto p-4 md:p-6 min-h-screen">
-//         <div className="mb-8">
-//           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-//             Tài khoản của tôi
-//           </h1>
-//           <p className="text-gray-600">
-//             Quản lý thông tin cá nhân và đơn hàng của bạn
-//           </p>
-//         </div>
-
-//         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-//           {/* Sidebar Navigation */}
-//           <div className="lg:col-span-1">
-//             <div className="bg-white border border-gray-200 rounded-lg p-4 sticky top-4">
-//               <div className="space-y-2">
-//                 {tabs.map((tab) => (
-//                   <button
-//                     key={tab.id}
-//                     onClick={() => setActiveTab(tab.id)}
-//                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-//                       activeTab === tab.id
-//                         ? "bg-orange-50 text-orange-600 border border-orange-200"
-//                         : "text-gray-700 hover:bg-gray-50"
-//                     }`}
-//                   >
-//                     <span className="text-lg">{tab.icon}</span>
-//                     <span className="font-medium">{tab.label}</span>
-//                   </button>
-//                 ))}
-//               </div>
-
-//               <div className="mt-6 pt-6 border-t border-gray-200">
-//                 <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-600 hover:bg-red-50 transition-colors">
-//                   <span className="text-lg">🚪</span>
-//                   <span className="font-medium">Đăng xuất</span>
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* Main Content */}
-//           <div className="lg:col-span-3">{renderContent()}</div>
-//         </div>
-//       </div>
-//       <Footer />
-//     </>
-//   );
-// }
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+}

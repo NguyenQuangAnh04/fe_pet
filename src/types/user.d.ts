@@ -17,6 +17,7 @@ export interface userDTO {
   password: string;
   confirmPassword: string;
   createdAt: string | Date;
+  newPassword?: string;
   updatedAt: string | Date;
   roleName: string;
   role: Role;
@@ -32,7 +33,6 @@ export interface userUpdateRole {
     id: number;
   };
 }
-
 
 export interface Role {
   id: number;

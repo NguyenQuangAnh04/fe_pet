@@ -1,12 +1,25 @@
-
-import type { userRegister, userUpdateRole } from "../types/user";
+import type { userDTO, userRegister, userUpdateRole } from "../types/user";
 import api from "./axiosClient";
 
-export const findAllUser = (params?: { name?: string; phoneNumber?: string; email?: string; page?: number }) => {
-    return api.get("/user", { params });
+export const findAllUser = (params?: {
+  name?: string;
+  phoneNumber?: string;
+  email?: string;
+  page?: number;
+}) => {
+  return api.get("/user", { params });
 };
-export const addUser = async (userRegister: userRegister) => await api.post("/user/create", userRegister);
-export const updateRoleUser = async (id: number, userUpdateRole: userUpdateRole) =>
-    await api.put(`/user/update/${id}`, userUpdateRole);
-export const deleteUser = async (id: number) => await api.delete(`/user/delete/${id}`);
+export const addUser = async (userRegister: userRegister) =>
+  await api.post("/user/create", userRegister);
+export const updateRoleUser = async (
+  id: number,
+  userUpdateRole: userUpdateRole
+) => await api.put(`/user/update/${id}`, userUpdateRole);
+export const deleteUser = async (id: number) =>
+  await api.delete(`/user/delete/${id}`);
 export const selectRoleUser = async () => await api.get("/role");
+
+// Profile APIs
+export const getUserProfile = async () => await api.get("/user/profile");
+export const updateProfile = async (data: userDTO) =>
+  await api.put("/user/update-profile", data);

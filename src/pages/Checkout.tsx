@@ -47,7 +47,12 @@ export default function Checkout() {
   const { data: provinces } = useProvinces();
   const { data: districts } = useDistricts(selectedProvince);
   const { data: wards } = useWards(selectedDistrict);
-
+  const token = localStorage.getItem("accessToken");
+  useEffect(() => {
+    if (!token) {
+      window.location.href = "/login";
+    }
+  }, []);
   useEffect(() => {
     if (buyNowItems) {
       setCart(buyNowItems);
