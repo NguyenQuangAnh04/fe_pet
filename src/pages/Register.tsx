@@ -7,6 +7,7 @@ import type { userRegister } from "../types/user";
 import illustration from "/src/assets/posterregister.jpg";
 import hiddenAnimal from "/src/assets/cat2.png";
 import hiddenAnimal2 from "/src/assets/ngunhubo.png";
+import { useNavigate } from "react-router-dom";
 type FormErrors = {
   userName?: string;
   email?: string;
@@ -28,13 +29,17 @@ const Register = () => {
   const handleChangeInput = (field: keyof userRegister, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
+  const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: async (formData: userRegister) => {
       await register(formData);
     },
     onSuccess: () => {
       toast.success("Đăng ký thành công!");
+      navigate("/Login");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Đăng ký thất bại!");
     },
   });
   const handleSubmit = (e: React.FormEvent) => {
@@ -76,8 +81,8 @@ const Register = () => {
 
     mutation.mutate(formData);
   };
-  
-//giao diện đăng ký
+
+  //giao diện đăng ký
   return (
     <div className="flex w-full min-h-screen bg-[#f7c884] items-center justify-center relative px-4 py-8">
       <div className="flex flex-col-reverse lg:flex-row-reverse w-full max-w-6xl relative">
@@ -87,7 +92,9 @@ const Register = () => {
             src={hiddenAnimal2}
             alt="Hidden animal"
             className={`absolute bottom-[-15px] left-[-160px] w-[300px] xl:w-[400px] z-0 transform rotate-[10deg] transition-all duration-500 ease-in-out ${
-              showPassword || showComfirmPassword ? "translate-x-0" : "translate-x-[110px]"
+              showPassword || showComfirmPassword
+                ? "translate-x-0"
+                : "translate-x-[110px]"
             }`}
           />
         </div>
@@ -123,22 +130,30 @@ const Register = () => {
               </div>
               <form onSubmit={handleSubmit} className="flex flex-col space-y-3">
                 <div>
-                  <label className="block mb-1 text-sm text-gray-600">Tài khoản:</label>
+                  <label className="block mb-1 text-sm text-gray-600">
+                    Tài khoản:
+                  </label>
                   <input
                     type="text"
                     name="userName"
                     value={formData?.userName}
-                    onChange={(e) => handleChangeInput("userName", e.target.value)}
+                    onChange={(e) =>
+                      handleChangeInput("userName", e.target.value)
+                    }
                     placeholder="Nhập tài khoản"
                     className="w-full px-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all"
                   />
                   {error.userName && (
-                    <p className="text-red-500 text-xs mt-1">{error.userName}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {error.userName}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm text-gray-600">Email:</label>
+                  <label className="block mb-1 text-sm text-gray-600">
+                    Email:
+                  </label>
                   <input
                     type="email"
                     value={formData?.email}
@@ -152,27 +167,37 @@ const Register = () => {
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm text-gray-600">Số điện thoại:</label>
+                  <label className="block mb-1 text-sm text-gray-600">
+                    Số điện thoại:
+                  </label>
                   <input
                     type="text"
                     value={formData?.phoneNumber}
-                    onChange={(e) => handleChangeInput("phoneNumber", e.target.value)}
+                    onChange={(e) =>
+                      handleChangeInput("phoneNumber", e.target.value)
+                    }
                     name="phoneNumber"
                     placeholder="Nhập số điện thoại"
                     className="w-full px-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all"
                   />
                   {error.phoneNumber && (
-                    <p className="text-red-500 text-xs mt-1">{error.phoneNumber}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {error.phoneNumber}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm text-gray-600">Mật khẩu:</label>
+                  <label className="block mb-1 text-sm text-gray-600">
+                    Mật khẩu:
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={formData?.password}
-                      onChange={(e) => handleChangeInput("password", e.target.value)}
+                      onChange={(e) =>
+                        handleChangeInput("password", e.target.value)
+                      }
                       placeholder="Nhập mật khẩu"
                       className="w-full px-3 py-2.5 pr-10 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all"
                     />
@@ -181,46 +206,69 @@ const Register = () => {
                       className="absolute top-3 right-3 text-gray-500 cursor-pointer hover:text-gray-700 transition-colors"
                       title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                     >
-                      {showPassword ? <AiFillEyeInvisible size={18} /> : <AiFillEye size={18} />}
+                      {showPassword ? (
+                        <AiFillEyeInvisible size={18} />
+                      ) : (
+                        <AiFillEye size={18} />
+                      )}
                     </span>
                   </div>
                   {error.password && (
-                    <p className="text-red-500 text-xs mt-1">{error.password}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {error.password}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm text-gray-600">Nhập lại mật khẩu:</label>
+                  <label className="block mb-1 text-sm text-gray-600">
+                    Nhập lại mật khẩu:
+                  </label>
                   <div className="relative">
                     <input
                       type={showComfirmPassword ? "text" : "password"}
-                      onChange={(e) => handleChangeInput("confirmPassword", e.target.value)}
+                      onChange={(e) =>
+                        handleChangeInput("confirmPassword", e.target.value)
+                      }
                       value={formData?.confirmPassword}
                       placeholder="Nhập lại mật khẩu"
                       className="w-full px-3 py-2.5 pr-10 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 transition-all"
                     />
                     <span
-                      onClick={() => setComfirmShowPassword(!showComfirmPassword)}
+                      onClick={() =>
+                        setComfirmShowPassword(!showComfirmPassword)
+                      }
                       className="absolute top-3 right-3 text-gray-500 cursor-pointer hover:text-gray-700 transition-colors"
-                      title={showComfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                      title={
+                        showComfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+                      }
                     >
-                      {showComfirmPassword ? <AiFillEyeInvisible size={18} /> : <AiFillEye size={18} />}
+                      {showComfirmPassword ? (
+                        <AiFillEyeInvisible size={18} />
+                      ) : (
+                        <AiFillEye size={18} />
+                      )}
                     </span>
                   </div>
                   {error.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">{error.confirmPassword}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {error.confirmPassword}
+                    </p>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">
-                  <input 
-                    type="checkbox" 
-                    id="terms" 
+                  <input
+                    type="checkbox"
+                    id="terms"
                     name="terms"
                     title="Chấp nhận điều khoản"
                     className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
                   />
-                  <label htmlFor="terms" className="text-xs text-gray-600 cursor-pointer">
+                  <label
+                    htmlFor="terms"
+                    className="text-xs text-gray-600 cursor-pointer"
+                  >
                     Chấp nhận các điều khoản
                   </label>
                 </div>
@@ -234,7 +282,13 @@ const Register = () => {
                 </button>
 
                 <p className="mt-3 text-center text-amber-950 text-xs">
-                  Đã có tài khoản? <a href="./Login" className="underline hover:text-amber-700 transition-colors">Đăng nhập</a>
+                  Đã có tài khoản?{" "}
+                  <a
+                    href="./Login"
+                    className="underline hover:text-amber-700 transition-colors"
+                  >
+                    Đăng nhập
+                  </a>
                 </p>
               </form>
             </div>
