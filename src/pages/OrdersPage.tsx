@@ -25,6 +25,14 @@ import {
 import { OrderStatus } from "../types/order";
 import type { OrderDTO } from "../types/order";
 import { formatPrice } from "../utils/format";
+import {
+  getProvinces,
+  getDistricts,
+  getWards,
+  type Province,
+  type District,
+  type Ward,
+} from "../api/addressService";
 
 export default function OrdersPage() {
   const getStatusLabel = (status: OrderStatus) => {
@@ -43,6 +51,54 @@ export default function OrdersPage() {
 
   const navigate = useNavigate();
   const { mutateAsync: mutateCancelOrder } = useCancelOrderUser();
+
+  // Address API states
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [wards, setWards] = useState<Ward[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
+  const [selectedDistrict, setSelectedDistrict] = useState<number | null>(null);
+  const [selectedWard, setSelectedWard] = useState<number | null>(null);
+
+  // Load provinces on mount
+  useEffect(() => {
+    const loadProvinces = async () => {
+      const data = await getProvinces();
+      setProvinces(data);
+    };
+    loadProvinces();
+  }, []);
+
+  // Load districts when province changes
+  useEffect(() => {
+    if (selectedProvince) {
+      const loadDistricts = async () => {
+        const data = await getDistricts(selectedProvince);
+        setDistricts(data);
+        setWards([]);
+        setSelectedDistrict(null);
+        setSelectedWard(null);
+      };
+      loadDistricts();
+    } else {
+      setDistricts([]);
+      setWards([]);
+    }
+  }, [selectedProvince]);
+
+  // Load wards when district changes
+  useEffect(() => {
+    if (selectedDistrict) {
+      const loadWards = async () => {
+        const data = await getWards(selectedDistrict);
+        setWards(data);
+        setSelectedWard(null);
+      };
+      loadWards();
+    } else {
+      setWards([]);
+    }
+  }, [selectedDistrict]);
 
   // State cho shipping modal
   const [shippingModal, setShippingModal] = useState<{
@@ -97,10 +153,48 @@ export default function OrdersPage() {
         commune: order.addressDTO?.commune || "",
       },
     });
+    // Reset selected values khi mở modal
+    setSelectedProvince(null);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    setDistricts([]);
+    setWards([]);
   };
 
   const closeShippingModal = () => {
     setShippingModal({ isOpen: false, order: null });
+    setSelectedProvince(null);
+    setSelectedDistrict(null);
+    setSelectedWard(null);
+    setDistricts([]);
+    setWards([]);
+  };
+
+  const handleProvinceChange = (provinceCode: number) => {
+    setSelectedProvince(provinceCode);
+    const province = provinces.find((p) => p.code === provinceCode);
+    if (province) {
+      handleChangeAddressDTO("city", province.name);
+      handleChangeAddressDTO("district", "");
+      handleChangeAddressDTO("commune", "");
+    }
+  };
+
+  const handleDistrictChange = (districtCode: number) => {
+    setSelectedDistrict(districtCode);
+    const district = districts.find((d) => d.code === districtCode);
+    if (district) {
+      handleChangeAddressDTO("district", district.name);
+      handleChangeAddressDTO("commune", "");
+    }
+  };
+
+  const handleWardChange = (wardCode: number) => {
+    setSelectedWard(wardCode);
+    const ward = wards.find((w) => w.code === wardCode);
+    if (ward) {
+      handleChangeAddressDTO("commune", ward.name);
+    }
   };
 
   const { mutateAsync: mutateUpdateOrderClient } = useUpdateOrderClient();
@@ -540,16 +634,25 @@ export default function OrdersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tỉnh/Thành phố
                 </label>
-                <input
-                  type="text"
-                  name="city"
-                  value={formData.addressDTO?.city}
-                  onChange={(e) =>
-                    handleChangeAddressDTO("city", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="Nhập tỉnh/thành phố"
-                />
+                <select
+                  value={selectedProvince || ""}
+                  onChange={(e) => handleProvinceChange(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+                >
+                  <option value="">
+                    {formData.addressDTO?.city || "Chọn tỉnh/thành phố"}
+                  </option>
+                  {provinces.map((province) => (
+                    <option key={province.code} value={province.code}>
+                      {province.name}
+                    </option>
+                  ))}
+                </select>
+                {formData.addressDTO?.city && !selectedProvince && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Địa chỉ hiện tại: {formData.addressDTO.city}
+                  </p>
+                )}
               </div>
 
               {/* Quận/Huyện */}
@@ -557,16 +660,26 @@ export default function OrdersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Quận/Huyện
                 </label>
-                <input
-                  type="text"
-                  name="district"
-                  value={formData.addressDTO?.district}
-                  onChange={(e) =>
-                    handleChangeAddressDTO("district", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="Nhập quận/huyện"
-                />
+                <select
+                  value={selectedDistrict || ""}
+                  onChange={(e) => handleDistrictChange(Number(e.target.value))}
+                  disabled={!selectedProvince}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">
+                    {formData.addressDTO?.district || "Chọn quận/huyện"}
+                  </option>
+                  {districts.map((district) => (
+                    <option key={district.code} value={district.code}>
+                      {district.name}
+                    </option>
+                  ))}
+                </select>
+                {formData.addressDTO?.district && !selectedDistrict && !selectedProvince && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Địa chỉ hiện tại: {formData.addressDTO.district}
+                  </p>
+                )}
               </div>
 
               {/* Phường/Xã */}
@@ -574,16 +687,26 @@ export default function OrdersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Phường/Xã
                 </label>
-                <input
-                  type="text"
-                  name="commune"
-                  value={formData.addressDTO?.commune}
-                  onChange={(e) =>
-                    handleChangeAddressDTO("commune", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="Nhập phường/xã"
-                />
+                <select
+                  value={selectedWard || ""}
+                  onChange={(e) => handleWardChange(Number(e.target.value))}
+                  disabled={!selectedDistrict}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">
+                    {formData.addressDTO?.commune || "Chọn phường/xã"}
+                  </option>
+                  {wards.map((ward) => (
+                    <option key={ward.code} value={ward.code}>
+                      {ward.name}
+                    </option>
+                  ))}
+                </select>
+                {formData.addressDTO?.commune && !selectedWard && !selectedDistrict && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Địa chỉ hiện tại: {formData.addressDTO.commune}
+                  </p>
+                )}
               </div>
             </div>
 
