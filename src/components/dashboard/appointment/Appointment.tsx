@@ -496,12 +496,14 @@ export default function Appointment() {
                       <BsEye className="w-4 h-4" />
                     </button>
 
-                    <button
-                      onClick={() => item.id && handleDelete(item.id)}
-                      className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
-                    >
-                      <BsTrash className="w-4 h-4" />
-                    </button>
+                    {user?.nameRole === "ADMIN" && (
+                      <button
+                        onClick={() => item.id && handleDelete(item.id)}
+                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                      >
+                        <BsTrash className="w-4 h-4" />
+                      </button>
+                    )}
                     {/* Nút thêm dịch vụ - chỉ hiện khi đang tiến hành */}
                     {user?.nameRole === "DOCTOR" &&
                       item.appointStatus === AppointStatus.IN_PROGRESS && (
