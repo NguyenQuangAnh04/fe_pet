@@ -13,6 +13,7 @@ import {
   type Ward,
 } from "../api/addressService";
 import type { userDTO } from "../types/user";
+import { useNavigate } from "react-router-dom";
 
 export default function Account() {
   const { user } = useAuth();
@@ -30,6 +31,10 @@ export default function Account() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
 
+  // Store original values
+  const [originalPhoneNumber, setOriginalPhoneNumber] = useState("");
+  const [originalEmail, setOriginalEmail] = useState("");
+
   const [selectedProvince, setSelectedProvince] = useState<number | null>(null);
 
   // Password fields
@@ -45,8 +50,12 @@ export default function Account() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setEmail(user?.email || "");
-        setPhoneNumber(user?.phoneNumber || "");
+        const userEmail = user?.email || "";
+        const userPhone = user?.phoneNumber || "";
+        setEmail(userEmail);
+        setPhoneNumber(userPhone);
+        setOriginalEmail(userEmail);
+        setOriginalPhoneNumber(userPhone);
       } catch (error) {
         console.error("Error fetching profile:", error);
       } finally {
@@ -54,7 +63,8 @@ export default function Account() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [user]);
+  const navigate = useNavigate();
 
   const showMsg = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -123,17 +133,22 @@ export default function Account() {
 
   const handleDiscard = () => {
     // Reset to original values
-    if (profile) {
-      const nameParts = (profile.userName || "").split(" ");
-      setFirstName(nameParts[0] || "");
-      setLastName(nameParts.slice(1).join(" ") || "");
-      setPhoneNumber(profile.phoneNumber || "");
-      setEmail(profile.email || "");
-    }
+    setPhoneNumber(originalPhoneNumber);
+    setEmail(originalEmail);
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
     setShowPasswordSection(false);
+  };
+
+  // Check if form has changes
+  const hasChanges = () => {
+    const phoneChanged = phoneNumber !== originalPhoneNumber;
+    const emailChanged = email !== originalEmail;
+    const passwordChanged =
+      showPasswordSection && currentPassword && newPassword && confirmPassword;
+
+    return phoneChanged || emailChanged || passwordChanged;
   };
 
   if (loading) {
@@ -148,6 +163,7 @@ export default function Account() {
     );
   }
 
+ 
   return (
     <div>
       <Header />
@@ -160,7 +176,10 @@ export default function Account() {
               <h2 className="text-xl font-semibold text-gray-800">
                 Chỉnh sửa thông tin cá nhân
               </h2>
-              <button className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button
+                onClick={() => navigate("/")}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <FaTimes size={20} />
               </button>
             </div>
@@ -313,8 +332,12 @@ export default function Account() {
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={saving}
-                className="px-6 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={saving || !hasChanges()}
+                className={`${
+                  saving || !hasChanges()
+                    ? "bg-red-300 cursor-not-allowed"
+                    : "bg-red-500 hover:bg-red-600"
+                } px-6 py-2 text-white font-medium rounded-md transition-colors`}
               >
                 {saving ? "Đang lưu..." : "Lưu thay đổi"}
               </button>

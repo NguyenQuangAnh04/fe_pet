@@ -26,6 +26,7 @@ import {
 import type { CartDTOItem } from "../types/cart";
 import type { AddressDTO, ItemDTO, OrderDTO } from "../types/order";
 import { formatPrice } from "../utils/format";
+import { useAuth } from "../context/AuthContext";
 
 export default function Checkout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -174,7 +175,7 @@ export default function Checkout() {
       setIsSubmitting(false);
     }
   };
-
+  const {user} = useAuth();
   const totalMoney = (cart ?? []).reduce(
     (sum, item) => sum + (item.product?.price || 0) * (item.quantity ?? 1),
     0
@@ -258,7 +259,7 @@ export default function Checkout() {
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                           type="tel"
-                          value={formData?.phoneNumber || ""}
+                          value={formData?.phoneNumber || user?.phoneNumber || ""}
                           onChange={(e) =>
                             handleInputChange("phoneNumber", e.target.value)
                           }
