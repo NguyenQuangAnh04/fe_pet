@@ -14,6 +14,7 @@ import { useAuth } from "../../../context/AuthContext";
 export default function User() {
   const { user } = useAuth();
   const isAdmin = user?.nameRole === "ADMIN";
+
   const [page, setPage] = useState(0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -175,7 +176,7 @@ export default function User() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-3">
-                      {isAdmin && (
+                      {isAdmin && user.userId !== item.id && (
                         <>
                           {/* <button className="text-green-600 hover:text-green-800 transition duration-150">
                             <BiEdit size={20} />
