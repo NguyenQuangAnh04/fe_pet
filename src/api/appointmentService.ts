@@ -49,3 +49,8 @@ export const findAllAppointmentDoctor = (
     params: { ownerName, email, phoneNumber, petName, vetName, status, page },
   });
 };
+
+export const getAppointmentByPhone = async (phoneNumber: string) =>
+  await api.get(`/appointment/check-phone`, {
+    params: { phoneNumber },
+  });

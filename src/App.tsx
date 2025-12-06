@@ -31,6 +31,7 @@ import OAuth2Success from "./components/OAuth2Success";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Account from "./pages/Account";
+import Appoinments from "./pages/Appoinments";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
         <Route path="/oauth2/success" element={<OAuth2Success />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/appointments" element={<Appoinments />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />

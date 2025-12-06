@@ -71,7 +71,7 @@ export default function Account() {
     setTimeout(() => setMessage(null), 4000);
   };
   useEffect(() => {
-    if (!user) {
+    if (!user || user.provide === "google") {
       navigate("/");
     }
   }, [user]);
