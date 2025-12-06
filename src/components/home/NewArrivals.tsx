@@ -12,6 +12,7 @@ import ViewAll from "../common/ViewAll";
 
 const NewArrivals = () => {
   const { data } = useQueryProduct({ size: 10 });
+  console.log(data);
   const navigate = useNavigate();
   const [selectProduct, setSelectedProduct] = useState<ProductDTO>();
   const [showModalProductCart, setShowModalProductCart] = useState(false);
