@@ -42,6 +42,6 @@ export function getAppointMonthlyRevenue(year : number) {
 }
 
 export function getTopExam() {
-  return api.get("/dashboardApp/exam/top-selling");
+  return api.get("/dashboardApp/exam/top");
 
 }
