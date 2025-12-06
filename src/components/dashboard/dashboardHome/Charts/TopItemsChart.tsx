@@ -16,6 +16,7 @@ interface TopItemsChartProps {
 }
 
 export const TopItemsChart = ({ topItemsData, chartType, setChartType }: TopItemsChartProps) => (
+  console.log("Rendering TopItemsChart with data:", topItemsData),
   <div className="bg-white rounded-lg shadow p-5 overflow-hidden mb-10">
     {/* Header */}
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-5">
