@@ -70,7 +70,11 @@ export default function Account() {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 4000);
   };
-
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+  }, [user]);
   const handleSave = async () => {
     if (!phoneNumber.trim()) {
       showMsg("error", "Vui lòng nhập số điện thoại");
@@ -115,7 +119,6 @@ export default function Account() {
         updateData.newPassword = newPassword;
         updateData.confirmPassword = confirmPassword;
       }
-      console.log(updateData);
 
       await updateProfile(updateData);
       showMsg("success", "Cập nhật thông tin thành công!");
@@ -141,15 +144,15 @@ export default function Account() {
     setShowPasswordSection(false);
   };
 
-  // Check if form has changes
-  const hasChanges = () => {
-    const phoneChanged = phoneNumber !== originalPhoneNumber;
-    const emailChanged = email !== originalEmail;
-    const passwordChanged =
-      showPasswordSection && currentPassword && newPassword && confirmPassword;
+  // // Check if form has changes
+  // const hasChanges = () => {
+  //   const phoneChanged = phoneNumber !== originalPhoneNumber;
+  //   const emailChanged = email !== originalEmail;
+  //   const passwordChanged =
+  //     showPasswordSection && currentPassword && newPassword && confirmPassword;
 
-    return phoneChanged || emailChanged || passwordChanged;
-  };
+  //   return phoneChanged || emailChanged || passwordChanged;
+  // };
 
   if (loading) {
     return (
@@ -163,7 +166,6 @@ export default function Account() {
     );
   }
 
- 
   return (
     <div>
       <Header />
@@ -332,12 +334,7 @@ export default function Account() {
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={saving || !hasChanges()}
-                className={`${
-                  saving || !hasChanges()
-                    ? "bg-red-300 cursor-not-allowed"
-                    : "bg-red-500 hover:bg-red-600"
-                } px-6 py-2 text-white font-medium rounded-md transition-colors`}
+                className={`${"bg-red-500 hover:bg-red-600"} px-6 py-2 text-white font-medium rounded-md transition-colors`}
               >
                 {saving ? "Đang lưu..." : "Lưu thay đổi"}
               </button>
