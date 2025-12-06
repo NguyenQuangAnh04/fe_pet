@@ -505,7 +505,7 @@ export default function Appointment() {
                       </button>
                     )}
                     {/* Nút thêm dịch vụ - chỉ hiện khi đang tiến hành */}
-                    {user?.nameRole === "DOCTOR" &&
+                    {user?.nameRole !== "USER"  &&
                       item.appointStatus === AppointStatus.IN_PROGRESS && (
                         <button
                           onClick={() => setSelectedAppointmentForExam(item)}
@@ -515,7 +515,7 @@ export default function Appointment() {
                         </button>
                       )}
                     {/* Nút in hóa đơn - chỉ hiện khi hoàn thành */}
-                    {user?.nameRole === "DOCTOR" &&
+                    {user?.nameRole !== "USER" &&
                       item.appointStatus === AppointStatus.COMPLETED && (
                         <button
                           onClick={() => downloadInvoice(item.id)}
