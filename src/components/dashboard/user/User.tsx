@@ -177,9 +177,9 @@ export default function User() {
                     <div className="flex gap-3">
                       {isAdmin && (
                         <>
-                          <button className="text-green-600 hover:text-green-800 transition duration-150">
+                          {/* <button className="text-green-600 hover:text-green-800 transition duration-150">
                             <BiEdit size={20} />
-                          </button>
+                          </button> */}
                           <button
                             className="text-red-600 hover:text-red-800 transition duration-150"
                             onClick={() => handleDelete(item.id)}
