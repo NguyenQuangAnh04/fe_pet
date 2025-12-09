@@ -7,17 +7,19 @@ import {
 } from "../../../hook/veterinarian/useVeterinarian";
 import { toast } from "react-toastify";
 
+type Error = {
+  errorName: string;
+  errorEmail: string;
+  errorPhoneNumber: string;
+};
+
 type VetProps = {
   onClose: () => void;
   initialData?: VeterinarianDTO;
   mode: "create" | "update";
 };
 
-const VetModal: React.FC<VetProps> = ({
-  onClose,
-  mode,
-  initialData,
-}) => {
+const VetModal: React.FC<VetProps> = ({ onClose, mode, initialData }) => {
   const [formData, setFormData] = useState<VeterinarianDTO>({
     id: 0,
     email: "",
@@ -30,6 +32,12 @@ const VetModal: React.FC<VetProps> = ({
   const { mutateAsync: useMutateAddVet } = useAddVeterinarian();
   const { mutateAsync: useMutateUpdateVet } = useUpdateVeterinarian();
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Error>({
+    errorName: "",
+    errorEmail: "",
+    errorPhoneNumber: "",
+  });
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
     if (initialData && mode === "update") {
@@ -41,11 +49,54 @@ const VetModal: React.FC<VetProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Check form valid không set state
+  const isFormValid = () => {
+    return (
+      formData.name.trim() !== "" &&
+      formData.email.trim() !== "" &&
+      formData.phoneNumber.trim() !== ""
+    );
+  };
+
+  // Validate và set errors khi submit
+  const validateForm = () => {
+    const newErrors: Error = {
+      errorName: "",
+      errorEmail: "",
+      errorPhoneNumber: "",
+    };
+
+    if (!formData.name.trim()) {
+      newErrors.errorName = "Tên bác sĩ không được để trống!";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.errorEmail = "Email không được để trống!";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.errorEmail = "Email không hợp lệ!";
+    }
+
+    if (!formData.phoneNumber.trim()) {
+      newErrors.errorPhoneNumber = "Số điện thoại không được để trống!";
+    } else if (!/^(0|\+84)[0-9]{9}$/.test(formData.phoneNumber)) {
+      newErrors.errorPhoneNumber = "Số điện thoại không hợp lệ!";
+    }
+
+    setErrors(newErrors);
+    return (
+      newErrors.errorName === "" &&
+      newErrors.errorEmail === "" &&
+      newErrors.errorPhoneNumber === ""
+    );
+  };
+
   const handleSubmit = async () => {
-    // if (!validateForm()) {
-    //   toast.error("Vui lòng điền đầy đủ thông tin!");
-    //   return;
-    // }
+    setHasSubmitted(true);
+
+    if (!validateForm()) {
+      toast.error("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -58,7 +109,6 @@ const VetModal: React.FC<VetProps> = ({
         await useMutateUpdateVet({
           id: formData.id as number,
           updateVet: formData,
-
         });
       }
       onClose();
@@ -95,6 +145,9 @@ const VetModal: React.FC<VetProps> = ({
               value={formData.name}
               onChange={(e) => handleChangeInput("name", e.target.value)}
             />
+            {hasSubmitted && errors.errorName && (
+              <p className="text-red-500 text-sm mt-1">{errors.errorName}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -108,7 +161,9 @@ const VetModal: React.FC<VetProps> = ({
               value={formData.email}
               onChange={(e) => handleChangeInput("email", e.target.value)}
             />
-
+            {hasSubmitted && errors.errorEmail && (
+              <p className="text-red-500 text-sm mt-1">{errors.errorEmail}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -122,7 +177,11 @@ const VetModal: React.FC<VetProps> = ({
               value={formData.phoneNumber}
               onChange={(e) => handleChangeInput("phoneNumber", e.target.value)}
             />
-
+            {hasSubmitted && errors.errorPhoneNumber && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.errorPhoneNumber}
+              </p>
+            )}
           </div>
 
           <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 flex gap-3 justify-end rounded-b-xl">
@@ -133,12 +192,13 @@ const VetModal: React.FC<VetProps> = ({
               Hủy bỏ
             </button>
             <button
-              disabled={isLoading}
+              disabled={isLoading || !isFormValid()}
               onClick={handleSubmit}
-              className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${isLoading
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
-                }`}
+              className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isLoading || !isFormValid()
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
+              }`}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -156,5 +216,5 @@ const VetModal: React.FC<VetProps> = ({
       </div>
     </div>
   );
-}
+};
 export default VetModal;

@@ -7,6 +7,12 @@ import {
 } from "../../../hook/examination/useExamination";
 import { toast } from "react-toastify";
 
+type Error = {
+  errorName: string;
+  errorPrice: string;
+  errorDescription: string;
+};
+
 type ExamProps = {
   onClose: () => void;
   initialData?: ExaminationDTO;
@@ -25,6 +31,12 @@ const VetModal: React.FC<ExamProps> = ({ onClose, mode, initialData }) => {
   const { mutateAsync: useMutateAddExam } = userAddExamination();
   const { mutateAsync: useMutateUpdateExam } = userUpdateExamination();
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Error>({
+    errorName: "",
+    errorPrice: "",
+    errorDescription: "",
+  });
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
     if (initialData && mode === "update") {
@@ -36,7 +48,43 @@ const VetModal: React.FC<ExamProps> = ({ onClose, mode, initialData }) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+
+  // Validate và set errors khi submit
+  const validateForm = () => {
+    const newErrors: Error = {
+      errorName: "",
+      errorPrice: "",
+      errorDescription: "",
+    };
+
+    if (!formData.name.trim()) {
+      newErrors.errorName = "Tên dịch vụ không được để trống!";
+    }
+
+    if (!formData.price || formData.price <= 0) {
+      newErrors.errorPrice = "Giá dịch vụ phải lớn hơn 0!";
+    }
+
+    if (!formData?.description?.trim()) {
+      newErrors.errorDescription = "Mô tả dịch vụ không được để trống!";
+    }
+
+    setErrors(newErrors);
+    return (
+      newErrors.errorName === "" &&
+      newErrors.errorPrice === "" &&
+      newErrors.errorDescription === ""
+    );
+  };
+
   const handleSubmit = async () => {
+    setHasSubmitted(true);
+
+    if (!validateForm()) {
+      toast.error("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+
     setIsLoading(true);
     try {
       if (mode === "create") {
@@ -86,6 +134,9 @@ const VetModal: React.FC<ExamProps> = ({ onClose, mode, initialData }) => {
               value={formData.name}
               onChange={(e) => handleChangeInput("name", e.target.value)}
             />
+            {hasSubmitted && errors.errorName && (
+              <p className="text-red-500 text-sm mt-1">{errors.errorName}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -99,6 +150,9 @@ const VetModal: React.FC<ExamProps> = ({ onClose, mode, initialData }) => {
               value={formData.price}
               onChange={(e) => handleChangeInput("price", e.target.value)}
             />
+            {hasSubmitted && errors.errorPrice && (
+              <p className="text-red-500 text-sm mt-1">{errors.errorPrice}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -112,6 +166,11 @@ const VetModal: React.FC<ExamProps> = ({ onClose, mode, initialData }) => {
               value={formData.description}
               onChange={(e) => handleChangeInput("description", e.target.value)}
             />
+            {hasSubmitted && errors.errorDescription && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.errorDescription}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-3">

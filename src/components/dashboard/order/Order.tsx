@@ -4,6 +4,7 @@ import { BsCheckCircle, BsClock, BsEye, BsTrash } from "react-icons/bs";
 import { FaMoneyBillWave, FaTruck } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
 import { MdCancel } from "react-icons/md";
+import Swal from "sweetalert2";
 import {
   useDeleteOrder,
   useQueryOrder,
@@ -34,8 +35,36 @@ export default function Order() {
   const { data: totalRevenue } = useQueryTotalRevenue();
   const { mutateAsync: mutateDeleteOrder } = useDeleteOrder();
 
-  const handleDelete = (id: number) => {
-    return mutateDeleteOrder(id);
+  const handleDelete = async (id: number) => {
+    const result = await Swal.fire({
+      title: "Xác nhận xóa",
+      text: "Bạn có chắc chắn muốn xóa đơn hàng này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await mutateDeleteOrder(id);
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          text: "Đơn hàng đã được xóa thành công.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra khi xóa!",
+        });
+      }
+    }
   };
   const getStatusColor = (status: OrderStatus) => {
     const color: Record<OrderStatus, string> = {
@@ -45,7 +74,6 @@ export default function Order() {
       [OrderStatus.SHIPPING]: "text-purple-700 bg-purple-200",
       [OrderStatus.COMPLETED]: "text-emerald-700 bg-emerald-200",
       [OrderStatus.CANCELED]: "text-red-700 bg-red-200",
-      [OrderStatus.FAILED_PAYMENT]: "text-red-700 bg-red-200",
       [OrderStatus.NOT_RECEIVED]: "text-red-700 bg-red-200",
     };
     return color[status];
@@ -59,7 +87,6 @@ export default function Order() {
       [OrderStatus.SHIPPING]: "Đang giao hàng",
       [OrderStatus.COMPLETED]: "Hoàn thành",
       [OrderStatus.CANCELED]: "Đã hủy",
-      [OrderStatus.FAILED_PAYMENT]: "Thanh toán thất bại",
       [OrderStatus.NOT_RECEIVED]: "Khách hàng không nhận hàng",
     };
     return label[status];
@@ -74,25 +101,7 @@ export default function Order() {
     setStatus(statusInput);
     setPage(pageInput);
   };
-  const pendingOrders = data?.content.filter(
-    (order) => order.status === OrderStatus.PENDING
-  ).length;
 
-  const confirmedOrders = data?.content.filter(
-    (order) => order.status === OrderStatus.CONFIRMED
-  ).length;
-
-  const shippingOrders = data?.content.filter(
-    (order) => order.status === OrderStatus.SHIPPING
-  ).length;
-
-  const completedOrders = data?.content.filter(
-    (order) => order.status === OrderStatus.COMPLETED
-  ).length;
-
-  const canceledOrders = data?.content.filter(
-    (order) => order.status === OrderStatus.CANCELED
-  ).length;
   return (
     <div className="p-4 bg-gray-50 min-h-screen ml-[250px]">
       <h1 className="text-2xl font-semibold">Quản lý đơn hàng</h1>
@@ -303,9 +312,35 @@ export default function Order() {
                       {item.status && getStatusLabel(item.status)}
                     </option>
                     {Object.values(OrderStatus)
-                      .filter((i) => i !== item.status && i !== "")
+                      .filter((status) => {
+                        if (status === "" || status === item.status)
+                          return false;
+
+                        const statusOrder = [
+                          OrderStatus.PENDING,
+                          OrderStatus.CONFIRMED,
+                          OrderStatus.SHIPPING,
+                          OrderStatus.COMPLETED,
+                          OrderStatus.CANCELED,
+                          OrderStatus.NOT_RECEIVED,
+                        ];
+
+                        const currentIndex = statusOrder.indexOf(item.status!);
+                        const statusIndex = statusOrder.indexOf(status);
+
+                        // Ẩn các trạng thái có index nhỏ hơn trạng thái hiện tại
+                        if (currentIndex !== -1 && statusIndex !== -1) {
+                          return statusIndex >= currentIndex;
+                        }
+
+                        return true;
+                      })
                       .map((it) => (
-                        <option className="bg-white text-black" value={it}>
+                        <option
+                          key={it}
+                          className="bg-white text-black"
+                          value={it}
+                        >
                           {getStatusLabel(it)}
                         </option>
                       ))}

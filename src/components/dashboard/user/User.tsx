@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import Swal from "sweetalert2";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
 import {
@@ -35,7 +35,35 @@ export default function User() {
   }, [page]);
 
   const handleDelete = async (id: number) => {
-    await mutateDeleteUser(id);
+    const result = await Swal.fire({
+      title: "Xác nhận xóa",
+      text: "Bạn có chắc chắn muốn xóa người dùng này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await mutateDeleteUser(id);
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          text: "Người dùng đã được xóa thành công.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra khi xóa!",
+        });
+      }
+    }
   };
 
   const handleSearch = () => {

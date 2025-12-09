@@ -27,11 +27,19 @@ const CategoryModal: React.FC<CategoryProps> = ({
     product: [],
   });
 
-  const { mutateAsync: useMutateAddCategory } = useAddCategory();
-  const { mutateAsync: useMutateUpdateCategory } = useUpdateCategory();
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutateAsync: useMutateAddCategory, isPending: isAddPending } =
+    useAddCategory();
+  const { mutateAsync: useMutateUpdateCategory, isPending: isUpdatePending } =
+    useUpdateCategory();
   const [image, setImage] = useState<File>();
   const [previewImage, setPreviewImage] = useState<string>();
+  const [errors, setErrors] = useState({
+    nameCate: "",
+    description: "",
+    image: "",
+  });
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const isLoading = isAddPending || isUpdatePending;
 
   useEffect(() => {
     if (initialData && mode === "update") {
@@ -64,28 +72,39 @@ const CategoryModal: React.FC<CategoryProps> = ({
   };
 
   const validateForm = () => {
-    return (
-      formData.nameCate.trim() !== "" &&
-      formData.description.trim() !== "" &&
-      (mode === "update" || image !== undefined)
-    );
+    const newErrors = {
+      nameCate: "",
+      description: "",
+      image: "",
+    };
+
+    if (!formData.nameCate.trim()) {
+      newErrors.nameCate = "Vui lòng nhập tên danh mục";
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Vui lòng nhập mô tả danh mục";
+    }
+
+    if (mode === "create" && !image) {
+      newErrors.image = "Vui lòng chọn ảnh danh mục";
+    }
+
+    setErrors(newErrors);
+    return !newErrors.nameCate && !newErrors.description && !newErrors.image;
   };
 
   const handleSubmit = async () => {
+    setHasSubmitted(true);
+
     if (!validateForm()) {
-      toast.error("Vui lòng điền đầy đủ thông tin!");
       return;
     }
 
-    setIsLoading(true);
     try {
       if (mode === "create") {
-        if (!image) {
-          toast.error("Vui lòng chọn ảnh!");
-          return;
-        }
-        await useMutateAddCategory({ categoryDTO: formData, image });
-        toast.success("Tạo danh mục thành công!");
+        await useMutateAddCategory({ categoryDTO: formData, image: image! });
+        console.log(formData);
       }
 
       if (mode === "update") {
@@ -96,9 +115,8 @@ const CategoryModal: React.FC<CategoryProps> = ({
         });
       }
       onClose();
-    } catch {
-    } finally {
-      setIsLoading(false);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.Error || "Có lỗi xảy ra!");
     }
   };
 
@@ -124,11 +142,18 @@ const CategoryModal: React.FC<CategoryProps> = ({
             </label>
             <input
               type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg  "
+              className={`w-full px-4 py-3 border rounded-lg ${
+                hasSubmitted && errors.nameCate
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="Nhập tên danh mục"
               value={formData.nameCate}
               onChange={(e) => handleChangeInput("nameCate", e.target.value)}
             />
+            {hasSubmitted && errors.nameCate && (
+              <p className="text-sm text-red-600">{errors.nameCate}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -136,12 +161,19 @@ const CategoryModal: React.FC<CategoryProps> = ({
               Mô tả danh mục *
             </label>
             <textarea
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-0 focus:outline-none  min-h-[100px]"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-0 focus:outline-none min-h-[100px] ${
+                hasSubmitted && errors.description
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
               placeholder="Nhập mô tả chi tiết cho danh mục"
               value={formData.description}
               onChange={(e) => handleChangeInput("description", e.target.value)}
               rows={4}
             />
+            {hasSubmitted && errors.description && (
+              <p className="text-sm text-red-600">{errors.description}</p>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -150,30 +182,41 @@ const CategoryModal: React.FC<CategoryProps> = ({
             </label>
 
             {!previewImage ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 ">
-                <label
-                  htmlFor="files"
-                  className="flex flex-col items-center justify-center cursor-pointer"
+              <>
+                <div
+                  className={`border-2 border-dashed rounded-lg p-8 ${
+                    hasSubmitted && errors.image
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
                 >
-                  <BsUpload className="text-5xl text-gray-400 mb-4" />
-                  <p className="text-gray-600 text-center text-lg">
-                    <span className="font-semibold text-blue-600">
-                      Nhấn để chọn ảnh
-                    </span>{" "}
-                    hoặc kéo thả file vào đây
-                  </p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    Hỗ trợ: JPG, PNG, GIF (Tối đa 5MB)
-                  </p>
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  id="files"
-                  onChange={handleImage}
-                  className="hidden"
-                />
-              </div>
+                  <label
+                    htmlFor="files"
+                    className="flex flex-col items-center justify-center cursor-pointer"
+                  >
+                    <BsUpload className="text-5xl text-gray-400 mb-4" />
+                    <p className="text-gray-600 text-center text-lg">
+                      <span className="font-semibold text-blue-600">
+                        Nhấn để chọn ảnh
+                      </span>{" "}
+                      hoặc kéo thả file vào đây
+                    </p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      Hỗ trợ: JPG, PNG, GIF (Tối đa 5MB)
+                    </p>
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="files"
+                    onChange={handleImage}
+                    className="hidden"
+                  />
+                </div>
+                {hasSubmitted && errors.image && (
+                  <p className="text-sm text-red-600">{errors.image}</p>
+                )}
+              </>
             ) : (
               <div className="relative">
                 <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
@@ -212,13 +255,13 @@ const CategoryModal: React.FC<CategoryProps> = ({
             Hủy bỏ
           </button>
           <button
-            disabled={isLoading || !validateForm()}
             onClick={handleSubmit}
+            disabled={isLoading}
             className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-              isLoading || !validateForm()
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
-            }`}
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg"
+            } text-white`}
           >
             {isLoading ? (
               <div className="flex items-center gap-2">

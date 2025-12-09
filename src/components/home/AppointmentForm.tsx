@@ -9,7 +9,7 @@ import type { VeterinarianDTO } from "../../types/veterinarian";
 
 // Các khung giờ làm việc
 const TIME_SLOTS = [
-  "08:00",
+  "07:30",
   "08:30",
   "09:00",
   "09:30",
@@ -24,7 +24,7 @@ const TIME_SLOTS = [
   "15:30",
   "16:00",
   "16:30",
-  "17:00",
+  "17:30",
 ];
 
 export default function AppointmentForm() {

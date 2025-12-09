@@ -10,6 +10,7 @@ export interface ProductDTO {
   imageUrl: string;
   slug?: string;
   sl?: number;
+  categoryId?: number;
   categoryName?: number;
   imagesDTO: ImagesDTO[];
   averageRating: number;

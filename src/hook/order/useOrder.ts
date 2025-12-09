@@ -98,8 +98,8 @@ export function useUpdateOrderAdmin() {
       toast.success("Cập nhật trạng thái đơn hàng");
     },
 
-    onError: (err) => {
-      console.error(err.message);
+    onError: (err: any) => {
+      toast.error(err.response.data.Error);
     },
   });
 }

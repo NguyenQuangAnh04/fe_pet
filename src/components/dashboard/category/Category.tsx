@@ -7,6 +7,7 @@ import { BiEdit, BiTrash, BiPlus, BiSearch } from "react-icons/bi";
 import type { CategoriesDTO } from "../../../types/category";
 import CategoryModal from "./ModalCategory";
 import { useAuth } from "../../../context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function Category() {
   const { user } = useAuth();
@@ -17,8 +18,37 @@ export default function Category() {
   const [showModalUpdate, setShowModalUpdate] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoriesDTO>();
   const { mutateAsync: mutateDeleteCategory } = useDeleteCategory();
+
   const handleDeleteCategory = async (id: number) => {
-    await mutateDeleteCategory(id);
+    const result = await Swal.fire({
+      title: "Xác nhận xóa",
+      text: "Bạn có chắc chắn muốn xóa danh mục này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await mutateDeleteCategory(id);
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          text: "Danh mục đã được xóa thành công.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra khi xóa!",
+        });
+      }
+    }
   };
 
   const isUser = user?.nameRole === "USER";

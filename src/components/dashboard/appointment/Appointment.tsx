@@ -8,6 +8,7 @@ import {
   BsPlusSquare,
   BsTrash,
 } from "react-icons/bs";
+import Swal from "sweetalert2";
 import { FaDog, FaEnvelope, FaMoneyBillWave, FaTruck } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
 import { MdCancel } from "react-icons/md";
@@ -66,8 +67,37 @@ export default function Appointment() {
     link.remove();
   };
   const { mutateAsync: mutateDeleteOrder } = useDeleteAppointment();
-  const handleDelete = (id: number) => {
-    return mutateDeleteOrder(id);
+
+  const handleDelete = async (id: number) => {
+    const result = await Swal.fire({
+      title: "Xác nhận xóa",
+      text: "Bạn có chắc chắn muốn xóa lịch hẹn này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await mutateDeleteOrder(id);
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          text: "Lịch hẹn đã được xóa thành công.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra khi xóa!",
+        });
+      }
+    }
   };
   const getStatusColor = (status: AppointStatus) => {
     const color: Record<AppointStatus, string> = {
@@ -87,8 +117,8 @@ export default function Appointment() {
       [AppointStatus.ALL]: "",
       [AppointStatus.PENDING]: "Đang xử lý",
       [AppointStatus.CONFIRMED]: "Đã xác nhận",
-      [AppointStatus.IN_QUEUE]: "Đang chờ",
-      [AppointStatus.IN_PROGRESS]: "Đang tiến hành",
+      [AppointStatus.IN_QUEUE]: "Đang chờ khám",
+      [AppointStatus.IN_PROGRESS]: "Đang khám",
       [AppointStatus.COMPLETED]: "Hoàn thành",
       [AppointStatus.CANCELLED]: "Đã hủy",
     };
@@ -154,7 +184,6 @@ export default function Appointment() {
     userId: user?.userId,
   });
 
-  // State cho modal exam special - lưu appointment được chọn thay vì boolean
   const [selectedAppointmentForExam, setSelectedAppointmentForExam] =
     useState<AppointmentDTO | null>(null);
 
@@ -168,7 +197,6 @@ export default function Appointment() {
       status: status.trim(),
     });
   };
-  console.log(data);
 
   const handleClearSearch = () => {
     setOwnerName("");
@@ -187,7 +215,6 @@ export default function Appointment() {
       status: "",
     });
   };
-  console.log(data);
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen ml-[250px]">
@@ -505,7 +532,7 @@ export default function Appointment() {
                       </button>
                     )}
                     {/* Nút thêm dịch vụ - chỉ hiện khi đang tiến hành */}
-                    {user?.nameRole !== "USER"  &&
+                    {user?.nameRole !== "USER" &&
                       item.appointStatus === AppointStatus.IN_PROGRESS && (
                         <button
                           onClick={() => setSelectedAppointmentForExam(item)}

@@ -48,8 +48,8 @@ export function useAddCategory() {
       queryClient.invalidateQueries({ queryKey: ["category"] });
       toast.success("Thêm danh mục thành công");
     },
-    onError: () => {
-      toast.error("Thêm danh mục thất bại");
+    onError: (err:any) => {
+      console.log(err.response.data.Error);
     },
   });
 }

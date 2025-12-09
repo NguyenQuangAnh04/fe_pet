@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import { BsEye } from "react-icons/bs";
+import Swal from "sweetalert2";
 
 import ModalViewProduct from "./ModalViewProduct";
 import {
@@ -26,8 +27,37 @@ const Product = () => {
   const [showModalViewProduct, setModalShowProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO>();
   const { mutateAsync: mutateDeleteProduct } = useDeleteProduct();
-  const handleDelete = (id: number) => {
-    mutateDeleteProduct(id);
+
+  const handleDelete = async (id: number) => {
+    const result = await Swal.fire({
+      title: "Xác nhận xóa",
+      text: "Bạn có chắc chắn muốn xóa sản phẩm này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await mutateDeleteProduct(id);
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          text: "Sản phẩm đã được xóa thành công.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra khi xóa!",
+        });
+      }
+    }
   };
   return (
     <div className="p-4 ml-[250px]">

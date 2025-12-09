@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
+import Swal from "sweetalert2";
 import {
   useQueryExamination,
   useDeleteExamination,
@@ -34,7 +35,35 @@ export default function Examination() {
   }, [page]);
 
   const handleDelete = async (id: number) => {
-    await mutateDeleteExam(id);
+    const result = await Swal.fire({
+      title: "Xác nhận xóa",
+      text: "Bạn có chắc chắn muốn xóa dịch vụ khám này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await mutateDeleteExam(id);
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          text: "Dịch vụ khám đã được xóa thành công.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra khi xóa!",
+        });
+      }
+    }
   };
 
   const handleSearch = () => {

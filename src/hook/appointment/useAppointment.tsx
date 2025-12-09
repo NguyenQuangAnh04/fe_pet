@@ -78,12 +78,12 @@ export function useUpdateAppointment() {
     mutationFn: async ({ id, appointment }: UpdateAppointment) => {
       return await updateAppointment(id, appointment);
     },
-    onSettled: () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointment"] });
       toast.success("Cập nhật lịch khám thành công!");
     },
-    onError: (err) => {
-      toast.error(err.message);
+    onError: (err: any) => {
+      toast.error(err.response.data.Error);
       console.error(err.message);
     },
   });

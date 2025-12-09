@@ -81,7 +81,9 @@ export default function ProductDetails() {
         <div className="max-w-6xl mx-auto p-4 md:p-6 mt-4">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-            <a href="/" className="hover:text-orange-600 transition">Trang chủ</a>
+            <a href="/" className="hover:text-orange-600 transition">
+              Trang chủ
+            </a>
             <span>›</span>
             <span className="text-gray-700">{product?.namePro}</span>
           </div>
@@ -110,24 +112,26 @@ export default function ProductDetails() {
                   {/* Rating & Category */}
                   <div className="flex items-center gap-3 flex-wrap">
                     {/* Rating */}
-                    {product?.averageRating !== undefined && product.averageRating > 0 && (
-                      <div className="flex items-center gap-1">
-                        <div className="flex">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-4 h-4 ${star <= Math.round(product.averageRating)
-                                ? "text-yellow-400 fill-yellow-400"
-                                : "text-gray-300"
+                    {product?.averageRating !== undefined &&
+                      product.averageRating > 0 && (
+                        <div className="flex items-center gap-1">
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${
+                                  star <= Math.round(product.averageRating)
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-300"
                                 }`}
-                            />
-                          ))}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm font-medium text-gray-700">
+                            {product.averageRating.toFixed(1)}
+                          </span>
                         </div>
-                        <span className="text-sm font-medium text-gray-700">
-                          {product.averageRating.toFixed(1)}
-                        </span>
-                      </div>
-                    )}
+                      )}
 
                     {/* Category badge */}
                     <div className="flex items-center gap-2">
@@ -160,11 +164,24 @@ export default function ProductDetails() {
                 {/* Chọn size */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <p className="font-semibold text-gray-900 text-sm">Chọn kích thước:</p>
+                    <p className="font-semibold text-gray-900 text-sm">
+                      Chọn kích thước:
+                    </p>
                     {selectedSize && (
-                      <span className="text-xs text-gray-600">
-                        <Package className="w-3.5 h-3.5 inline mr-1" />
-                        Còn <span className="font-semibold text-green-600">{selectedSize.stock}</span>
+                      <span className="text-xs">
+                        {selectedSize.stock !== undefined && selectedSize.stock > 0 ? (
+                          <span className="text-gray-600">
+                            <Package className="w-3.5 h-3.5 inline mr-1" />
+                            Còn{" "}
+                            <span className="font-semibold text-green-600">
+                              {selectedSize.stock}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">
+                            Hết hàng
+                          </span>
+                        )}
                       </span>
                     )}
                   </div>
@@ -178,10 +195,11 @@ export default function ProductDetails() {
                             setQuantity(1);
                             setSelectedSize(s);
                           }}
-                          className={`relative border-2 px-3 py-2.5 rounded-lg font-semibold transition-all text-sm ${size === index
-                            ? "border-orange-500 bg-orange-50 text-orange-700"
-                            : "border-gray-300 hover:border-orange-300 text-gray-700"
-                            }`}
+                          className={`relative border-2 px-3 py-2.5 rounded-lg font-semibold transition-all text-sm ${
+                            size === index
+                              ? "border-orange-500 bg-orange-50 text-orange-700"
+                              : "border-gray-300 hover:border-orange-300 text-gray-700"
+                          }`}
                         >
                           <div className="text-center">
                             <div className="font-bold">{s.size}</div>
@@ -200,66 +218,82 @@ export default function ProductDetails() {
                 </div>
 
                 {/* Số lượng */}
-                <div className="space-y-2">
-                  <p className="font-semibold text-gray-900 text-sm">Số lượng:</p>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden">
-                      <button
-                        disabled={quantity <= 1}
-                        onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                        className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
-                      >
-                        −
-                      </button>
-                      <span className="px-4 py-2 text-base font-bold border-x-2 border-gray-300 min-w-[60px] text-center bg-gray-50">
-                        {quantity}
-                      </span>
-                      {product?.variants && product?.variants[size].stock && (
+                { selectedSize?.stock !== undefined && selectedSize?.stock > 0 && (
+                  <div className="space-y-2">
+                    <p className="font-semibold text-gray-900 text-sm">
+                      Số lượng:
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden">
                         <button
-                          disabled={quantity >= product?.variants[size].stock}
-                          onClick={() => setQuantity((prev) => prev + 1)}
+                          disabled={quantity <= 1}
+                          onClick={() =>
+                            setQuantity((prev) => Math.max(1, prev - 1))
+                          }
                           className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
                         >
-                          +
+                          −
                         </button>
-                      )}
+                        <span className="px-4 py-2 text-base font-bold border-x-2 border-gray-300 min-w-[60px] text-center bg-gray-50">
+                          {quantity}
+                        </span>
+                        {product?.variants && product?.variants[size].stock && (
+                          <button
+                            disabled={quantity >= product?.variants[size].stock}
+                            onClick={() => setQuantity((prev) => prev + 1)}
+                            className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                          >
+                            +
+                          </button>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        Tối đa: {selectedSize?.stock || 0}
+                      </span>
                     </div>
-                    <span className="text-xs text-gray-500">
-                      Tối đa: {selectedSize?.stock || 0}
-                    </span>
                   </div>
-                </div>
+                )}
 
                 {/* Tổng tiền */}
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-semibold text-gray-700">
-                      Tổng tiền:
-                    </span>
-                    {product?.variants && product?.variants[size].price && (
-                      <span className="text-2xl font-bold text-orange-600">
-                        {formatPrice(product.variants[size].price * quantity)}
+                {selectedSize?.stock !== undefined && selectedSize.stock > 0 && (
+                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-semibold text-gray-700">
+                        Tổng tiền:
                       </span>
-                    )}
+                      {product?.variants && product?.variants[size].price && (
+                        <span className="text-2xl font-bold text-orange-600">
+                          {formatPrice(product.variants[size].price * quantity)}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Nút hành động */}
                 <div className="space-y-2 pt-2">
-                  <button
-                    onClick={() => product && handleBuyNow(product)}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition shadow-sm hover:shadow flex items-center justify-center gap-2 text-sm"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    Mua ngay
-                  </button>
-                  <button
-                    onClick={() => product && handleAddToCart(product.id)}
-                    className="w-full bg-white hover:bg-orange-50 text-orange-600 font-semibold py-3 px-4 rounded-lg border-2 border-orange-500 transition hover:shadow-sm flex items-center justify-center gap-2 text-sm"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                    Thêm vào giỏ
-                  </button>
+                  {selectedSize && selectedSize.stock === 0 ? (
+                    <div className="w-full bg-red-50 border-2 border-red-300 text-red-700 font-semibold py-3 px-4 rounded-lg text-center text-sm">
+                      Sản phẩm tạm thời hết hàng
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => product && handleBuyNow(product)}
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition shadow-sm hover:shadow flex items-center justify-center gap-2 text-sm"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        Mua ngay
+                      </button>
+                      <button
+                        onClick={() => product && handleAddToCart(product.id)}
+                        className="w-full bg-white hover:bg-orange-50 text-orange-600 font-semibold py-3 px-4 rounded-lg border-2 border-orange-500 transition hover:shadow-sm flex items-center justify-center gap-2 text-sm"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        Thêm vào giỏ
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 

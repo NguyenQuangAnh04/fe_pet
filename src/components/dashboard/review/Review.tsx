@@ -1,5 +1,6 @@
 import { Eye, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
+import Swal from "sweetalert2";
 import {
   useGetAllReviews,
   useUpdateReviewStatus,
@@ -44,14 +45,36 @@ const Review = () => {
   };
 
   const handleUpdateStatus = async (id: number, status: ReviewStatus) => {
-    if (
-      window.confirm(
-        `Bạn có chắc muốn ${
-          status === "APPROVED" ? "duyệt" : "từ chối"
-        } đánh giá này?`
-      )
-    ) {
-      await updateStatus({ id, status });
+    const result = await Swal.fire({
+      title: "Xác nhận",
+      text: `Bạn có chắc muốn ${
+        status === "APPROVED" ? "duyệt" : "từ chối"
+      } đánh giá này?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: status === "APPROVED" ? "#10b981" : "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: status === "APPROVED" ? "Duyệt" : "Từ chối",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await updateStatus({ id, status });
+        Swal.fire({
+          icon: "success",
+          title: "Thành công",
+          text: `Đã ${status === "APPROVED" ? "duyệt" : "từ chối"} đánh giá!`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra!",
+        });
+      }
     }
   };
 

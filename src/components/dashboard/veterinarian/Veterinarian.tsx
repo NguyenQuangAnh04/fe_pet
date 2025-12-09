@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
+import Swal from "sweetalert2";
 import {
   useQueryVeterinarian,
   deleteVeterinarian,
@@ -32,7 +33,35 @@ export default function Veterinarian() {
   }, [page]);
 
   const handleDelete = async (id: number) => {
-    await mutateDeleteVet(id);
+    const result = await Swal.fire({
+      title: "Xác nhận xóa",
+      text: "Bạn có chắc chắn muốn xóa bác sĩ thú y này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await mutateDeleteVet(id);
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          text: "Bác sĩ thú y đã được xóa thành công.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } catch (error: any) {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: error?.response?.data?.Error || "Có lỗi xảy ra khi xóa!",
+        });
+      }
+    }
   };
 
   const handleSearch = () => {
