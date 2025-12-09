@@ -36,13 +36,13 @@ export function userAddExamination() {
         mutationFn: async (newExam: ExaminationDTO) => {
             return await addExamination(newExam);
         },
-        onSettled: () => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["examination"] });
             toast.success("Thêm dịch vụ khám thành công!");
         },
-        onError: (err) => {
-            toast.error(err.message);
-            console.error(err.message);
+        onError: (err: any) => {
+            toast.error(err.response?.data?.message || err.message);
+            console.error(err);
         },
     });
 }
@@ -57,12 +57,12 @@ export function userUpdateExamination() {
         mutationFn: async ({ id, updateExam }: UpdateExaminationParams) => {
             return await updateExamination(id, updateExam);
         },
-        onSettled: () => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["examination"] });
             toast.success("Cập nhật dịch vụ khám thành công!");
         },
-        onError: (err) => {
-            toast.error(err.message);
+        onError: (err: any) => {
+            toast.error(err.response?.data?.message || err.message);
             console.error(err.message);
         },
     });

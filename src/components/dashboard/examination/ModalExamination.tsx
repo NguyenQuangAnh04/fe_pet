@@ -89,7 +89,6 @@ const VetModal: React.FC<ExamProps> = ({ onClose, mode, initialData }) => {
     try {
       if (mode === "create") {
         await useMutateAddExam(formData);
-        toast.success("Tạo bác sĩ thành công!");
       }
 
       if (mode === "update") {
