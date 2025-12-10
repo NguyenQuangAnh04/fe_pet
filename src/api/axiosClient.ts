@@ -15,17 +15,18 @@ api.interceptors.request.use(
 );
 const refreshToken = async () => {
   try {
-    const response = await api.post(
-      "/auth/refresh-token",
+    const response = await axios.post(
+      "http://localhost:8080/api/auth/refresh-token",
       {},
       { withCredentials: true }
     );
     const newAccessToken = response.data.data.token;
+    console.log(response)
     localStorage.setItem("accessToken", newAccessToken);
     return newAccessToken;
   } catch (err) {
     localStorage.removeItem("accessToken");
-    window.location.href = "/login";
+    // window.location.href = "/login";
     return Promise.reject(err);
   }
 };
