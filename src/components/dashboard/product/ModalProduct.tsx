@@ -200,10 +200,14 @@ const ModalProduct: React.FC<ModalProduct> = ({
           images,
         });
       } else if (mode === "update") {
+        console.log("Category:", categoryId);
+        console.log("FormData:", formData);
         await mutateUpdateProduct({
           cateId: formData.id,
+
           productDTO: {
             ...formData,
+            categoryId: categoryId,
             variants: variants,
           },
           images,
@@ -246,7 +250,10 @@ const ModalProduct: React.FC<ModalProduct> = ({
       },
     ]);
     // Clear lỗi của variant mới
-    setVariantErrors((prev) => [...prev, { price: "", quantity: "", size: "" }]);
+    setVariantErrors((prev) => [
+      ...prev,
+      { price: "", quantity: "", size: "" },
+    ]);
   };
 
   if (!isOpen) return null;

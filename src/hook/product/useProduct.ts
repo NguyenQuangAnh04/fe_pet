@@ -88,7 +88,7 @@ export function useUpdateProduct() {
     },
     onError: (err) => {
       toast.error(err.message);
-      console.error(err.message);
+      console.error(err);
     },
   });
 }
