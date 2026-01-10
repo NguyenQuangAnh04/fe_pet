@@ -18,6 +18,7 @@ type FormErrors = {
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showComfirmPassword, setComfirmShowPassword] = useState(false);
+  const [check, setCheck] = useState(false);
   const [formData, setFormData] = useState<userRegister>({
     userName: "",
     email: "",
@@ -73,7 +74,10 @@ const Register = () => {
     } else if (formData.password !== formData.confirmPassword) {
       newError.confirmPassword = "Mật khẩu không khớp";
     }
-
+    if (!check) {
+      toast.error("Vui lòng chấp nhận các điều khoản");
+      return;
+    }
     setError(newError);
 
     // Nếu có lỗi thì không submit
@@ -262,6 +266,7 @@ const Register = () => {
                     type="checkbox"
                     id="terms"
                     name="terms"
+                    onClick={() => setCheck(!check)}
                     title="Chấp nhận điều khoản"
                     className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
                   />

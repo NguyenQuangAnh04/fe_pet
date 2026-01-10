@@ -12,6 +12,8 @@ import type { CartDTOItem } from "../types/cart";
 import type { ProductDTO } from "../types/product";
 import type { VariantDTO } from "../types/variant";
 import { formatPrice } from "../utils/format";
+import ProductCard from "../components/common/ProductCard";
+import { useQueryProduct } from "../hook/product/useProduct";
 
 export default function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
@@ -26,6 +28,7 @@ export default function ProductDetails() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -33,7 +36,7 @@ export default function ProductDetails() {
       const res = await findProductBySlug(slug);
       setProduct(res.data);
       console.log(res);
-
+      setCategoryId(res.data.categoryId || null);
       if (res.data?.variants && res.data.variants.length > 0) {
         setSelectedSize(res.data.variants[0]);
         setSize(0);
@@ -41,7 +44,7 @@ export default function ProductDetails() {
     };
     getData();
   }, [slug]);
-
+  const { data } = useQueryProduct({ categoryId: categoryId || undefined, size: 5 });
   const handleAddToCart = (id: number) => {
     const cartItem: CartDTOItem = {
       productId: id,
@@ -169,7 +172,8 @@ export default function ProductDetails() {
                     </p>
                     {selectedSize && (
                       <span className="text-xs">
-                        {selectedSize.stock !== undefined && selectedSize.stock > 0 ? (
+                        {selectedSize.stock !== undefined &&
+                        selectedSize.stock > 0 ? (
                           <span className="text-gray-600">
                             <Package className="w-3.5 h-3.5 inline mr-1" />
                             Còn{" "}
@@ -218,57 +222,75 @@ export default function ProductDetails() {
                 </div>
 
                 {/* Số lượng */}
-                { selectedSize?.stock !== undefined && selectedSize?.stock > 0 && (
-                  <div className="space-y-2">
-                    <p className="font-semibold text-gray-900 text-sm">
-                      Số lượng:
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden">
-                        <button
-                          disabled={quantity <= 1}
-                          onClick={() =>
-                            setQuantity((prev) => Math.max(1, prev - 1))
-                          }
-                          className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
-                        >
-                          −
-                        </button>
-                        <span className="px-4 py-2 text-base font-bold border-x-2 border-gray-300 min-w-[60px] text-center bg-gray-50">
-                          {quantity}
-                        </span>
-                        {product?.variants && product?.variants[size].stock && (
+                {selectedSize?.stock !== undefined &&
+                  selectedSize?.stock > 0 && (
+                    <div className="space-y-2">
+                      <p className="font-semibold text-gray-900 text-sm">
+                        Số lượng:
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden">
                           <button
-                            disabled={quantity >= product?.variants[size].stock}
-                            onClick={() => setQuantity((prev) => prev + 1)}
+                            disabled={quantity <= 1}
+                            onClick={() =>
+                              setQuantity((prev) => Math.max(1, prev - 1))
+                            }
                             className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
                           >
-                            +
+                            −
                           </button>
-                        )}
+                          <input
+                            type="number"
+                            min="1"
+                            max={selectedSize?.stock || 1}
+                            value={quantity}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value) || 1;
+                              const maxStock = selectedSize?.stock || 1;
+                              setQuantity(
+                                Math.min(Math.max(1, value), maxStock)
+                              );
+                            }}
+                            className="px-4 py-2 text-base font-bold border-x-2 border-gray-300 min-w-[60px] text-center bg-gray-50 focus:outline-none focus:bg-white"
+                          />
+                          {product?.variants &&
+                            product?.variants[size].stock && (
+                              <button
+                                disabled={
+                                  quantity >= product?.variants[size].stock
+                                }
+                                onClick={() => setQuantity((prev) => prev + 1)}
+                                className="px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                              >
+                                +
+                              </button>
+                            )}
+                        </div>
+                        <span className="text-xs text-gray-500">
+                          Tối đa: {selectedSize?.stock || 0}
+                        </span>
                       </div>
-                      <span className="text-xs text-gray-500">
-                        Tối đa: {selectedSize?.stock || 0}
-                      </span>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Tổng tiền */}
-                {selectedSize?.stock !== undefined && selectedSize.stock > 0 && (
-                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-semibold text-gray-700">
-                        Tổng tiền:
-                      </span>
-                      {product?.variants && product?.variants[size].price && (
-                        <span className="text-2xl font-bold text-orange-600">
-                          {formatPrice(product.variants[size].price * quantity)}
+                {selectedSize?.stock !== undefined &&
+                  selectedSize.stock > 0 && (
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-gray-700">
+                          Tổng tiền:
                         </span>
-                      )}
+                        {product?.variants && product?.variants[size].price && (
+                          <span className="text-2xl font-bold text-orange-600">
+                            {formatPrice(
+                              product.variants[size].price * quantity
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Nút hành động */}
                 <div className="space-y-2 pt-2">
@@ -326,6 +348,76 @@ export default function ProductDetails() {
               {slug && <ProductReviews slug={slug} />}
             </div>
           )}
+          <div>
+            <h1 className="mt-4 text-xl font-bold text-gray-900 mb-4 p-4">
+              Sản phẩm cùng loại
+            </h1>
+            <div className=" space-y-16">
+              <section>
+                <div className="grid grid-cols-2 gap-6 md:grid-cols-5">
+                  {data?.content
+                    ?.sort((a, b) => b.id - a.id)
+                    .slice(0, 5)
+                    .map((p) => (
+                      <div
+                        key={p.id}
+                        className="bg-white p-4 rounded-2xl cursor-pointer flex flex-col h-full shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group"
+                      >
+                        <div className="relative overflow-hidden rounded-xl">
+                          <img
+                            onClick={() =>
+                              navigate(`/product-details/${p.slug}`)
+                            }
+                            src={p.imageUrl}
+                            alt=""
+                            className="w-full h-[250px] object-cover rounded-xl transition-transform duration-500 group-hover:scale-110"
+                          />
+                          {p.imagesDTO.length > 1 && (
+                            <img
+                              onClick={() =>
+                                navigate(`/product-details/${p.slug}`)
+                              }
+                              src={p.imagesDTO?.[1]?.imageUrl ?? p.imageUrl}
+                              className="w-full h-[250px] object-cover rounded-xl absolute top-0 left-0 right-0 bottom-0 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                              alt=""
+                            />
+                          )}
+                          {/* Badge */}
+                         
+                        </div>
+                        <p className="font-semibold text-gray-800 line-clamp-2 mt-4 min-h-[3rem] group-hover:text-green-600 transition-colors">
+                          {p.namePro}
+                        </p>
+
+                        {/* Rating */}
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${
+                                  star <= Math.round(p.averageRating || 0)
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-200"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs font-medium text-gray-500">
+                            ({(p.averageRating || 0).toFixed(1)})
+                          </span>
+                        </div>
+
+                        <p className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500 mt-auto pt-3">
+                          {p.price.toLocaleString("vi-VN")}₫
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </section>
+             
+            </div>
+          </div>
         </div>
       </div>
       <Footer />

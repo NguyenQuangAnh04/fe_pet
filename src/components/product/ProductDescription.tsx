@@ -1,8 +1,10 @@
+import React from "react";
 import type { ProductDTO } from "../../types/product";
 type ProductDescriptionProps = {
   product: ProductDTO;
 };
 const ProductDescription = ({ product }: ProductDescriptionProps) => {
+  const [showAllDescription, setShowAllDescription] = React.useState(false);
   // mô tả sản phẩm
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -13,8 +15,18 @@ const ProductDescription = ({ product }: ProductDescriptionProps) => {
           </h3>
           <p className="text-gray-700 leading-relaxed mb-4 whitespace-pre-line">
             {/* {product.categoryName} */}
-            {product.description}
+            {showAllDescription
+              ? product.description
+              : `${product.description.slice(0, 100)}...`}
           </p>
+          <div className="flex items-center justify-center">
+            <button
+              className="text-blue-500 hover:underline text-center"
+              onClick={() => setShowAllDescription(!showAllDescription)}
+            >
+              {showAllDescription ? "Thu gọn" : "Xem thêm"}
+            </button>
+          </div>
 
           {/* <h4 className="text-md font-semibold text-gray-900 mb-2">Lợi ích chính:</h4>
           <ul className="list-disc list-inside space-y-2 text-gray-700">

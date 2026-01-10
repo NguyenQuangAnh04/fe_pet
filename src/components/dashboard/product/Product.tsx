@@ -47,7 +47,7 @@ const Product = () => {
           icon: "success",
           title: "Đã xóa!",
           text: "Sản phẩm đã được xóa thành công.",
-          timer: 1500,
+          timer: 1000,
           showConfirmButton: false,
         });
       } catch (error: any) {
