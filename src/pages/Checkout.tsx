@@ -175,7 +175,16 @@ export default function Checkout() {
       setIsSubmitting(false);
     }
   };
-  const {user} = useAuth();
+  const { user } = useAuth();
+  useEffect(() => {
+    if (user?.phoneNumber) {
+      setFormData((prev) => ({
+        ...prev,
+        phoneNumber: user.phoneNumber,
+      }));
+    }
+  }, [user]);
+
   const totalMoney = (cart ?? []).reduce(
     (sum, item) => sum + (item.product?.price || 0) * (item.quantity ?? 1),
     0
@@ -259,7 +268,7 @@ export default function Checkout() {
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                           type="tel"
-                          value={formData?.phoneNumber || user?.phoneNumber || ""}
+                          value={formData?.phoneNumber || ""}
                           onChange={(e) =>
                             handleInputChange("phoneNumber", e.target.value)
                           }
