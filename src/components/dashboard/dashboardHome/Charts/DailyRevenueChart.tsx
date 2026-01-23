@@ -23,7 +23,8 @@ interface DailyRevenueChartProps {
 function normalizeLast7Days(data: any[]) {
   const map = new Map();
   data.forEach((item) => {
-    map.set(item.date, item); // item.date dạng "02/12"
+    // item.date được format thành "DD/MM"
+    map.set(item.date, item);
   });
 
   const result = [];
@@ -33,10 +34,10 @@ function normalizeLast7Days(data: any[]) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
 
-    const dateString =
-      String(d.getDate()).padStart(2, "0") +
-      "/" +
-      String(d.getMonth() + 1).padStart(2, "0");
+    // Format ngày dưới dạng DD/MM để match với data được gửi từ BE
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const dateString = `${day}/${month}`;
 
     result.push(
       map.get(dateString) || {

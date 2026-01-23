@@ -79,19 +79,31 @@ export default function Dashboard() {
   }, [appointMonthly, monthsBase]);
 
   const dailyOrderData = useMemo(() =>
-    (orderDaily ?? []).map((d) => ({
-      date: d.date ? new Date(d.date).toLocaleDateString() : "",
-      revenue: d.revenue ?? 0,
-      count: d.orderCount ?? 0,
-    })),
+    (orderDaily ?? []).map((d) => {
+      if (!d.date) return { date: "", revenue: 0, count: 0 };
+      const date = new Date(d.date);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      return {
+        date: `${day}/${month}`,
+        revenue: d.revenue ?? 0,
+        count: d.orderCount ?? 0,
+      };
+    }),
     [orderDaily]);
 
   const dailyAppointData = useMemo(() =>
-    (appointDaily ?? []).map((d) => ({
-      date: d.date ? new Date(d.date).toLocaleDateString() : "",
-      revenue: d.revenue ?? 0,
-      count: d.appointCount ?? 0,
-    })),
+    (appointDaily ?? []).map((d) => {
+      if (!d.date) return { date: "", revenue: 0, count: 0 };
+      const date = new Date(d.date);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      return {
+        date: `${day}/${month}`,
+        revenue: d.revenue ?? 0,
+        count: d.appointCount ?? 0,
+      };
+    }),
     [appointDaily]);
 
   const dailyData = dailyChartType === "order" ? dailyOrderData : dailyAppointData;
